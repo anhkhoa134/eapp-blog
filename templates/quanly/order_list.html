@@ -153,8 +153,8 @@
     </div>
 
     {% for order in page_obj %}
-    <div class="modal fade" id="detailorderModal-{{ order.id }}" tabindex="-1" aria-labelledby="detailorderModalLabel-{{ order.id }}" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+    <div class="modal fade order-detail-modal" id="detailorderModal-{{ order.id }}" tabindex="-1" aria-labelledby="detailorderModalLabel-{{ order.id }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="detailorderModalLabel-{{ order.id }}">Chi tiết đơn hàng</h1>
@@ -162,13 +162,13 @@
                 </div>
 
                 <div class="modal-body">
-                    <div class="text-start mb-2">
+                    <div class="order-detail-recipient text-start mb-3">
                         <b>Người nhận: </b>{{ order.fullname }} <br>
                         <b>Điện thoại: </b><a href="tel:{{ order.phone }}">{{ order.phone }}</a> <br>
                         <b>Địa chỉ: </b>{{ order.shipping_address }}
                     </div>
 
-                    <div class="site-blocks-table rounded">
+                    <div class="site-blocks-table order-detail-table table-responsive rounded">
                         <table class="table">
                             <thead>
                                 <tr>
@@ -181,7 +181,7 @@
                             <tbody>
                                 {% for item in order.items.all %}
                                 <tr>
-                                    <td class="text-start">{{ item.product.get_icon }} {{ item.product.name }}</td>
+                                    <td class="order-detail-product text-start">{{ item.product.get_icon }} {{ item.product.name }}</td>
                                     <td>{{ item.price }}<sup><u>đ</u></sup></td>
                                     <td>{{ item.quantity }}</td>
                                     <td>{{ item.subtotal }}<sup><u>đ</u></sup></td>
@@ -191,7 +191,7 @@
                         </table>
                     </div>
 
-                    <div class="text-end me-4">
+                    <div class="order-detail-total text-end">
                         <b>Tổng: </b>{{order.total_price}}<sup><u>đ</u></sup>
                     </div>
                 </div>

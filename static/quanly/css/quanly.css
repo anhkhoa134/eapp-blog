@@ -1462,6 +1462,51 @@ a.card-title:hover, button.card-title:hover {
   padding: 28px !important;
 }
 
+.order-detail-modal .modal-body {
+  padding-bottom: 24px !important;
+}
+
+.order-detail-recipient {
+  color: #334155;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.order-detail-table {
+  margin-bottom: 22px;
+}
+
+.order-detail-table .table {
+  min-width: 680px;
+  table-layout: fixed;
+}
+
+.order-detail-table th,
+.order-detail-table td {
+  vertical-align: middle;
+}
+
+.order-detail-table th:first-child,
+.order-detail-table td:first-child {
+  width: 42%;
+}
+
+.order-detail-product img {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+.order-detail-total {
+  color: var(--text-main);
+  font-size: 17px;
+  font-weight: 600;
+  padding-right: 28px;
+}
+
 /* Modal form controls */
 .modal-body p {
   margin-bottom: 18px !important;

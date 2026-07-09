@@ -2,7 +2,7 @@
 
 Phiên bản: 2026-07-09
 
-Tài liệu này ghi lại trạng thái codebase sau khi tách app ecommerce cũ thành các app theo domain. Project đã chọn hướng **reset DB dev/local**, nên migration hiện tại là bộ `0001_initial.py` sạch cho từng app domain.
+Tài liệu này ghi lại trạng thái codebase sau khi tách app ecommerce cũ thành các app theo domain. Project đã chọn hướng **reset DB dev/local** cho baseline refactor, nên mỗi app domain bắt đầu bằng bộ `0001_initial.py` sạch; các thay đổi nghiệp vụ sau refactor được ghi bằng migration tăng dần.
 
 ## Trạng Thái Hiện Tại
 
@@ -39,10 +39,10 @@ Không còn module URL trung gian giữ namespace legacy.
 | App | Trách nhiệm chính |
 | --- | --- |
 | `App_Core` | Trang home/static, contact, upload CKEditor, middleware, sitemap, constants, helper storage/model utils, `PageView` |
-| `App_Account` | Đăng ký/đăng nhập/đăng xuất, profile, checkout info, password reset, password validation, Google SocialApp setup |
-| `App_Product` | Product/category/subcategory, variant/attribute, specs/photos, cart, checkout, order, payment method, wishlist, compare, review |
+| `App_Account` | Đăng ký/đăng nhập/đăng xuất, profile, checkout info, password reset, password validation, Google SocialApp setup, merge giỏ hàng/yêu thích guest sau đăng nhập |
+| `App_Product` | Product/category/subcategory, variant/attribute, specs/photos, cart, checkout, order, payment method, wishlist, compare, review, helper truy cập cart/wishlist theo user hoặc session |
 | `App_Post` | Subject/subsubject, post, post photo/content, comment, reply |
-| `App_Quanly` | Dashboard/quản trị nghiệp vụ, menu config, import sản phẩm, seed dữ liệu quản lý |
+| `App_Quanly` | Dashboard/quản trị nghiệp vụ, menu config, cấu hình thương mại, import sản phẩm, seed dữ liệu quản lý |
 
 ## Model Ownership
 
@@ -88,6 +88,7 @@ Không còn module URL trung gian giữ namespace legacy.
 `App_Quanly.models`:
 
 - `QuanlyMenuConfig`
+- `CommerceBehaviorConfig`
 
 ## URL Namespace Chuẩn
 
@@ -113,14 +114,38 @@ Code phụ trợ đã nằm cùng app domain:
 - `App_Account/forms.py`: account/profile/password forms
 - `App_Product/forms.py`: product/cart/order/payment/review forms
 - `App_Product/filters.py`: product/order filters
+- `App_Product/cart_access.py`: helper chuẩn cho cart/wishlist theo user hoặc session guest
 - `App_Post/forms.py`: post/comment/reply forms
 - `App_Post/filters.py`: post filters
 - `App_Core/middleware.py`: security/upload/pageview middleware
 - `App_Core/storage.py`: storage/upload path helpers
 - `App_Core/sitemap.py`: sitemap classes
+- `App_Core/context_processors.py`: expose `commerce_config`, cart badge/count dùng chung
 - `App_Account/password_validation.py`: password strength helpers
 
 Khi thêm form/filter/admin mới, đặt trong app sở hữu model đó.
+
+## Cấu Hình Thương Mại
+
+`App_Quanly.models.CommerceBehaviorConfig` là cấu hình singleton cho hành vi thương mại:
+
+- `allow_guest_cart`: cho phép khách chưa đăng nhập thêm giỏ hàng và đi tới checkout.
+- `allow_guest_wishlist`: cho phép khách chưa đăng nhập thêm sản phẩm yêu thích.
+
+Luồng cart/wishlist không đọc trực tiếp `request.user.cart` ở view/template mới. Dùng `App_Product.cart_access`:
+
+- `commerce_behavior()`
+- `get_cart_for_request(request, create=False)`
+- `get_owned_cart_item(request, cart_item_id)`
+- `wishlist_product_ids(request)`
+- `get_wishlist_items_for_request(request)`
+- `add_product_to_wishlist(request, product)`
+- `remove_product_from_wishlist(request, product)`
+- `merge_guest_commerce_to_user(request, user, old_session_key)`
+
+`Cart` và `Wishlist` hỗ trợ cả owner là user và owner là `session_key`. Khi khách đăng nhập, `App_Account.views.login_user` gọi `merge_guest_commerce_to_user` để gom cart/wishlist guest vào tài khoản.
+
+Checkout guest chỉ bật khi `allow_guest_cart=True`. Order guest lưu `Order.user=None`, bắt buộc số điện thoại, email không bắt buộc, và quyền xem `order_success` được giữ bằng `request.session['guest_order_ids']`. Trang quản lý đơn hàng phải xử lý `order.user is None` như "Khách vãng lai".
 
 ## Static Assets
 
@@ -183,8 +208,10 @@ Trạng thái migration:
 - `App_Core/migrations/0001_initial.py`
 - `App_Account/migrations/0001_initial.py`
 - `App_Product/migrations/0001_initial.py`
+- `App_Product/migrations/0002_cart_session_key_wishlist_session_key_and_more.py`
 - `App_Post/migrations/0001_initial.py`
 - `App_Quanly/migrations/0001_initial.py`
+- `App_Quanly/migrations/0002_commercebehaviorconfig.py`
 
 DB SQLite cũ đã từng được backup trước khi reset, sau đó đã xoá theo quyết định dọn local:
 
@@ -230,4 +257,6 @@ rg -n "url 'App_ecom:|url \"App_ecom:" templates App_* Project --glob '!*.pyc'
 - Không tạo namespace legacy để che lỗi template.
 - Không đặt model ở app không sở hữu domain.
 - Không tạo migration phụ thuộc app legacy.
+- Không bypass `App_Product.cart_access` khi sửa cart/wishlist/checkout; helper này là nơi giữ logic user/session guest.
+- Khi thêm luồng checkout hoặc đơn hàng guest, luôn xử lý `Order.user=None` và kiểm tra quyền truy cập bằng session guest hoặc user owner.
 - Nếu cần khôi phục dữ liệu từ backup DB, làm thành task riêng và viết migration/import script rõ ràng.
