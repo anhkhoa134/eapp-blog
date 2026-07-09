@@ -1,0 +1,17 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /quan-ly/
+Disallow: /quanly/
+Disallow: /gio-hang/
+Disallow: /thanh-toan/
+Disallow: /don-hang/
+Disallow: /dang-nhap/
+Disallow: /dang-ky/
+Disallow: /thong-tin-tai-khoan/
+Disallow: /dia-chi-giao-hang/
+Disallow: /don-hang-da-mua/
+Disallow: /dat-lai-mat-khau/
+Disallow: /htmx/
+Disallow: /*?*
+
+Sitemap: {{ request.scheme }}://{{ request.get_host }}/sitemap.xml

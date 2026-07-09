@@ -1,0 +1,24 @@
+<script>
+    (function () {
+        const select = document.getElementById('payment_method');
+        const info = document.querySelector('[data-payment-method-info]');
+        const cards = document.querySelectorAll('[data-payment-card]');
+
+        if (!select || !info || !cards.length) {
+            return;
+        }
+
+        const updatePaymentInfo = () => {
+            let hasActiveCard = false;
+            cards.forEach((card) => {
+                const isActive = card.dataset.paymentCard === select.value;
+                card.hidden = !isActive;
+                hasActiveCard = hasActiveCard || isActive;
+            });
+            info.hidden = !hasActiveCard;
+        };
+
+        select.addEventListener('change', updatePaymentInfo);
+        updatePaymentInfo();
+    })();
+</script>

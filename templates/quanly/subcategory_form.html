@@ -1,0 +1,23 @@
+<form class="modal-content" hx-post="{{ request.path }}" hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' enctype="multipart/form-data">
+    <div class="modal-header">
+        {% if current_subcategory %}
+            <h5 class="modal-title">Sửa danh mục phụ: <b>{{current_subcategory.name}}</b></h5>
+        {% else %}
+            <h5 class="modal-title">Thêm danh mục phụ</h5>
+        {% endif %}
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        {{subcategory_form.media}}
+        {{subcategory_form.as_p}}
+    </div>
+    <div class="modal-footer">
+        {% if current_subcategory %}
+            <button type="button" class="btn btn-danger" hx-post="{% url 'quanly:delete_subcategory' current_subcategory.id %}">Xóa</button><span class="flex-grow-1"></span> <!-- để nút Remove nằm bên trái -->
+        {% endif %}
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="submit" class="btn btn-primary">Lưu</button>
+    </div>
+ </form>
+ 
+ 

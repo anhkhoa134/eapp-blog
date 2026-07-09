@@ -1,0 +1,55 @@
+/* Style cho blockquote */
+blockquote {
+    font-style: italic;
+    border-left: 5px solid #ccc;
+    margin: 10px 0;
+    padding-left: 10px;
+}
+
+/* Style cho bảng (table) */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+table th, table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+
+
+
+/* Style cho font size */
+p {
+    font-size: 16px; /* Bạn có thể thay đổi kích thước mặc định */
+}
+
+/* Style cho mediaEmbed (iframe) */
+iframe {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Style cho blockquote */
+blockquote {
+    font-style: italic;
+    border-left: 5px solid #ccc;
+    margin: 10px 0;
+    padding-left: 10px;
+}
+
+/* Style cho bảng (table) */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+table th, table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}

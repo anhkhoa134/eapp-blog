@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Thông tin tài khoản{% endblock title %}
+
+{% block content %}
+<main class="container page-shell">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Trang Chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Thông Tin Tài Khoản</li>
+        </ol>
+    </nav>
+
+    <section class="page-hero">
+        <div>
+            <span class="page-kicker"><i class="bi bi-person-circle"></i> Tài khoản</span>
+            <h1 class="page-title">Thông tin tài khoản</h1>
+            <p class="page-subtitle">Cập nhật thông tin liên hệ để PTcom hỗ trợ đơn hàng và khôi phục tài khoản khi cần.</p>
+        </div>
+    </section>
+
+    <section class="row g-4 account-layout">
+        {% include 'partials/account_sidebar.html' %}
+
+        <div class="col-xl-9 col-lg-8">
+            <form method="POST" action=".">
+                {% csrf_token %}
+                <div class="account-card">
+                    <h2 class="account-card__title">Hồ sơ cá nhân</h2>
+                    <p class="account-card__subtitle">Các trường có dấu * được dùng cho liên hệ và xác nhận đơn hàng.</p>
+
+                    <div class="account-form-grid">
+                        <div>
+                            <label>Họ tên <span class="text-danger">*</span></label>
+                            <input type="text" name="fullname" value="{{ profile.fullname }}" required class="form-control" placeholder="Họ tên">
+                        </div>
+                        <div>
+                            <label>Số điện thoại <span class="text-danger">*</span></label>
+                            <input type="text" name="phone" value="{{ profile.phone }}" required class="form-control" placeholder="Số điện thoại">
+                        </div>
+                        <div class="full">
+                            <label>Địa chỉ <span class="text-danger">*</span></label>
+                            <input type="text" name="address" value="{{ profile.address }}" required class="form-control" placeholder="Địa chỉ">
+                        </div>
+                        <div class="full">
+                            <label>Email <span class="text-warning">*</span></label>
+                            <small class="d-block text-muted mb-2">Dùng để khôi phục mật khẩu.</small>
+                            <input type="email" name="email" value="{{ request.user.email }}" class="form-control" placeholder="Email">
+                        </div>
+                        <div>
+                            <label>Ngày sinh</label>
+                            <input type="date" name="birthday" class="form-control" value="{{ profile.birthday|date:'Y-m-d' }}" id="birthdayInput">
+                        </div>
+                        <div>
+                            <label>Giới tính</label>
+                            <select name="gender" class="form-select">
+                                {% if profile.gender == 'Nam' %}
+                                    <option value="Nam">Nam</option>
+                                    <option value="Nữ">Nữ</option>
+                                    <option value="Khác">Khác</option>
+                                {% elif profile.gender == 'Nữ' %}
+                                    <option value="Nữ">Nữ</option>
+                                    <option value="Nam">Nam</option>
+                                    <option value="Khác">Khác</option>
+                                {% elif profile.gender == 'Khác' %}
+                                    <option value="Khác">Khác</option>
+                                    <option value="Nam">Nam</option>
+                                    <option value="Nữ">Nữ</option>
+                                {% else %}
+                                    <option value="Chọn giới tính">Chọn giới tính</option>
+                                    <option value="Nam">Nam</option>
+                                    <option value="Nữ">Nữ</option>
+                                    <option value="Khác">Khác</option>
+                                {% endif %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="account-actions">
+                        <button type="button" data-bs-toggle="modal" data-bs-target="#logoutModal" class="btn btn-outline-secondary">Đăng xuất</button>
+                        <button type="submit" class="btn btn-primary px-4">Lưu thay đổi</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+</main>
+
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Đăng xuất</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                Thoát khỏi tài khoản này và quay lại trang chủ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Huỷ</button>
+                <a href="{% url 'account:logout' %}" class="btn btn-primary">Thoát</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const birthdayInput = document.getElementById('birthdayInput');
+    if (birthdayInput && !birthdayInput.value) {
+        birthdayInput.setAttribute('value', new Date().toISOString().split('T')[0]);
+    }
+</script>
+{% endblock content %}

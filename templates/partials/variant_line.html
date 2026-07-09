@@ -1,0 +1,21 @@
+<span class="cart-product__icon">
+    {% if product %}
+        {{ product.get_icon }}
+    {% else %}
+        <i class="bi bi-box"></i>
+    {% endif %}
+</span>
+<span class="cart-product__body">
+    <span class="fw-semibold text-dark">
+        {% if product %}
+            {{ product.name }}
+        {% elif variant %}
+            {{ variant.name }}
+        {% else %}
+            Sản phẩm
+        {% endif %}
+    </span>
+    {% if variant %}
+        <span class="cart-product__variant">{{ variant.attribute_summary }}</span>
+    {% endif %}
+</span>

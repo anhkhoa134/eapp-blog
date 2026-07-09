@@ -1,0 +1,128 @@
+<section class="category-section container">
+    <div class="section-head">
+        <h2 class="section-title">Danh Mục Sản Phẩm</h2>
+        <a class="view-all" href="{% url 'product:product_all' %}">Xem tất cả <i class="fa fa-arrow-right ml-1"></i></a>
+    </div>
+    <button type="button" class="control-btn prev-btn" aria-label="Danh mục trước">
+        <i class="bi bi-chevron-left"></i>
+    </button>
+    <div class="category-wrapper">
+        <div class="category-list">
+            {% for category in categories %}
+                <div class="category-item">
+                    <a href="{% url 'product:product_all' category.slug %}" class="category-card text-decoration-none">
+                        <img src="{{ category.get_image }}" alt="{{ category.name }}" width="280" height="280" loading="lazy">
+                        <div class="category-content">
+                            <h5 class="category-name m-0">{{ category.name }}</h5>
+                            <p class="category-count text-center m-0">{{ category.products.count }} sản phẩm</p>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <button type="button" class="control-btn next-btn" aria-label="Danh mục sau">
+        <i class="bi bi-chevron-right"></i>
+    </button>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const section = document.querySelector('.category-section');
+        if (!section) {
+            return;
+        }
+        const prevBtn = section.querySelector('.prev-btn');
+        const nextBtn = section.querySelector('.next-btn');
+        const categoryList = section.querySelector('.category-list');
+        const categoryItems = section.querySelectorAll('.category-item');
+        const totalItems = categoryItems.length;
+
+        if (!prevBtn || !nextBtn || !categoryList || totalItems === 0) {
+            return;
+        }
+
+        let currentIndex = 0;
+        let autoSlideInterval;
+
+        function getItemsPerView() {
+            const width = window.innerWidth;
+            if (width >= 992) {
+                return 4;
+            }
+            if (width >= 768) {
+                return 3;
+            }
+            return 2;
+        }
+
+        let itemsPerView = getItemsPerView();
+
+        function getMaxIndex() {
+            return Math.max(0, totalItems - itemsPerView);
+        }
+
+        function updateSlider() {
+            const first = categoryItems[0];
+            if (!first || !categoryList) {
+                return;
+            }
+            const itemWidth = first.clientWidth;
+            categoryList.style.transform = 'translateX(-' + (currentIndex * itemWidth) + 'px)';
+        }
+
+        function startAutoSlide() {
+            clearInterval(autoSlideInterval);
+            if (getMaxIndex() <= 0) {
+                return;
+            }
+            autoSlideInterval = setInterval(function () {
+                if (currentIndex < getMaxIndex()) {
+                    currentIndex++;
+                } else {
+                    currentIndex = 0;
+                }
+                updateSlider();
+            }, 5000);
+        }
+
+        function stopAutoSlide() {
+            clearInterval(autoSlideInterval);
+        }
+
+        window.addEventListener('resize', function () {
+            itemsPerView = getItemsPerView();
+            currentIndex = Math.min(currentIndex, getMaxIndex());
+            updateSlider();
+            startAutoSlide();
+        });
+
+        nextBtn.addEventListener('click', function () {
+            stopAutoSlide();
+            if (currentIndex < getMaxIndex()) {
+                currentIndex++;
+            } else {
+                currentIndex = 0;
+            }
+            updateSlider();
+            startAutoSlide();
+        });
+
+        prevBtn.addEventListener('click', function () {
+            stopAutoSlide();
+            if (currentIndex > 0) {
+                currentIndex--;
+            } else {
+                currentIndex = getMaxIndex();
+            }
+            updateSlider();
+            startAutoSlide();
+        });
+
+        section.addEventListener('mouseenter', stopAutoSlide);
+        section.addEventListener('mouseleave', startAutoSlide);
+
+        updateSlider();
+        startAutoSlide();
+    });
+</script>

@@ -1,0 +1,30 @@
+{% load static %}
+{% load custom_tags %}
+
+<div class="col-xl-3 col-lg-4">
+    <aside class="account-sidebar">
+        <img src="{{ request.user.profile.get_image }}" class="account-avatar" alt="{{ request.user.username }}">
+        <div class="account-user">
+            <span>Tài khoản của</span>
+            <strong>{{ request.user.username }}</strong>
+        </div>
+
+        <nav class="account-nav" aria-label="Tài khoản">
+            <a class="{% if request.path|strip_slashes == 'thong-tin-tai-khoan' %}active{% endif %}" href="{% url 'account:edit_profile' %}">
+                <i class="bi bi-person-circle"></i> Thông tin tài khoản
+            </a>
+            <a class="{% if request.path|strip_slashes == 'dia-chi-giao-hang' %}active{% endif %}" href="{% url 'account:edit_info' %}">
+                <i class="bi bi-geo-alt"></i> Địa chỉ giao hàng
+            </a>
+            <a class="{% if request.path|strip_slashes == 'don-hang-da-mua' %}active{% endif %}" href="{% url 'account:order_cus' %}">
+                <i class="bi bi-bag-check"></i> Đơn hàng đã mua
+            </a>
+            <a class="{% if request.path|strip_slashes == 'wishlist' %}active{% endif %}" href="{% url 'product:wishlist_view' %}">
+                <i class="bi bi-heart"></i> Sản phẩm yêu thích
+            </a>
+            <a class="{% if request.path|strip_slashes == 'doi-mat-khau' %}active{% endif %}" href="{% url 'account:change_password' %}">
+                <i class="bi bi-lock"></i> Đổi mật khẩu
+            </a>
+        </nav>
+    </aside>
+</div>

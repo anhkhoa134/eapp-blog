@@ -1,0 +1,91 @@
+<div id="contact-list-container">
+
+    <!-- Filter Form -->
+    <!-- <div class="col-12">
+        <form hx-get="{% url 'quanly:contact_list' %}" hx-target="#contact-list-container"> 
+            <div class="row">
+                <div class="col-lg-5 col-md-6">
+                    <div class="d-flex justify-content-between">
+                        {{form.category}}
+                        {{form.is_stock}}
+                    </div>
+                </div>
+
+                <div class="col-lg-5 col-md-6">
+                    <div class="d-flex justify-content-between">
+                        <select name="sort_by" class="form-select">
+                            <option value="-id" {% if request.GET.sort_by == '-id' %}selected{% endif %}>Sản phẩm mới nhất</option>
+                            <option value="id" {% if request.GET.sort_by == 'id' %}selected{% endif %}>Sản phẩm cũ nhất</option>
+                            <option value="name_asc" {% if request.GET.sort_by == 'name_asc' %}selected{% endif %}>Tên: A -> Z</option>
+                            <option value="name_desc" {% if request.GET.sort_by == 'name_desc' %}selected{% endif %}>Tên: Z -> A</option>
+                            <option value="price_asc" {% if request.GET.sort_by == 'price_asc' %}selected{% endif %}>Giá tăng dần</option>
+                            <option value="price_desc" {% if request.GET.sort_by == 'price_desc' %}selected{% endif %}>Giá giảm dần</option>
+                        </select>    
+
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <div class="d-flex justify-content-end">
+                        <input type="submit" value="Lọc" class="btn btn-primary me-2">
+                        <a class="btn btn-secondary" href="{% url 'quanly:contact_view' %}">Hủy</a>
+                    </div>
+                </div>
+        
+            </div>
+        </form>
+    </div>
+    <br> -->
+
+    <!-- Contact List -->
+    <div class="col-12">
+        <div class="card recent-sales overflow-auto">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <h5 class="card-title">Liên hệ</h5>
+                    
+                    <a type="button" class="card-title" href="{% url 'quanly:profile_quanly' %}">
+                        <i class="bi bi-pencil-square"></i> Email quản lý: <span class="fw-bold">{{ profile.email }}</span>
+                    </a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-borderless table-hover text-center align-middle">
+                        <thead>
+                            <tr>
+                                <th>Họ tên</th>
+                                <th>Điện thoại</th>
+                                <th>Email</th>
+                                <th>Nội dung</th>
+                                <th>Ngày</th>
+                                <th>Xoá</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for contact in page_obj_contact %}
+                            <tr id="contact-{{contact.id}}">
+                                <td>{{ contact.name }}</td>
+                                <td><a href="tel:{{ contact.phone }}">{{ contact.phone }}</a></td>
+                                <td><a href="mailto:{{ contact.email }}">{{ contact.email }}</a></td>
+                                <td>{{ contact.message|truncatechars:20 }}</td>
+                                <td>{{ contact.created_at|date:"H:i d-m-Y" }}</td>
+                                <td>
+                                    <a style="cursor: pointer;" class="link-danger"
+                                        hx-get="{% url 'quanly:delete_contact' contact.id %}"
+                                        hx-target="#dialog"> 
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td> 
+                            </tr> 
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% include 'quanly/pagination.html' with page_obj=page_obj_contact %}
+
+</div>

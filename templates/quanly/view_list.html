@@ -1,0 +1,30 @@
+<div id="view-list-container">
+    <div class="col-12">
+        <div class="card recent-sales overflow-auto">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <h5 class="card-title">Truy cập</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-borderless table-hover text-center align-middle">
+                        <thead>
+                            <tr>
+                                <th>URL</th>
+                                <th>Số lượt truy cập</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for page_view in page_obj_view %}
+                            <tr>
+                                <td>{{ page_view.path }}</td>
+                                <td>{{ page_view.view_count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include 'quanly/pagination.html' with page_obj=page_obj_view %}
+</div>

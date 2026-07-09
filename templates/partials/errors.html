@@ -1,0 +1,17 @@
+{% if form.errors %}
+    {% for field in form %}
+        {% for error in field.errors %}
+            <div class="alert alert-danger d-flex align-items-center" role="alert">
+                <!-- <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"></use></svg> -->
+                <div>{{field.name}} {{ error|escape }}</div>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    {% for error in form.non_field_errors %}
+        <div class="alert alert-danger d-flex align-items-center" role="alert">
+            <!-- <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"></use></svg> -->
+            <div>{{field.name}} {{ error|escape }}</div>
+        </div>
+    {% endfor %}
+{% endif %}

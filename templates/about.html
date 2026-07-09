@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Giới Thiệu{% endblock title %}
+
+{% block meta %}
+{% include 'partials/meta.html' %}
+{% endblock meta %}
+
+{% block content %}
+<main class="container page-shell">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Trang Chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Giới Thiệu</li>
+        </ol>
+    </nav>
+
+    <section class="page-hero">
+        <div>
+            <span class="page-kicker"><i class="bi bi-shop"></i> Về PTcom</span>
+            <h1 class="page-title">Cửa hàng công nghệ tại Hóc Môn</h1>
+            <p class="page-subtitle">PTCOM chuyên mua bán điện thoại, laptop, camera giám sát, phụ kiện và thiết bị thông minh với tư vấn rõ ràng, giá hợp lý và dịch vụ sau bán hàng tận tâm.</p>
+        </div>
+        <a href="{% url 'product:product_all' %}" class="btn btn-primary">
+            <i class="bi bi-grid me-1"></i> Xem sản phẩm
+        </a>
+    </section>
+
+    <section class="row g-4 align-items-center">
+        <div class="col-lg-6">
+            <img src="{% static 'website/img/hero-2.webp' %}" alt="Cửa hàng PTcom" class="img-fluid rounded shadow-sm">
+        </div>
+        <div class="col-lg-6">
+            <div class="about-panel">
+                <h2 class="h3 mb-3">Thiết bị phù hợp cho nhu cầu thật</h2>
+                <p>PTcom hỗ trợ khách hàng chọn đúng sản phẩm theo ngân sách, mục đích sử dụng và yêu cầu bảo hành. Chúng tôi phục vụ tại cửa hàng ở Hóc Môn, TP.HCM và kênh bán hàng trực tuyến.</p>
+                <p class="mb-4">Từ tư vấn trước mua, giao hàng, đổi trả đến bảo hành, mỗi bước được xử lý minh bạch để khách hàng yên tâm sử dụng sản phẩm lâu dài.</p>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{% url 'product:product_all' %}" class="btn btn-primary">Xem Sản Phẩm</a>
+                    <a href="{% url 'core:contact' %}" class="btn btn-outline-primary">Liên Hệ</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="mt-5">
+        <div class="section-head">
+            <h2 class="section-title">Cam kết của chúng tôi</h2>
+        </div>
+        <div class="row g-3">
+            <div class="col-6 col-lg-3">
+                <div class="about-feature">
+                    <i class="fa fa-check"></i>
+                    <h3 class="h6">Chất lượng cao</h3>
+                    <p class="mb-0 small text-muted">Sản phẩm rõ nguồn gốc, thông tin minh bạch.</p>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="about-feature">
+                    <i class="fa fa-shipping-fast"></i>
+                    <h3 class="h6">Giao hàng nhanh</h3>
+                    <p class="mb-0 small text-muted">Hỗ trợ giao hàng toàn quốc theo đơn hàng.</p>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="about-feature">
+                    <i class="fas fa-exchange-alt"></i>
+                    <h3 class="h6">Đổi trả 7 ngày</h3>
+                    <p class="mb-0 small text-muted">Quy trình xử lý rõ ràng, thuận tiện.</p>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="about-feature">
+                    <i class="fa fa-phone-volume"></i>
+                    <h3 class="h6">Hỗ trợ tận tâm</h3>
+                    <p class="mb-0 small text-muted">Tư vấn trước và sau khi mua sản phẩm.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="mt-5">
+        <div class="section-head">
+            <h2 class="section-title">Vì sao chọn PTcom</h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="about-panel h-100">
+                    <i class="fa fa-tags text-primary mb-3 fs-3"></i>
+                    <h3 class="h5">Giá tốt mỗi ngày</h3>
+                    <p class="mb-0">Cập nhật giá theo thị trường, nhiều khuyến mãi cho khách hàng thân thiết và đơn hàng số lượng lớn.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="about-panel h-100">
+                    <i class="fa fa-shield-alt text-primary mb-3 fs-3"></i>
+                    <h3 class="h5">Chính hãng & bảo hành</h3>
+                    <p class="mb-0">Sản phẩm có nguồn gốc rõ ràng, đầy đủ hóa đơn và được bảo hành theo tiêu chuẩn phù hợp.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="about-panel h-100">
+                    <i class="fa fa-headset text-primary mb-3 fs-3"></i>
+                    <h3 class="h5">Tư vấn đúng nhu cầu</h3>
+                    <p class="mb-0">Đội ngũ am hiểu sản phẩm, hỗ trợ chọn thiết bị đúng mục đích sử dụng và ngân sách.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="row g-4 align-items-center mt-5">
+        <div class="col-lg-5">
+            <div class="about-panel">
+                <h2 class="h3 mb-3">Ghé thăm cửa hàng</h2>
+                <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-2"></i>88 Bùi Công Trừng, Đông Thạnh, Hóc Môn, TP.HCM</p>
+                <p class="mb-2"><i class="fa fa-envelope text-primary mr-2"></i><a href="mailto:ptcom88a@gmail.com">ptcom88a@gmail.com</a></p>
+                <p class="mb-4"><i class="fa fa-phone-alt text-primary mr-2"></i><a href="tel:0938717380">0938.717.380</a></p>
+                <a href="{% url 'core:contact' %}" class="btn btn-primary">Gửi Tin Nhắn</a>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <iframe class="map-frame"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d510.2171345534269!2d106.65084892661815!3d10.90838644738967!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3174d669c888896f%3A0xf7f24c48be6324d2!2zODggQsO5aSBDw7RuZyBUcuG7q25nLCDEkMO0bmcgVGjhuqFuaCwgSMOzYyBNw7RuLCBI4buTIENow60gTWluaA!5e0!3m2!1sen!2s!4v1736740556746!5m2!1sen!2s"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                title="Bản đồ cửa hàng PTcom">
+            </iframe>
+        </div>
+    </section>
+</main>
+{% endblock content %}

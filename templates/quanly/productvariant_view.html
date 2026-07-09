@@ -1,0 +1,43 @@
+{% extends 'quanly/quanly.html' %}
+{% load static %}
+{% load custom_tags %}
+{% block title %}Biến thể{% endblock title %}
+
+{% block content %}
+
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h1>Biến Thể</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'quanly:dashboard' %}">Quản lý</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'quanly:product_view' %}">Sản phẩm</a></li>
+                <li class="breadcrumb-item active">Biến thể</li>
+            </ol>
+        </nav>
+    </div>
+    <!-- End Page Title -->
+
+    <section class="section dashboard">
+        <div class="row">
+
+            <!-- ProductVariant -->
+            <div class="col-12 mb-3"
+                hx-trigger="load, listChange from:body"
+                hx-get="{% url 'quanly:productvariant_list' %}"
+                hx-target="this">
+            </div>
+
+            <!-- Attribute -->
+            <div class="col-12 mb-3"
+                hx-trigger="load, listChange from:body"
+                hx-get="{% url 'quanly:attribute_list' %}"
+                hx-target="this">
+            </div>
+
+        </div>
+    </section>
+</main>
+<!-- End #main -->
+
+{% endblock content %}

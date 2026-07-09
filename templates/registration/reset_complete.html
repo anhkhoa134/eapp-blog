@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Thay đổi mật khẩu thành công{% endblock title %}
+
+{% block content %}
+<main class="container page-shell">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Trang Chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Mật khẩu đã cập nhật</li>
+        </ol>
+    </nav>
+
+    <section class="auth-shell">
+        <div class="auth-card text-center">
+            <span class="auth-card__icon"><i class="bi bi-check2-circle"></i></span>
+            <h1 class="auth-card__title">Thay đổi mật khẩu thành công</h1>
+            <p class="auth-card__subtitle">Mật khẩu mới đã được thiết lập. Bạn có thể đăng nhập bằng mật khẩu mới.</p>
+            <a href="{% url 'account:login' %}" class="btn btn-primary btn-lg w-100">Đăng nhập</a>
+        </div>
+    </section>
+</main>
+{% endblock content %}

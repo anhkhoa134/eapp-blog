@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Giỏ hàng{% endblock title %}
+
+{% block content %}
+<main class="container page-shell">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Trang Chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Giỏ hàng</li>
+        </ol>
+    </nav>
+
+    <section class="auth-shell">
+        <div class="auth-card text-center">
+            <span class="auth-card__icon"><i class="bi bi-cart3"></i></span>
+            <h1 class="auth-card__title">Giỏ hàng đã được chuyển</h1>
+            <p class="auth-card__subtitle">Trang giỏ hàng mới đang dùng đường dẫn chuẩn `/gio-hang/` với cập nhật HTMX và giao diện mới.</p>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <a href="{% url 'product:cart_view' %}" class="btn btn-primary">
+                    Mở giỏ hàng <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+                <a href="{% url 'product:product_all' %}" class="btn btn-outline-primary">
+                    Tiếp tục mua hàng
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock content %}

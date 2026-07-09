@@ -1,0 +1,97 @@
+# Môi trường và cấu hình
+.env
+.env.*
+!.env.example
+.cursorignore
+Project/.env
+Project/khoa.eapp@gmail.com.json
+
+# Tệp tạm và tệp log
+Docs/
+!docs/
+docs/*
+!docs/UI-REPLACEMENT-SKILL.md
+!docs/SECURITY-DEBUG-ISSUES.md
+!docs/SEO-GUIDE-SKILL.md
+!docs/GOOGLE-LOGIN-SETUP.md
+!docs/APP-REFACTOR.md
+logs/
+temp/
+backup/
+
+
+# Cơ sở dữ liệu
+db.sqlite3
+db.sqlite3.*
+*.sqlite3
+*.sqlite3.*
+*.sqlite3-journal
+
+
+# Static và media files
+# static/
+staticfiles/
+media/
+
+
+# Tệp tạm và tệp log
+*.log
+*.pot
+*.swp
+
+
+# Python bytecode
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+**/__pycache__/
+
+
+# MacOS và hệ điều hành
+.DS_Store
+
+
+# Mã hóa, khóa API hoặc chứng chỉ
+*.key
+*.crt
+*.pem
+
+
+# Virtual environment
+venv/
+ENV/
+env/
+
+
+# IDE và Editor
+.idea/
+*.vscode/
+.vscode/
+*.sublime-*
+
+
+# Coverage reports
+htmlcov/
+.coverage
+.tox/
+.nox/
+
+
+# Build files
+build/
+dist/
+*.egg-info/
+*.eggs/
+
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+
+# Node.js (nếu bạn có dùng)
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log

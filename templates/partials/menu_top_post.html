@@ -1,0 +1,13 @@
+<!-- {% for subject in subjects %}
+    <li><a href="{% url 'post:subject' subject.slug %}" class="text-uppercase">{{ subject.title }}</a></li>
+{% endfor %}     -->
+
+{% for subject in subjects %}
+<li><a href="{% url 'post:subject' subject.slug %}">{{subject}}</a>
+    <ul class="dropdown">
+        {% for subsubject in subject.subsubjects.all %}
+        <li><a href="{% url 'post:subsubject' subsubject.slug %}">{{subsubject}}</a></li>
+        {% endfor %}
+    </ul>
+</li>
+{% endfor %}

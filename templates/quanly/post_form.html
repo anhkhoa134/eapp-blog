@@ -1,0 +1,147 @@
+<form class="modal-content post-form" hx-post="{{ request.path }}" hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' enctype="multipart/form-data">
+    <div class="modal-header">
+        {% if current_post %}
+            <h5 class="modal-title">Sửa bài viết: <b>{{current_post.title}}</b></h5>
+        {% else %}
+            <h5 class="modal-title">Thêm bài viết</h5>
+        {% endif %}
+
+
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+ 
+ 
+    <div class="modal-body">
+        {{post_form.media}}
+        {{ post_form.non_field_errors }}
+        <div class="admin-modal-form-grid">
+            <div class="admin-modal-form-field">
+                {{ post_form.subject.label_tag }}
+                {{ post_form.subject }}
+                {{ post_form.subject.errors }}
+            </div>
+            <div class="admin-modal-form-field">
+                {{ post_form.subsubject.label_tag }}
+                {{ post_form.subsubject }}
+                {{ post_form.subsubject.errors }}
+            </div>
+            <div class="admin-modal-form-field admin-modal-form-field--full">
+                {{ post_form.title.label_tag }}
+                {{ post_form.title }}
+                {{ post_form.title.errors }}
+            </div>
+            <div class="admin-modal-form-field admin-modal-form-field--full">
+                {{ post_form.description.label_tag }}
+                {{ post_form.description }}
+                {{ post_form.description.errors }}
+            </div>
+            <div class="admin-modal-form-field">
+                {{ post_form.featured.label_tag }}
+                {{ post_form.featured }}
+                {{ post_form.featured.errors }}
+            </div>
+            <div class="admin-modal-form-field">
+                {{ post_form.display_at.label_tag }}
+                {{ post_form.display_at }}
+                {{ post_form.display_at.errors }}
+            </div>
+            <div class="admin-modal-form-field">
+                {{ post_form.image.label_tag }}
+                {{ post_form.image }}
+                {{ post_form.image.errors }}
+            </div>
+            <div class="admin-modal-form-field">
+                {{ photo_form.photo.label_tag }}
+                {{ photo_form.photo }}
+                {{ photo_form.photo.errors }}
+            </div>
+        </div>
+    </div>
+ 
+ 
+    <div class="modal-footer">
+        {% if current_post %} <!-- thêm tính năng Xóa cho button Edit -->
+            <button type="button" class="btn btn-danger" hx-post="{% url 'quanly:delete_post' current_post.id %}">Xóa</button><span class="flex-grow-1"></span> <!-- để nút Remove nằm bên trái -->
+        {% endif %}
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="submit" class="btn btn-primary">Lưu</button>
+    </div>
+</form>
+ 
+
+
+
+<script>
+    (function () {
+        const dialog = document.getElementById('dialog');
+        if (dialog) {
+            dialog.classList.add('modal-lg');
+            const modal = document.getElementById('modal');
+            if (modal) {
+                modal.addEventListener('hidden.bs.modal', function () {
+                    dialog.classList.remove('modal-lg');
+                }, { once: true });
+            }
+        }
+    })();
+</script>
+
+<script>
+    // Đoạn script này dùng để tải danh sách chủ đề phụ (subsubjects) dựa trên chủ đề chính (subject) được chọn
+    // Tạo combobox phụ thuộc - khi chọn chủ đề chính thì danh sách chủ đề phụ sẽ thay đổi theo
+    $(document).ready(function() {
+        // Lưu giá trị subsubject hiện tại nếu đang trong trường hợp edit
+        var currentSubsubjectId = $('#subsubject').val();
+
+        // Thiết lập token CSRF cho tất cả các request AJAX để bảo mật
+        $.ajaxSetup({
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        });
+
+        // Bắt sự kiện khi người dùng thay đổi lựa chọn ở combobox chủ đề chính
+        $('#subject').change(function() {
+            var subjectId = $(this).val();
+            if (!subjectId) {
+                // Nếu không có chủ đề chính nào được chọn
+                // Xóa hết các option trong combobox chủ đề phụ và thêm option mặc định
+                var subsubjectSelect = $('#subsubject');
+                subsubjectSelect.empty();
+                subsubjectSelect.append('<option value="">---------</option>');
+                return;
+            }
+
+            // Gọi API để lấy danh sách chủ đề phụ tương ứng với chủ đề chính
+            $.ajax({
+                url: '{% url "quanly:get_subsubjects" %}',
+                data: {
+                    'subject_id': subjectId
+                },
+                success: function(data) {
+                    // Xử lý khi API trả về thành công
+                    // Cập nhật lại các option trong combobox chủ đề phụ
+                    var subsubjectSelect = $('#subsubject');
+                    subsubjectSelect.empty();
+                    subsubjectSelect.append('<option value="">---------</option>');
+                    $.each(data, function(key, value) {
+                        // Kiểm tra nếu là subsubject hiện tại thì selected
+                        var selected = (value.id == currentSubsubjectId) ? 'selected' : '';
+                        subsubjectSelect.append('<option value="' + value.id + '" ' + selected + '>' + value.title + '</option>');
+                    });
+                },
+                error: function(xhr, status, error) {
+                    // Xử lý khi API bị lỗi
+                    console.error("Lỗi khi tải danh sách chủ đề phụ:", error);
+                    alert("Có lỗi khi tải danh sách chủ đề phụ. Vui lòng thử lại.");
+                }
+            });
+        });
+
+        // Tự động kích hoạt sự kiện change nếu chủ đề chính đã được chọn sẵn
+        // (Thường dùng trong trường hợp chỉnh sửa bài viết)
+        if ($('#subject').val()) {
+            $('#subject').trigger('change');
+        }
+    });
+</script>

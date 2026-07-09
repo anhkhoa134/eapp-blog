@@ -1,0 +1,19 @@
+<form class="modal-content" hx-post="{{ request.path }}" hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' enctype="multipart/form-data">
+    <div class="modal-header">
+        <h5 class="modal-title">Xoá Đánh Giá: <b>#{{current_review.id}}</b></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    <div class="modal-body">
+        Tài khoản: {{current_review.user.username}} <br>
+        Đánh giá: <b>{{current_review.rating}} sao</b> <br>
+        Nội dung: {{current_review.comment}} <br>
+        Nhấn <b>Lưu</b> để xoá đánh giá này.
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button><span class="flex-grow-1"></span> <!-- để nút Remove nằm bên trái -->
+        <button type="button" class="btn btn-danger" hx-post="{% url 'quanly:delete_review' current_review.id %}">Xóa</button>
+    </div>
+</form>
+

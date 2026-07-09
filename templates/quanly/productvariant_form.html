@@ -1,0 +1,134 @@
+<form class="modal-content variant-form" hx-post="{{ request.path }}" hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' enctype="multipart/form-data">
+    <div class="modal-header">
+        {% if current_productvariant %}
+            <h5 class="modal-title">Sửa biến thể: <b>{{ current_productvariant.name }}</b></h5>
+        {% else %}
+            <h5 class="modal-title">Thêm biến thể</h5>
+        {% endif %}
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    <div class="modal-body">
+        {{ variant_form.non_field_errors }}
+        <div class="variant-form-grid">
+            {% for field in variant_form %}
+                <div class="variant-form-field">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="variant-attributes-panel">
+            <div class="variant-attributes-heading">
+                <h6>Thuộc tính biến thể</h6>
+                <span>{{ selected_attribute_ids|length }} đang chọn</span>
+            </div>
+
+            {% if grouped_attributes %}
+                <div class="variant-attribute-groups">
+                    {% for key, attributes in grouped_attributes.items %}
+                        <fieldset class="variant-attribute-group">
+                            <legend>{{ key }}</legend>
+                            <div class="variant-attribute-options">
+                                {% for attribute in attributes %}
+                                    <label class="variant-attribute-chip">
+                                        <input type="checkbox" name="selected_attributes" value="{{ attribute.id }}" {% if attribute.id in selected_attribute_ids %}checked{% endif %}>
+                                        <span>{{ attribute.value }}</span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </fieldset>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="variant-empty-state mb-0">Chưa có thuộc tính.</p>
+            {% endif %}
+        </div>
+
+        <div class="variant-new-attributes">
+            <div class="variant-attributes-heading">
+                <h6>Thêm nhanh thuộc tính</h6>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-add-attribute-row title="Thêm dòng">
+                    <i class="bi bi-plus-lg"></i>
+                </button>
+            </div>
+            <div data-attribute-rows>
+                <div class="variant-new-attribute-row">
+                    <input class="form-control" type="text" name="new_attribute_key" placeholder="Thuộc tính">
+                    <input class="form-control" type="text" name="new_attribute_value" placeholder="Giá trị">
+                </div>
+                <div class="variant-new-attribute-row">
+                    <input class="form-control" type="text" name="new_attribute_key" placeholder="Thuộc tính">
+                    <input class="form-control" type="text" name="new_attribute_value" placeholder="Giá trị">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        {% if current_productvariant %}
+            <button type="button" class="btn btn-danger" hx-post="{% url 'quanly:delete_productvariant' current_productvariant.id %}">Xóa</button><span class="flex-grow-1"></span>
+        {% endif %}
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="submit" class="btn btn-primary">Lưu</button>
+    </div>
+</form>
+
+<script>
+    (function () {
+        const dialog = document.getElementById('dialog');
+        if (dialog) {
+            dialog.classList.add('modal-lg');
+            const modal = document.getElementById('modal');
+            if (modal) {
+                modal.addEventListener('hidden.bs.modal', function () {
+                    dialog.classList.remove('modal-lg');
+                }, { once: true });
+            }
+        }
+
+        const form = document.querySelector('.variant-form');
+        if (!form) {
+            return;
+        }
+
+        const formatNumber = (value) => new Intl.NumberFormat('en-US').format(value.replace(/\D/g, ''));
+        const priceField = form.querySelector('#id_price_var');
+        const priceSaleField = form.querySelector('#id_price_sale_var');
+        const stockField = form.querySelector('#id_stock_var');
+
+        [priceField, priceSaleField, stockField].forEach((field) => {
+            if (!field) {
+                return;
+            }
+            if (field.value) {
+                field.value = formatNumber(field.value);
+            }
+            field.addEventListener('input', function (event) {
+                event.target.value = formatNumber(event.target.value);
+            });
+        });
+
+        const selectedCount = form.querySelector('.variant-attributes-heading span');
+        form.addEventListener('change', function (event) {
+            if (!event.target.matches('input[name="selected_attributes"]') || !selectedCount) {
+                return;
+            }
+            selectedCount.textContent = form.querySelectorAll('input[name="selected_attributes"]:checked').length + ' đang chọn';
+        });
+
+        const rows = form.querySelector('[data-attribute-rows]');
+        const addRowButton = form.querySelector('[data-add-attribute-row]');
+        if (rows && addRowButton) {
+            addRowButton.addEventListener('click', function () {
+                const row = document.createElement('div');
+                row.className = 'variant-new-attribute-row';
+                row.innerHTML = '<input class="form-control" type="text" name="new_attribute_key" placeholder="Thuộc tính"><input class="form-control" type="text" name="new_attribute_value" placeholder="Giá trị">';
+                rows.appendChild(row);
+                row.querySelector('input').focus();
+            });
+        }
+    })();
+</script>

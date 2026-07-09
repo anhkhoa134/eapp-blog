@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Địa chỉ giao hàng{% endblock title %}
+
+{% block content %}
+<main class="container page-shell">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Trang Chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Địa Chỉ Giao Hàng</li>
+        </ol>
+    </nav>
+
+    <section class="page-hero">
+        <div>
+            <span class="page-kicker"><i class="bi bi-geo-alt"></i> Giao hàng</span>
+            <h1 class="page-title">Địa chỉ giao hàng</h1>
+            <p class="page-subtitle">Lưu thông tin nhận hàng mặc định để rút ngắn bước thanh toán.</p>
+        </div>
+    </section>
+
+    <section class="row g-4 account-layout">
+        {% include 'partials/account_sidebar.html' %}
+
+        <div class="col-xl-9 col-lg-8">
+            <form method="POST" action=".">
+                {% csrf_token %}
+                <div class="account-card">
+                    <h2 class="account-card__title">Thông tin nhận hàng</h2>
+                    <p class="account-card__subtitle">Thông tin này sẽ được dùng khi bạn tiến hành thanh toán.</p>
+
+                    <div class="account-form-grid">
+                        <div>
+                            <label>Họ tên <span class="text-danger">*</span></label>
+                            <input type="text" name="fullname" value="{{ info.fullname }}" required class="form-control" placeholder="Họ tên">
+                        </div>
+                        <div>
+                            <label>Số điện thoại <span class="text-danger">*</span></label>
+                            <input type="text" name="phone" value="{{ info.phone }}" required class="form-control" placeholder="Số điện thoại">
+                        </div>
+                        <div class="full">
+                            <label>Địa chỉ <span class="text-danger">*</span></label>
+                            <input type="text" name="address" value="{{ info.address }}" required class="form-control" placeholder="Địa chỉ nhận hàng">
+                        </div>
+                    </div>
+
+                    <div class="account-actions justify-content-end">
+                        <button class="btn btn-primary px-4">Lưu địa chỉ</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+</main>
+{% endblock content %}

@@ -1,0 +1,364 @@
+{% load static %}
+{% load custom_tags %}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>{% block title %}{% endblock title %} - PTcom</title>
+    <meta content="PTcom Admin Dashboard" name="description">
+    <meta content="dashboard, admin, control panel" name="keywords">
+
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563eb'/%3E%3Ctext x='32' y='40' font-size='24' font-family='Arial,sans-serif' font-weight='700' fill='white' text-anchor='middle'%3EPT%3C/text%3E%3C/svg%3E">
+
+    <!-- Vendor CSS (self-host) -->
+    <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.min.css' %}" rel="stylesheet">
+    <link href="{% static 'vendor/fontawesome/css/all.min.css' %}" rel="stylesheet">
+
+    <!-- Web Fonts: Inter + Plus Jakarta Sans (self-host) -->
+    <link href="{% static 'vendor/gfonts/quanly-fonts.css' %}" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'canhan/css/style.css' %}">
+    <link href="{% static 'quanly/css/quanly.css' %}" rel="stylesheet">
+
+    {% block css %}{% endblock css %}
+</head>
+
+<body>
+
+    <!-- ======= Header ======= -->
+    <header id="header" class="header fixed-top d-flex align-items-center">
+        <div class="d-flex align-items-center justify-content-between">
+            <a href="{% url 'quanly:post_view' %}" class="logo d-flex align-items-center"> 
+                <span class="fw-bold fs-4 text-primary">PTcom</span>
+            </a>
+            <i class="bi bi-list toggle-sidebar-btn"></i>
+        </div>
+
+        {% if menu_config.show_product %}
+        <div class="search-bar">
+            <form class="search-form d-flex align-items-center" method="GET" action="{% url 'quanly:product_view' %}">
+                <input type="text" name="name" placeholder="Tìm nhanh sản phẩm..." title="Tìm kiếm">
+                <button type="submit" title="Tìm kiếm"><i class="bi bi-search"></i></button>
+            </form>
+        </div>
+        {% endif %}
+
+        <a href="{% url 'core:home' %}" target="_blank" class="btn-view-store d-none d-sm-inline-flex">
+            <i class="bi bi-globe"></i>
+            <span>Xem cửa hàng</span>
+        </a>
+
+        <nav class="header-nav ms-auto">
+            <ul class="d-flex align-items-center mb-0 list-unstyled">
+                <!-- Notifications -->
+                {% if menu_config.show_contact %}
+                <li class="nav-item me-2 d-none d-md-block">
+                    <a class="nav-link nav-icon {% if request.path|strip_slashes == 'quan-ly/lien-he' %}active{% endif %}" href="{% url 'quanly:contact_view' %}" title="Liên hệ cần xử lý">
+                        <i class="bi bi-bell"></i>
+                        {% if unread_contacts_count > 0 %}
+                        <span class="badge bg-danger badge-number">{{ unread_contacts_count }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+                {% endif %}
+
+                <!-- Orders -->
+                {% if menu_config.show_order %}
+                <li class="nav-item me-3 d-none d-md-block">
+                    <a class="nav-link nav-icon {% if request.path|strip_slashes == 'quan-ly/don-hang' %}active{% endif %}" href="{% url 'quanly:order_view' %}" title="Đơn hàng mới chưa xem">
+                        <i class="bi bi-bag-check"></i>
+                        {% if new_orders_count > 0 %}
+                        <span class="badge bg-success badge-number">{{ new_orders_count }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+                {% endif %}
+
+                <li class="nav-item dropdown pe-3">
+                    <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+                        <img src="{{request.user.profile.get_image}}" alt="Profile" class="rounded-circle" loading="lazy">
+                        <span class="d-none d-md-block dropdown-toggle ps-2">{{request.user}}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                        <li class="dropdown-header text-start px-3 py-2">
+                            <h6 class="mb-0 text-main fw-bold">{{request.user}}</h6>
+                            <span class="text-muted small">Quản trị viên</span>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="{% url 'quanly:profile_quanly' %}">
+                                <i class="bi bi-person"></i>
+                                <span>Tài Khoản</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <a href="#" class="dropdown-item d-flex align-items-center text-danger" data-bs-toggle="modal" data-bs-target="#logoutModal">
+                                <i class="bi bi-box-arrow-right text-danger"></i>
+                                <span>Đăng Xuất</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <!-- End Header -->
+        
+    <!-- ======= Sidebar ======= -->
+    <aside id="sidebar" class="sidebar">
+        <ul class="sidebar-nav" id="sidebar-nav">
+            {% if menu_config.any_above_content %}
+            <li class="nav-heading">Hoạt động kinh doanh</li>
+            {% endif %}
+
+            {% if menu_config.show_dashboard %}
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#icons-nav" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-bar-chart"></i>
+                    <span>Dashboard</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="icons-nav" class="nav-content collapse {% if request.path|strip_slashes == 'quan-ly' or request.path|strip_slashes == 'quan-ly/thang-nay' or request.path|strip_slashes == 'quan-ly/toan-thoi-gian' %}show{% else %}{% endif %}" data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="{% url 'quanly:dashboard_thangnay' %}" class="{% if request.path|strip_slashes == 'quan-ly' or request.path|strip_slashes == 'quan-ly/thang-nay' %}active{% else %}{% endif %}">
+                            <i class="bi bi-circle"></i>
+                            <span>Tháng này</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'quanly:fulltime' %}" class="{% if request.path|strip_slashes == 'quan-ly/toan-thoi-gian' %}active{% else %}{% endif %}">
+                            <i class="bi bi-circle"></i>
+                            <span>Toàn thời gian</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            {% endif %}
+
+            {% if menu_config.show_dashboard and menu_config.any_business %}
+            <hr>
+            {% endif %}
+
+            {% if menu_config.show_product %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.path|strip_slashes == 'quan-ly/san-pham' %}{% else %}collapsed{% endif %}" href="{% url 'quanly:product_view' %}">
+                    <i class="bi bi-box-seam"></i>
+                    <span>Sản Phẩm</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% if menu_config.show_productvariant %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.path|strip_slashes == 'quan-ly/bien-the' %}{% else %}collapsed{% endif %}" href="{% url 'quanly:productvariant_view' %}">
+                    <i class="bi bi-layers"></i>
+                    <span>Biến Thể</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% if menu_config.show_category %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.path|strip_slashes == 'quan-ly/danh-muc' %}{% else %}collapsed{% endif %}" href="{% url 'quanly:category_view' %}">
+                    <i class="bi bi-grid"></i>
+                    <span>Danh Mục</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% if menu_config.show_order %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.path|strip_slashes == 'quan-ly/don-hang' %}{% else %}collapsed{% endif %}" href="{% url 'quanly:order_view' %}">
+                    <i class="bi bi-cart-check"></i>
+                    <span>Đơn Hàng</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% if menu_config.show_customer %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.path|strip_slashes == 'quan-ly/khach-hang' %}{% else %}collapsed{% endif %}" href="{% url 'quanly:customer_view' %}">
+                    <i class="bi bi-person-check"></i>
+                    <span>Khách Hàng</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% if menu_config.show_review %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.path|strip_slashes == 'quan-ly/danh-gia' %}{% else %}collapsed{% endif %}" href="{% url 'quanly:review_view' %}">
+                    <i class="bi bi-star"></i>
+                    <span>Đánh giá</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% if menu_config.any_above_content and menu_config.any_content %}
+            <hr>
+            {% endif %}
+
+            {% if menu_config.show_post %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.path|strip_slashes == 'quan-ly/bai-viet' %}{% else %}collapsed{% endif %}" href="{% url 'quanly:post_view' %}">
+                    <i class="bi bi-file-earmark"></i>
+                    <span>Bài Viết</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% if menu_config.show_subject %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.path|strip_slashes == 'quan-ly/chu-de' %}{% else %}collapsed{% endif %}" href="{% url 'quanly:subject_view' %}">
+                    <i class="bi bi-card-list"></i>
+                    <span>Chủ Đề</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% if menu_config.show_comment %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.path|strip_slashes == 'quan-ly/binh-luan' %}{% else %}collapsed{% endif %}" href="{% url 'quanly:comment_view' %}">
+                    <i class="bi bi-chat-dots"></i>
+                    <span>Bình Luận</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% if menu_config.any_above_system and menu_config.any_system %}
+            <hr>
+            {% endif %}
+
+            {% if menu_config.show_contact %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.path|strip_slashes == 'quan-ly/lien-he' %}{% else %}collapsed{% endif %}" href="{% url 'quanly:contact_view' %}">
+                    <i class="bi bi-telephone"></i>
+                    <span>Liên Hệ</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% if menu_config.show_email %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.path|strip_slashes == 'quan-ly/email' %}{% else %}collapsed{% endif %}" href="{% url 'quanly:email_view' %}">
+                    <i class="bi bi-envelope"></i>
+                    <span>Email</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% if menu_config.show_payment %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.path|strip_slashes == 'quan-ly/phuong-thuc-thanh-toan' %}{% else %}collapsed{% endif %}" href="{% url 'quanly:paymentmethod_view' %}">
+                    <i class="bi bi-credit-card"></i>
+                    <span>Thanh Toán</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% if menu_config.show_pageview %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.path|strip_slashes == 'quan-ly/truy-cap' %}{% else %}collapsed{% endif %}" href="{% url 'quanly:view_view' %}">
+                    <i class="bi bi-eye"></i>
+                    <span>Truy Cập</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </aside>
+    <!-- End Sidebar-->
+
+    <!-- Sidebar Backdrop (mobile only) -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
+    {% block content %}{% endblock content %}
+
+    <!-- ======= Footer ======= -->
+    <footer id="footer" class="footer">
+        <div class="copyright">
+            &copy; Copyright <strong><span>PTcom</span></strong>. All Rights Reserved
+        </div>
+    </footer>
+    <!-- End Footer -->
+
+    <!-- Modal Logout -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold">Đăng Xuất</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-3">
+                    Thoát khỏi tài khoản này và quay lại trang chủ? <br>
+                    Nhấn "<span class="fw-bold text-primary">Thoát</span>" để xác nhận thực hiện. <br>
+                    Nhấn "<span class="fw-bold text-secondary">Huỷ</span>" để bỏ qua.
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huỷ</button>
+                    <a href="{% url 'account:logout' %}" class="btn btn-primary">Thoát</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spinner cho loading page + upload file -->
+    <div class="canhan-spinner" id="spinner" role="status" aria-live="polite" aria-label="Đang tải">
+        <div class="spinner-circle"></div>
+        <div class="loading-text">
+            Đang tải<span>.</span><span>.</span><span>.</span>
+        </div>
+    </div>
+    
+    <!-- Toast Message Django -->
+    {% if messages %}
+    {% for message in messages %}
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div id="toast_message" class="toast align-items-center text-white bg-{{ message.tags }} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">{{ message }}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-toast="dismiss" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <!-- HTMX Modal Form -->
+    <div id="modal" class="modal fade" tabindex="-1" aria-hidden="true">
+        <div id="dialog" class="modal-dialog" hx-target="this"></div>
+    </div>
+    
+    <!-- HTMX Toast Message -->
+    <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3">
+        <div id="toast-bg-htmx" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div id="toast-body-htmx" class="toast-body"></div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-toast="dismiss" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+    
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+    <!-- Vendor JS (self-host) -->
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'vendor/htmx/htmx.min.js' %}"></script>
+    {% block vendor_js %}{% endblock vendor_js %}
+
+    <!-- Custom JS -->
+    <script src="{% static 'quanly/js/quanly.js' %}"></script>
+    <script src="{% static 'canhan/js/style.js' %}"></script>
+    
+    {% block js %}{% endblock js %}
+ 
+</body>
+</html>

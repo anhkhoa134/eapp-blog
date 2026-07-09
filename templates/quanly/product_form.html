@@ -1,0 +1,180 @@
+<form class="modal-content product-form" hx-post="{{ request.path }}" hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' enctype="multipart/form-data">
+    <div class="modal-header">
+        {% if current_product %}
+            <h5 class="modal-title">Sửa sản phẩm: <b>{{current_product.name}}</b></h5>
+        {% else %}
+            <h5 class="modal-title">Thêm sản phẩm</h5>
+        {% endif %}
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    <div class="modal-body">
+        {{product_form.media}}
+        {{ product_form.non_field_errors }}
+        <div class="admin-modal-form-grid">
+            <div class="admin-modal-form-field">
+                {{ product_form.category.label_tag }}
+                {{ product_form.category }}
+                {{ product_form.category.errors }}
+            </div>
+            <div class="admin-modal-form-field">
+                {{ product_form.subcategory.label_tag }}
+                {{ product_form.subcategory }}
+                {{ product_form.subcategory.errors }}
+            </div>
+            <div class="admin-modal-form-field admin-modal-form-field--full">
+                {{ product_form.name.label_tag }}
+                {{ product_form.name }}
+                {{ product_form.name.errors }}
+            </div>
+            <div class="admin-modal-form-field admin-modal-form-field--full">
+                {{ product_form.description.label_tag }}
+                {{ product_form.description }}
+                {{ product_form.description.errors }}
+            </div>
+            <div class="admin-modal-form-field">
+                {{ product_form.featured.label_tag }}
+                {{ product_form.featured }}
+                {{ product_form.featured.errors }}
+            </div>
+            <div class="admin-modal-form-field">
+                {{ product_form.stock.label_tag }}
+                {{ product_form.stock }}
+                {{ product_form.stock.errors }}
+            </div>
+            <div class="admin-modal-form-field">
+                {{ product_form.price.label_tag }}
+                {{ product_form.price }}
+                {{ product_form.price.errors }}
+            </div>
+            <div class="admin-modal-form-field">
+                {{ product_form.price_sale.label_tag }}
+                {{ product_form.price_sale }}
+                {{ product_form.price_sale.errors }}
+            </div>
+            <div class="admin-modal-form-field">
+                {{ product_form.image.label_tag }}
+                {{ product_form.image }}
+                {{ product_form.image.errors }}
+            </div>
+            <div class="admin-modal-form-field admin-modal-form-field--full">
+                {{ photo_form.photo.label_tag }}
+                {{ photo_form.photo }}
+                {{ photo_form.photo.errors }}
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        {% if current_product %} <!-- thêm tính năng Xóa cho button Edit -->
+            <button type="button" class="btn btn-danger" hx-post="{% url 'quanly:delete_product' current_product.id %}">Xóa</button><span class="flex-grow-1"></span> <!-- để nút Remove nằm bên trái -->
+        {% endif %}
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="submit" class="btn btn-primary">Lưu</button>
+    </div>
+</form>
+
+
+<script>
+    (function () {
+        const dialog = document.getElementById('dialog');
+        if (dialog) {
+            dialog.classList.add('modal-lg');
+            const modal = document.getElementById('modal');
+            if (modal) {
+                modal.addEventListener('hidden.bs.modal', function () {
+                    dialog.classList.remove('modal-lg');
+                }, { once: true });
+            }
+        }
+    })();
+</script>
+
+<script>
+    // Đoạn script này dùng để tải danh sách danh mục phụ (subcategories) dựa trên danh mục chính (category) được chọn
+    // Tạo combobox phụ thuộc - khi chọn danh mục chính thì danh sách danh mục phụ sẽ thay đổi theo
+    $(document).ready(function() {
+        // Lưu giá trị subcategory hiện tại nếu đang trong trường hợp edit
+        var currentSubcategoryId = $('#subcategory').val();
+
+        // Thiết lập token CSRF cho tất cả các request AJAX để bảo mật
+        $.ajaxSetup({
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        });
+
+        // Bắt sự kiện khi người dùng thay đổi lựa chọn ở combobox danh mục chính
+        $('#category').change(function() {
+            var categoryId = $(this).val();
+            if (!categoryId) {
+                // Nếu không có danh mục chính nào được chọn
+                // Xóa hết các option trong combobox danh mục phụ và thêm option mặc định
+                var subcategorySelect = $('#subcategory');
+                subcategorySelect.empty();
+                subcategorySelect.append('<option value="">---------</option>');
+                return;
+            }
+
+            // Gọi API để lấy danh sách danh mục phụ tương ứng với danh mục chính
+            $.ajax({
+                url: '{% url "quanly:get_subcategories" %}',
+                data: {
+                    'category_id': categoryId
+                },
+                success: function(data) {
+                    // Xử lý khi API trả về thành công
+                    // Cập nhật lại các option trong combobox danh mục phụ
+                    var subcategorySelect = $('#subcategory');
+                    subcategorySelect.empty();
+                    subcategorySelect.append('<option value="">---------</option>');
+                    $.each(data, function(key, value) {
+                        // Kiểm tra nếu là subcategory hiện tại thì selected
+                        var selected = (value.id == currentSubcategoryId) ? 'selected' : '';
+                        subcategorySelect.append('<option value="' + value.id + '" ' + selected + '>' + value.name + '</option>');
+                    });
+                },
+                error: function(xhr, status, error) {
+                    // Xử lý khi API bị lỗi
+                    console.error("Lỗi khi tải danh sách danh mục phụ:", error);
+                    alert("Có lỗi khi tải danh sách danh mục phụ. Vui lòng thử lại.");
+                }
+            });
+        });
+
+        // Tự động kích hoạt sự kiện change nếu danh mục chính đã được chọn sẵn
+        // (Thường dùng trong trường hợp chỉnh sửa sản phẩm)
+        if ($('#category').val()) {
+            $('#category').trigger('change');
+        }
+    });
+</script>
+
+
+<script>
+    function formatNumber(value) {
+        return new Intl.NumberFormat('en-US').format(value.replace(/\D/g, ''));
+    }
+
+    document.getElementById('id_price').addEventListener('input', function (e) {
+        e.target.value = formatNumber(e.target.value);
+    });
+
+    document.getElementById('id_price_sale').addEventListener('input', function (e) {
+        e.target.value = formatNumber(e.target.value);
+    });
+
+    // Định dạng giá trị khi modal hiển thị
+    document.addEventListener('shown.bs.modal', function (e) {
+        const modal = e.target;
+        const priceField = modal.querySelector('#id_price');
+        const priceSaleField = modal.querySelector('#id_price_sale');
+
+        if (priceField && priceField.value) {
+            priceField.value = formatNumber(priceField.value);
+        }
+        if (priceSaleField && priceSaleField.value) {
+            priceSaleField.value = formatNumber(priceSaleField.value);
+        }
+    });
+</script>

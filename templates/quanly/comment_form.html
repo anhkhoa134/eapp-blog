@@ -1,0 +1,18 @@
+<form class="modal-content" hx-post="{{ request.path }}" hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' enctype="multipart/form-data">
+    <div class="modal-header">
+        <h5 class="modal-title">Xoá Bình Luận: <b>#{{current_comment.id}}</b></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    <div class="modal-body">
+        Tài khoản: {{current_comment.user.username}} <br>
+        Nội dung: {{current_comment.content}} <br>
+        Nhấn <b>Xóa</b> để xoá bình luận này.
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button><span class="flex-grow-1"></span> <!-- để nút Remove nằm bên trái -->
+        <button type="button" class="btn btn-danger" hx-post="{% url 'quanly:delete_comment' current_comment.id %}">Xóa</button>
+    </div>
+</form>
+

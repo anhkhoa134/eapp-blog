@@ -1,0 +1,49 @@
+{% extends 'quanly/quanly.html' %}
+{% load static %}
+{% block title %}Khách hàng{% endblock title %}
+
+{% block content %}
+
+<style>
+    .tooltip-inner {
+        max-width: 400px;
+        padding: .25rem .5rem;
+        color: #3a3b45;
+        text-align: left;
+        background-color: #eaecf4;
+        border-radius: .35rem
+    }
+</style>
+
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h1>Khách Hàng</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'quanly:dashboard' %}">Quản lý</a></li> 
+                <li class="breadcrumb-item active">Khách hàng</li>
+            </ol>
+        </nav>
+    </div>
+    <!-- End Page Title -->
+
+    <section class="section dashboard">
+
+        <div class="row"
+            hx-trigger="load, listChange from:body" id="hx-filter-customer"
+            hx-get="{% url 'quanly:customer_list' %}"
+            hx-target="this">                    
+            
+        </div>
+        
+    </section>
+</main>
+<!-- End #main -->
+
+
+
+
+{% endblock content %}
+
+
+

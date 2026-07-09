@@ -1,0 +1,62 @@
+{% load static %}
+
+{% for product in products %}
+    <div class="col-6 col-md-4 col-lg-3 mb-4">
+        <div class="product-card">
+            {% if not product.is_stock %}
+                <span class="badge-sale badge-out-of-stock">Hết hàng</span>
+            {% elif product.price_sale and product.price %}
+                <span class="badge-sale">-{{ product.get_percentage|floatformat:0 }}%</span>
+            {% endif %}
+
+            {% if user.is_authenticated and product.id in wishlist_product_ids %}
+                {% include 'partials/wishlist_button.html' with product=product in_wishlist=True %}
+            {% else %}
+                {% include 'partials/wishlist_button.html' with product=product %}
+            {% endif %}
+
+            <a {% include 'partials/href_product.html' %} class="product-thumb ratio ratio-1x1">
+                <img src="{{ product.get_thumbnail }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ product.name }}" loading="lazy">
+            </a>
+
+            <div class="product-body">
+                <a {% include 'partials/href_product.html' %} class="text-decoration-none">
+                    <h3 class="product-name" title="{{ product.name }}">{{ product.name }}</h3>
+                </a>
+                <div class="product-price">
+                    {% if product.price_sale %}
+                        <span class="price-current">{{ product.price_sale }}₫</span>
+                        <span class="price-old">{{ product.price }}₫</span>
+                    {% else %}
+                        <span class="price-regular">{{ product.price }}₫</span>
+                    {% endif %}
+                </div>
+                {% if not product.is_stock %}
+                    <span class="btn-add-cart disabled" aria-disabled="true">
+                        <i class="bi bi-x-circle"></i>Hết hàng
+                    </span>
+                {% elif user.is_authenticated %}
+                    <a class="btn-add-cart"
+                        href=""
+                        hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+                        hx-post="{% url 'product:add_to_cart_simple' product.id %}"
+                        hx-target="#cart-menu"
+                        hx-swap="outerHTML">
+                        <i class="fas fa-shopping-cart"></i>Thêm vào giỏ
+                    </a>
+                {% else %}
+                    <a class="btn-add-cart" href="{% url 'account:login' %}?next={{ request.path }}">
+                        <i class="fas fa-shopping-cart"></i>Thêm vào giỏ
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% empty %}
+    <div class="col-12">
+        <div class="text-center py-5">
+            <i class="fa fa-box-open fa-3x text-muted mb-3 d-block"></i>
+            <p class="mb-0">Không có sản phẩm nào được tìm thấy.</p>
+        </div>
+    </div>
+{% endfor %}

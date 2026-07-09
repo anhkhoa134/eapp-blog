@@ -1,0 +1,6 @@
+href="{% if comment.post.subject %} 
+            {% url 'post:post_detail' comment.post.subject.slug comment.post.slug %}
+        {% else %} 
+            <p>No post found.</p>
+        {% endif %}"
+

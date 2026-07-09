@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{% if category %}{{ category.name }}{% elif subcategory %}{{ subcategory.name }}{% else %}Tất Cả Sản phẩm{% endif %}{% endblock title %}
+
+{% block meta %}
+{% include 'partials/meta.html' %}
+{% endblock meta %}
+
+{% block content %}
+<main class="container page-shell">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Trang Chủ</a></li>
+            {% if not category and not subcategory %}
+                <li class="breadcrumb-item active" aria-current="page">Tất Cả Sản Phẩm</li>
+            {% elif category and not subcategory %}
+                <li class="breadcrumb-item"><a href="{% url 'product:product_all' %}">Tất Cả Sản Phẩm</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ category.name }}</li>
+            {% elif category and subcategory %}
+                <li class="breadcrumb-item"><a href="{% url 'product:product_all' %}">Tất Cả Sản Phẩm</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'product:product_all' subcategory.category.slug %}">{{ subcategory.category.name }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ subcategory.name }}</li>
+            {% endif %}
+        </ol>
+    </nav>
+
+    <section class="page-hero">
+        <div>
+            <span class="page-kicker"><i class="bi bi-grid"></i> Danh mục sản phẩm</span>
+            <h1 class="page-title">
+                {% if subcategory %}
+                    {{ subcategory.name }}
+                {% elif category %}
+                    {{ category.name }}
+                {% else %}
+                    Tất cả sản phẩm
+                {% endif %}
+            </h1>
+            <p class="page-subtitle">Tìm nhanh sản phẩm công nghệ phù hợp theo danh mục, thuộc tính và khoảng giá.</p>
+        </div>
+        <a href="{% url 'product:product_all' %}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-clockwise me-1"></i> Xem tất cả
+        </a>
+    </section>
+
+    <section class="row g-4">
+        <aside class="col-lg-3">
+            <button class="btn btn-outline-primary w-100 mb-3 d-lg-none" type="button"
+                data-bs-toggle="collapse" data-bs-target="#filterCollapse"
+                aria-expanded="false" aria-controls="filterCollapse">
+                <i class="bi bi-funnel"></i> Bộ lọc sản phẩm
+            </button>
+            <div id="filterCollapse" class="collapse d-lg-block">
+                <div class="filter-card">
+                    <div class="filter-actions">
+                        <h4><i class="bi bi-funnel mr-1"></i> Bộ lọc</h4>
+                        <a class="btn btn-sm btn-outline-primary" href="{% url 'product:product_all' %}" title="Xóa bộ lọc">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                    </div>
+
+                    <form id="product-filter-form"
+                        hx-get="{% url 'product:product_all' %}"
+                        hx-trigger="change"
+                        hx-target="#product-content"
+                        hx-swap="innerHTML">
+
+                        <div class="mb-4">
+                            <h6><i class="fa fa-search mr-1"></i> Tìm kiếm</h6>
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="product_name" id="product-search-input" placeholder="Tên sản phẩm..." value="{{ search_query|default:'' }}"
+                                    hx-get="{% url 'product:product_all' %}"
+                                    hx-trigger="keyup changed delay:500ms"
+                                    hx-target="#product-content"
+                                    hx-swap="innerHTML"
+                                    autocomplete="off">
+                                <button class="btn btn-outline-secondary" type="button" id="clear-search-btn"
+                                    hx-get="{% url 'product:product_all' %}"
+                                    hx-target="#product-content"
+                                    hx-swap="innerHTML"
+                                    {% if not search_query %}style="display: none;"{% endif %}>
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h6><i class="bi bi-list-ul mr-1"></i> Danh mục</h6>
+                            {% for category in categories %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="categories" value="{{ category.id }}" id="category{{ forloop.counter }}"
+                                        hx-get="{% url 'product:load_subcategories' %}"
+                                        hx-trigger="change"
+                                        hx-target="#subcategory-container"
+                                        hx-include="#product-filter-form"
+                                        {% if category.id|stringformat:"s" in selected_categories %}checked{% endif %}>
+                                    <label class="form-check-label" for="category{{ forloop.counter }}">{{ category.name }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-4" id="subcategory-container">
+                            {% include 'partials/subcategory_checkboxes.html' %}
+                        </div>
+
+                        {% for key, values in grouped_attributes.items %}
+                            <div class="mb-4">
+                                <h6>{{ key }}</h6>
+                                {% for value in values %}
+                                    <div class="form-check">
+                                        <label class="form-check-label">
+                                            <input class="form-check-input" type="checkbox" name="attributes" value="{{ key }}:{{ value }}"
+                                                {% if key|add:':'|add:value in selected_attributes %}checked{% endif %}>
+                                            {{ value }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+
+                        <div class="mb-4">
+                            <h6><i class="bi bi-cash mr-1"></i> Khoảng giá</h6>
+                            <div class="input-group">
+                                <input type="number" class="form-control form-control-sm" name="price_min" placeholder="Tối thiểu" min="0" value="{{ price_min }}">
+                                <span class="input-group-text px-1 py-0">-</span>
+                                <input type="number" class="form-control form-control-sm" name="price_max" placeholder="Tối đa" min="0" value="{{ price_max }}">
+                            </div>
+                        </div>
+
+                        <div>
+                            <h6><i class="bi bi-sort-alpha-down mr-1"></i> Sắp xếp</h6>
+                            <select name="order_by" id="order_by" class="form-select form-select-sm">
+                                <option value="">Mặc định</option>
+                                <option value="name_asc" {% if order_by == 'name_asc' %}selected{% endif %}>Tên: A -> Z</option>
+                                <option value="name_desc" {% if order_by == 'name_desc' %}selected{% endif %}>Tên: Z -> A</option>
+                                <option value="price_asc" {% if order_by == 'price_asc' %}selected{% endif %}>Giá tăng dần</option>
+                                <option value="price_desc" {% if order_by == 'price_desc' %}selected{% endif %}>Giá giảm dần</option>
+                                <option value="newest" {% if order_by == 'newest' %}selected{% endif %}>Sản phẩm mới nhất</option>
+                                <option value="oldest" {% if order_by == 'oldest' %}selected{% endif %}>Sản phẩm cũ nhất</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </aside>
+
+        <div class="col-lg-9">
+            <div id="product-content">
+                {% include 'partials/products_pagination.html' %}
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock content %}
+
+{% block js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('product-search-input');
+    const clearBtn = document.getElementById('clear-search-btn');
+
+    if (!searchInput || !clearBtn) {
+        return;
+    }
+
+    function toggleClearButton() {
+        clearBtn.style.display = searchInput.value.trim() !== '' ? 'block' : 'none';
+    }
+
+    searchInput.addEventListener('input', toggleClearButton);
+    clearBtn.addEventListener('click', function() {
+        searchInput.value = '';
+        toggleClearButton();
+        htmx.trigger(searchInput, 'keyup');
+    });
+
+    toggleClearButton();
+});
+</script>
+{% endblock js %}

@@ -1,0 +1,48 @@
+{% load static %}
+<!-- SEO Meta Tags -->
+<meta name="description" content="{{ product.name }}{% if product.description %}: {{ product.description|striptags|truncatechars:150 }}{% else %} tại PTcom.{% endif %}">
+<meta name="keywords" content="{% if product.category %}{{ product.category.name }}, {% endif %}{% if product.subcategory %}{{ product.subcategory.name }}, {% endif %}{{ product.name }}, PTcom, sản phẩm công nghệ">
+<meta name="author" content="PTcom">
+<meta name="robots" content="index, follow">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="product">
+<meta property="og:title" content="{{ product.name }} | PTcom">
+<meta property="og:description" content="{{ product.description|striptags|truncatechars:160 }}">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+<meta property="og:site_name" content="PTcom">
+<meta property="og:locale" content="vi_VN">
+{% if product.thumbnail %}
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ product.get_thumbnail }}">
+{% endif %}
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ product.name }} | PTcom">
+<meta name="twitter:description" content="{{ product.description|striptags|truncatechars:160 }}">
+{% if product.thumbnail %}
+<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ product.get_thumbnail }}">
+{% endif %}
+
+<!-- Product Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "{{ product.name|escapejs }}",
+  "description": "{{ product.description|striptags|truncatechars:160|escapejs }}",
+  "image": "{% if product.thumbnail %}{{ request.scheme }}://{{ request.get_host }}{{ product.get_thumbnail }}{% endif %}",
+  "brand": {
+    "@type": "Brand",
+    "name": "PTcom"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "{{ product.price }}",
+    "priceCurrency": "VND",
+    "availability": "{% if product.is_stock %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}",
+    "url": "{{ request.build_absolute_uri }}"
+  },
+  "category": "{% if product.category %}{{ product.category.name|escapejs }}{% endif %}"
+}
+</script>

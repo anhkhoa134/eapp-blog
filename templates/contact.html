@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Liên Hệ{% endblock title %}
+
+{% block meta %}
+{% include 'partials/meta.html' %}
+{% endblock meta %}
+
+{% block content %}
+<main class="container page-shell">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Trang Chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Liên Hệ</li>
+        </ol>
+    </nav>
+
+    <section class="page-hero">
+        <div>
+            <span class="page-kicker"><i class="bi bi-headset"></i> Hỗ trợ khách hàng</span>
+            <h1 class="page-title">Liên hệ PTcom</h1>
+            <p class="page-subtitle">Gửi yêu cầu tư vấn sản phẩm, bảo hành hoặc hỗ trợ đơn hàng. PTcom sẽ phản hồi trong thời gian sớm nhất.</p>
+        </div>
+        <a href="tel:0938717380" class="btn btn-primary">
+            <i class="bi bi-telephone me-1"></i> 0938.717.380
+        </a>
+    </section>
+
+    <section class="row g-4">
+        <div class="col-lg-6">
+            <div class="row g-3 mb-4">
+                <div class="col-12">
+                    <div class="contact-info-card">
+                        <i class="bi bi-geo-alt"></i>
+                        <h2 class="h5">Địa chỉ</h2>
+                        <p class="mb-0">88 Bùi Công Trừng, Đông Thạnh, Hóc Môn, TP.HCM</p>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="contact-info-card">
+                        <i class="bi bi-telephone"></i>
+                        <h2 class="h5">Điện thoại</h2>
+                        <p class="mb-0"><a href="tel:0938717380">0938.717.380</a></p>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="contact-info-card">
+                        <i class="bi bi-envelope"></i>
+                        <h2 class="h5">Email</h2>
+                        <p class="mb-0"><a href="mailto:ptcom88a@gmail.com">ptcom88a@gmail.com</a></p>
+                    </div>
+                </div>
+            </div>
+
+            <iframe class="map-frame"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d510.2171345534269!2d106.65084892661815!3d10.90838644738967!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3174d669c888896f%3A0xf7f24c48be6324d2!2zODggQsO5aSBDw7RuZyBUcuG7q25nLCDEkMO0bmcgVGjhuqFuaCwgSMOzYyBNw7RuLCBI4buTIENow60gTWluaA!5e0!3m2!1sen!2s!4v1736740556746!5m2!1sen!2s"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                title="Bản đồ cửa hàng PTcom">
+            </iframe>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="contact-panel">
+                <h2 class="h4 mb-2">Gửi tin nhắn</h2>
+                <p class="text-muted mb-4">Điền thông tin liên hệ, đội ngũ PTcom sẽ hỗ trợ đúng nhu cầu của bạn.</p>
+                <form onsubmit="showSpinner()" action="{% url 'core:contact' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            {{ form.name }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.phone }}
+                        </div>
+                        <div class="col-12">
+                            {{ form.email }}
+                        </div>
+                        <div class="col-12">
+                            {{ form.message }}
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-send me-1"></i> Gửi tin nhắn
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock content %}

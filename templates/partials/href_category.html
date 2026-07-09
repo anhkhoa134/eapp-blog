@@ -1,0 +1,5 @@
+href="{% if product.category %}
+            {% url 'product:product_all' product.category.slug %}
+        {% else %}
+            <p>No product found.</p>
+        {% endif %}"

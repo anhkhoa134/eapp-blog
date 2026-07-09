@@ -1,0 +1,43 @@
+<!-- Modal -->
+<form class="modal-content" hx-post="{{ request.path }}" hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' enctype="multipart/form-data">
+    <div class="modal-header">
+        <h5 class="modal-title">Liên hệ PTcom</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="mb-3">
+            <label for="id_name" class="form-label">Họ tên <span class="text-danger">*</span></label>
+            {{ form.name }}
+            {% if form.name.errors %}
+                <div class="text-danger">{{ form.name.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            <label for="id_phone" class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+            {{ form.phone }}
+            {% if form.phone.errors %}
+                <div class="text-danger">{{ form.phone.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            <label for="id_email" class="form-label">Email <span class="text-danger">*</span></label>
+            {{ form.email }}
+            {% if form.email.errors %}
+                <div class="text-danger">{{ form.email.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            <label for="id_message" class="form-label">Nội dung <span class="text-danger">*</span></label>
+            {{ form.message }}
+            {% if form.message.errors %}
+                <div class="text-danger">{{ form.message.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-paper-plane me-2"></i>Gửi yêu cầu
+            </button>
+        </div>
+    </div>
+</form>

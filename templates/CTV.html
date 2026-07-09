@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Tuyển cộng tác viên{% endblock title %}
+
+{% block content %}
+<main class="container page-shell">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Trang Chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Tuyển cộng tác viên</li>
+        </ol>
+    </nav>
+
+    <section class="page-hero">
+        <div>
+            <span class="page-kicker"><i class="bi bi-people"></i> Cộng tác cùng PTcom</span>
+            <h1 class="page-title">Tuyển cộng tác viên bán hàng công nghệ</h1>
+            <p class="page-subtitle">PTcom tìm kiếm cộng tác viên online giới thiệu điện thoại, laptop, camera, phụ kiện và thiết bị thông minh đến khách hàng phù hợp.</p>
+        </div>
+        <a href="{% url 'core:contact' %}" class="btn btn-primary">
+            <i class="bi bi-send me-1"></i> Liên hệ ứng tuyển
+        </a>
+    </section>
+
+    <section class="row g-4">
+        <div class="col-lg-8">
+            <div class="about-panel">
+                <h2 class="h4 mb-3">Mô tả công việc</h2>
+                <ul class="mb-4">
+                    <li>Giới thiệu và tư vấn sản phẩm công nghệ chính hãng của PTcom.</li>
+                    <li>Chăm sóc, ghi nhận nhu cầu và hỗ trợ khách hàng trong quá trình mua hàng.</li>
+                    <li>Tìm kiếm khách hàng tiềm năng qua mạng xã hội, nhóm cộng đồng hoặc quan hệ cá nhân.</li>
+                </ul>
+
+                <h2 class="h4 mb-3">Yêu cầu</h2>
+                <ul class="mb-4">
+                    <li>Có điện thoại hoặc máy tính kết nối internet.</li>
+                    <li>Quan tâm đến sản phẩm công nghệ và có tinh thần bán hàng nghiêm túc.</li>
+                    <li>Giao tiếp rõ ràng, phản hồi khách hàng đúng hẹn.</li>
+                </ul>
+
+                <h2 class="h4 mb-3">Quyền lợi</h2>
+                <ul class="mb-0">
+                    <li>Hoa hồng theo đơn hàng thành công.</li>
+                    <li>Được hỗ trợ thông tin sản phẩm, hình ảnh và nội dung tư vấn.</li>
+                    <li>Thời gian linh hoạt, phù hợp làm thêm online.</li>
+                </ul>
+            </div>
+        </div>
+
+        <aside class="col-lg-4">
+            <div class="contact-panel">
+                <h2 class="h5 mb-3">Thông tin ứng tuyển</h2>
+                <p class="text-muted">Gửi thông tin liên hệ để PTcom trao đổi chi tiết về chính sách cộng tác viên.</p>
+                <div class="d-grid gap-2">
+                    <a href="tel:0938717380" class="btn btn-outline-primary">
+                        <i class="bi bi-telephone-fill me-1"></i> 0938.717.380
+                    </a>
+                    <a href="mailto:ptcom88a@gmail.com" class="btn btn-outline-primary">
+                        <i class="bi bi-envelope me-1"></i> ptcom88a@gmail.com
+                    </a>
+                    <a href="{% url 'core:contact' %}" class="btn btn-primary">
+                        Gửi biểu mẫu liên hệ
+                    </a>
+                </div>
+            </div>
+        </aside>
+    </section>
+</main>
+{% endblock content %}

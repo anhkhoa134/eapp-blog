@@ -1,0 +1,36 @@
+{% extends 'quanly/quanly.html' %}
+{% load static %}
+{% load custom_tags %}
+{% block title %}Bài Viết{% endblock title %}
+
+{% block content %}
+
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h1>Bài Viết</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'quanly:dashboard' %}">Quản lý</a></li> 
+                <li class="breadcrumb-item active">Bài viết</li>
+            </ol>
+        </nav>
+    </div>
+    <!-- End Page Title -->
+
+    <section class="section dashboard">
+
+        <div class="row" 
+            hx-trigger="load, listChange from:body"
+            hx-get="{% url 'quanly:post_list' %}"
+            hx-target="this">
+
+        </div>
+
+    </section>
+</main>
+<!-- End #main -->
+
+
+{% endblock content %}
+
+

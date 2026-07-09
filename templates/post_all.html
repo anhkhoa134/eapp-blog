@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_tags %}
+{% block title %}{% if subject %}{{ subject.title }}{% elif subsubject %}{{ subsubject.title }}{% else %}Bài Viết{% endif %}{% endblock title %}
+
+{% block meta %}
+{% include 'partials/meta.html' %}
+{% endblock meta %}
+
+{% block content %}
+<main class="container page-shell">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Trang Chủ</a></li>
+            {% if not subject and not subsubject %}
+                <li class="breadcrumb-item active" aria-current="page">Tất Cả Bài Viết</li>
+            {% elif subject and not subsubject %}
+                <li class="breadcrumb-item"><a href="{% url 'post:post_all' %}">Tất Cả Bài Viết</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ subject.title }}</li>
+            {% elif subject and subsubject %}
+                <li class="breadcrumb-item"><a href="{% url 'post:post_all' %}">Tất Cả Bài Viết</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'post:subject' subsubject.subject.slug %}">{{ subsubject.subject.title }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ subsubject.title }}</li>
+            {% endif %}
+        </ol>
+    </nav>
+
+    <section class="page-hero">
+        <div>
+            <span class="page-kicker"><i class="bi bi-newspaper"></i> Tin tức & hướng dẫn</span>
+            <h1 class="page-title">
+                {% if subsubject %}
+                    {{ subsubject.title }}
+                {% elif subject %}
+                    {{ subject.title }}
+                {% else %}
+                    Tất cả bài viết
+                {% endif %}
+            </h1>
+            <p class="page-subtitle">Cập nhật thông tin sản phẩm, kinh nghiệm chọn thiết bị và các chương trình từ PTcom.</p>
+        </div>
+        <a href="{% url 'post:post_all' %}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-clockwise me-1"></i> Xem tất cả
+        </a>
+    </section>
+
+    <section class="row g-4">
+        <aside class="col-lg-3">
+            <button class="btn btn-outline-primary w-100 mb-3 d-lg-none" type="button"
+                data-bs-toggle="collapse" data-bs-target="#filterCollapse"
+                aria-expanded="false" aria-controls="filterCollapse">
+                <i class="bi bi-funnel"></i> Bộ lọc bài viết
+            </button>
+            <div id="filterCollapse" class="collapse d-lg-block">
+                <div class="filter-card">
+                    <div class="filter-actions">
+                        <h4><i class="bi bi-funnel mr-1"></i> Bộ lọc</h4>
+                        <a class="btn btn-sm btn-outline-primary" href="{% url 'post:post_all' %}">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                    </div>
+
+                    <form id="post-filter-form"
+                        hx-get="{% url 'post:post_all' %}"
+                        hx-trigger="change"
+                        hx-target="#post-content"
+                        hx-swap="innerHTML">
+
+                        <div class="mb-4">
+                            <h6><i class="fa fa-search mr-1"></i> Tìm kiếm</h6>
+                            <input hx-get="{% url 'post:post_all' %}"
+                                hx-trigger="keyup changed delay:500ms"
+                                hx-target="#post-content"
+                                type="search"
+                                class="form-control"
+                                name="keyword"
+                                placeholder="Nhập từ khoá">
+                        </div>
+
+                        <div>
+                            <h6><i class="bi bi-bookmark mr-1"></i> Chủ đề</h6>
+                            {% for subject in subjects %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="subject" value="{{ subject.id }}" id="subject{{ forloop.counter }}" {% if subject.id in selected_subjects %}checked{% endif %}>
+                                    <label class="form-check-label" for="subject{{ forloop.counter }}">{{ subject.title }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </aside>
+
+        <div class="col-lg-9">
+            <div id="post-content">
+                {% include 'partials/posts_pagination.html' %}
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock content %}

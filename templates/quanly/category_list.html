@@ -1,0 +1,49 @@
+<div id="category-list-container">
+
+    <!-- Category List -->
+    <div class="col-12" >
+        <div class="card recent-sales overflow-auto" >
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <h5 class="card-title">Danh mục 
+                        <!-- <span>| Gần đây</span> -->
+                    </h5>
+                    <a data-bs-target="#addModal" type="button" class="card-title" data-bs-toggle="modal"
+                        hx-get="{% url 'quanly:add_category' %}" hx-target="#dialog">
+                        <i class="bi bi-plus-circle"></i> Thêm danh mục
+                    </a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-borderless table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Danh mục</th>
+                                <th class="text-center">Số sản phẩm</th>
+                                <th class="text-center">Sửa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for category in page_obj_category %}
+                            <tr id="category-{{category.id}}">
+                                <td>{{category.get_icon}} {{category.name}}</td>
+                                <td class="text-center">{{category.products.count}}</td>
+                                <td class="text-center">
+                                    <a style="cursor: pointer;" class="link-primary"
+                                        hx-get="{% url 'quanly:edit_category' category.id %}"
+                                        hx-target="#dialog">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% include 'quanly/pagination.html' with page_obj=page_obj_category %}
+
+</div>

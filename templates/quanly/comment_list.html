@@ -1,0 +1,49 @@
+
+<div id="comment-list-container">
+    <!-- comment List -->
+    <div class="col-12" >
+        <div class="card recent-sales overflow-auto" >
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <h5 class="card-title">Bình luận 
+                        <!-- <span>| Gần đây</span> -->
+                    </h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-borderless table-hover text-center">
+                        <thead>
+                            <tr>
+                                <th>Tài khoản</th>
+                                <th>Bài viết</th>
+                                <th>Nội dung</th>
+                                <th>Ngày</th>
+                                <th>Xoá</th>                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for comment in page_obj %}
+                            <tr id="comment-{{comment.id}}">
+                                <td>{{ comment.user.username }}</td>
+                                <td><a {% include 'partials/href_comment.html' %}>{{ comment.post.title }}</a></td>
+                                <td>{{ comment.content|truncatechars:20 }}</td>
+                                <td>{{ comment.created_at|date:"H:i d-m-Y" }}</td>                
+                                <td>
+                                    <a  style="cursor: pointer;" class="link-danger"
+                                        hx-get="{% url 'quanly:delete_comment' comment.id %}"
+                                        hx-target="#dialog">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% include 'quanly/pagination.html' %}
+
+</div>

@@ -1,0 +1,15 @@
+<div id="comment-{{ comment.id }}" class="comment-item">
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+        <strong class="text-dark"><i class="bi bi-person-circle me-2"></i>{{ comment.user.username }}</strong>
+        <small class="text-muted">{{ comment.created_at|date:"H:i d-m-Y" }}</small>
+        <button class="btn btn-sm btn-outline-primary ms-auto"
+            hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+            hx-get="{% url 'post:add_reply' comment.id %}"
+            hx-target="#reply-form-{{ comment.id }}"
+            hx-swap="outerHTML">
+            <i class="bi bi-reply-fill"></i> Phản hồi
+        </button>
+    </div>
+    <p class="mb-0">{{ comment.content }}</p>
+    <div id="reply-form-{{ comment.id }}"></div>
+</div>

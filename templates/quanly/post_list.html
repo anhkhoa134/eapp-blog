@@ -1,0 +1,130 @@
+
+
+<div id="post-list-container">
+
+    <!-- Filter Form -->
+    <div class="col-12 filter-card mb-4">
+        <form hx-get="{% url 'quanly:post_list' %}" hx-target="#post-list-container">
+            <div class="row g-2 align-items-center">
+                <div class="col-12 col-md-4">
+                    {{ form.keyword }}
+                </div>
+                <div class="col-6 col-md-3">
+                    {{ form.subject }}
+                </div>
+                <div class="col-6 col-md-3">
+                    {{ form.subsubject }}
+                </div>
+                <div class="col-12 col-md-2 d-flex justify-content-md-end justify-content-start gap-2">
+                    <input type="submit" value="Lọc" class="btn btn-primary btn-sm px-3">
+                    <a class="btn btn-secondary btn-sm px-3" href="{% url 'quanly:post_view' %}">Hủy</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Post List -->
+    <div class="col-12">
+        <div class="card recent-sales overflow-auto">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <h5 class="card-title">
+                        Bài viết 
+                        <!-- <span>| Gần đây</span> -->
+                    </h5>
+                    <a data-bs-target="#addModal" type="button" class="card-title" data-bs-toggle="modal"
+                        hx-get="{% url 'quanly:add_post' %}" hx-target="#dialog">
+                        <i class="bi bi-plus-circle"></i> Thêm bài viết
+                    </a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-borderless table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Chủ đề</th>
+                                <th class="admin-post-title-column">Bài viết</th>
+                                <!-- <th>Mô tả ngắn</th> -->
+                                <!-- <th>Ngày cập nhật</th> -->
+                                <th>Ngày</th>
+                                <th class="text-center">Sửa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for post in page_obj %}
+                            <tr id="post-{{post.id}}">
+                                <td>
+                                    <div style="display:flex; flex-direction:column; gap:3px;">
+                                        {% if post.subject %}
+                                            <span style="font-size:0.85em; font-weight:600; color:#343a40;">
+                                                {{post.subject.get_icon}} {{post.subject|truncatechars:20}}
+                                            </span>
+                                        {% endif %}
+                                        {% if post.subsubject %}
+                                            <span style="display:inline-flex; align-items:center; gap:3px; font-size:0.76em; color:#6c757d;">
+                                                <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 2 L2 8 L8 8" stroke="#adb5bd" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                                {{post.subsubject.get_icon}} {{post.subsubject|truncatechars:20}}
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="admin-post-title-column">
+                                    {% if post.subject %}
+                                        <a class="admin-title-link" {% include 'partials/href_post.html' %}>
+                                            <span class="admin-title-body">
+                                                <span class="admin-title-icon">{{post.get_icon}}</span>
+                                                <span class="admin-title-text">{{post.title}}</span>
+                                            </span>
+                                            {% if post.featured %}
+                                                <span class="admin-featured-icon text-warning" title="Nổi bật" aria-label="Nổi bật">
+                                                    <i class="bi bi-star-fill"></i>
+                                                </span>
+                                            {% endif %}
+                                        </a>
+                                    {% else %}
+                                        <span class="admin-title-link">
+                                            <span class="admin-title-body">
+                                                <span class="admin-title-icon">{{post.get_icon}}</span>
+                                                <span class="admin-title-text">{{post.title}}</span>
+                                            </span>
+                                            {% if post.featured %}
+                                                <span class="admin-featured-icon text-warning" title="Nổi bật" aria-label="Nổi bật">
+                                                    <i class="bi bi-star-fill"></i>
+                                                </span>
+                                            {% endif %}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <!-- <td>{{post.description|truncatechars:20}}</td> -->
+                                <!-- <td>{{post.updated_at|date:"d-m-Y"}}</td> -->
+                                <td>
+                                    <div class="admin-date-stack">
+                                        <span>{{post.created_at|date:"d-m-Y"}}</span>
+                                        {% if post.display_at|date:"Y-m-d" != post.created_at|date:"Y-m-d" %}
+                                            <small>Hiển thị: {{post.display_at|date:"d-m-Y"}}</small>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="text-center"> 
+                                    <a  style="cursor: pointer;" class="link-primary"
+                                        hx-get="{% url 'quanly:edit_post' post.id %}"
+                                        hx-target="#dialog">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    &nbsp;&nbsp;
+                                    <a href="{% url 'quanly:edit_content' post.id %}"><i class="bi bi-credit-card-2-front"></i></a> 
+                                 </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% include 'quanly/pagination.html' %}
+
+
+</div>

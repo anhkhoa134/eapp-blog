@@ -1,0 +1,29 @@
+{% if user.is_authenticated %}
+    {% if in_wishlist %}
+        <a class="btn-wishlist is-active"
+            href="{% url 'product:remove_from_wishlist' product.id %}"
+            title="Bỏ yêu thích"
+            aria-label="Bỏ yêu thích"
+            hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+            hx-post="{% url 'product:remove_from_wishlist' product.id %}"
+            hx-target="this"
+            hx-swap="outerHTML">
+            <i class="fas fa-heart"></i>
+        </a>
+    {% else %}
+        <a class="btn-wishlist"
+            href="{% url 'product:add_to_wishlist' product.id %}"
+            title="Thêm vào yêu thích"
+            aria-label="Thêm vào yêu thích"
+            hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+            hx-post="{% url 'product:add_to_wishlist' product.id %}"
+            hx-target="this"
+            hx-swap="outerHTML">
+            <i class="far fa-heart"></i>
+        </a>
+    {% endif %}
+{% else %}
+    <a class="btn-wishlist" href="{% url 'account:login' %}?next={{ request.path }}" title="Thêm vào yêu thích" aria-label="Thêm vào yêu thích">
+        <i class="far fa-heart"></i>
+    </a>
+{% endif %}

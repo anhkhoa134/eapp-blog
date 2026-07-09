@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Giỏ hàng{% endblock title %}
+
+{% block meta %}
+{% include 'partials/meta.html' %}
+{% endblock meta %}
+
+{% block content %}
+<main class="container page-shell">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Trang Chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Giỏ Hàng</li>
+        </ol>
+    </nav>
+
+    <section class="page-hero">
+        <div>
+            <span class="page-kicker"><i class="bi bi-cart3"></i> Giỏ hàng & giao hàng</span>
+            <h1 class="page-title">Kiểm tra và xác nhận đơn</h1>
+            <p class="page-subtitle">Điều chỉnh sản phẩm, nhập thông tin giao hàng và chọn phương thức thanh toán trên cùng một trang.</p>
+            <div class="checkout-steps">
+                <span class="checkout-step active"><span class="checkout-step__number">1</span><i class="bi bi-cart3"></i> Giỏ hàng & giao hàng</span>
+                <span class="checkout-step"><span class="checkout-step__number">2</span><i class="bi bi-check2-circle"></i> Hoàn tất</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="row g-4 align-items-start">
+        <div class="col-lg-7">
+            <div class="cart-panel">
+                <h2 class="account-card__title">Sản phẩm trong giỏ</h2>
+                <p class="account-card__subtitle">Kiểm tra biến thể, số lượng và tổng tiền trước khi đặt hàng.</p>
+                {% include 'cart/cart_items.html' %}
+
+                <div class="d-flex flex-wrap justify-content-between gap-2 mt-4">
+                    <a href="{% url 'product:product_all' %}" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-left me-1"></i> Tiếp tục mua hàng
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="checkout-panel checkout-summary">
+                <h2 class="account-card__title">Giao hàng & thanh toán</h2>
+                <p class="account-card__subtitle">Thông tin này sẽ được dùng để liên hệ, giao hàng và xác nhận thanh toán.</p>
+                {% if cart and cart.items.exists %}
+                    {% include 'cart/checkout_form.html' %}
+                {% else %}
+                    <div class="cart-empty">
+                        <i class="fas fa-shopping-cart"></i>
+                        <p class="mb-0">Thêm sản phẩm vào giỏ để nhập thông tin giao hàng.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock content %}
+
+{% block js %}
+{% include 'cart/payment_method_script.html' %}
+{% endblock js %}

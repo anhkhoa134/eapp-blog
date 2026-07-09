@@ -1,0 +1,396 @@
+/* Back to Top */
+.square-button {
+   width: 40px; /* Độ rộng */
+   height: 40px; /* Chiều cao */
+   background-color: black; /* Màu nền đen */
+   border: none; /* Xóa viền */
+   color: white; /* Màu chữ trắng */
+   text-align: center; /* Canh giữa nội dung */
+   text-decoration: none; /* Xóa gạch chân khi hover */
+   display: flex; /* Hiển thị như khối và canh giữa */
+   justify-content: center; /* Canh giữa theo chiều ngang */
+   align-items: center; /* Canh giữa theo chiều dọc */
+   font-size: 14px; /* Cỡ chữ */
+   cursor: pointer; /* Bộ chỉa con trỏ */
+   border-radius: 5px; /* Bo tròn 4 cạnh */
+   padding-top: 5px /* thay đổi khoảng cách giữa chữ và phần trên của nút */
+}
+
+#btn-back-to-top {
+position: fixed;
+bottom: 20px;
+left: 20px;
+display: none;
+opacity: 0.3; /* Điều chỉnh giá trị opacity từ 0 đến 1, 0 là hoàn toàn trong suốt, 1 là không trong suốt */
+}
+
+
+
+
+
+/* Contact social */
+.contact-buttons {
+  position: fixed;
+  bottom: 10px;
+  right: 30px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.contact-buttons button {
+  margin-bottom: 10px; /* Khoảng cách giữa các nút */
+  padding: 10px 20px; /* Kích thước của nút */
+  border: none;
+  background-color: #007bff; /* Màu nền của nút */
+  color: white; /* Màu chữ của nút */
+  cursor: pointer;
+  position: relative; /* Để định vị bóng mờ tương đối với nút */
+  overflow: hidden; /* Ẩn bớt bóng mờ không nằm trong phạm vi của nút */
+  animation: ripple-animation 2s infinite; /* Sử dụng animation "ripple-animation" với thời gian 1 giây, lặp vô hạn */
+}
+
+@keyframes ripple-animation {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.5); /* Bắt đầu với bóng mờ không */
+  }
+  100% {
+    box-shadow: 0 0 0 20px rgba(0, 123, 255, 0); /* Kết thúc với bóng mờ lớn hơn */
+  }
+}
+
+
+
+
+
+/* <!-- Spinner cho loading page + upload file --> */
+.canhan-spinner {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.75); /* Lớp phủ mờ toàn màn hình */
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    /* Ẩn spinner mặc định nhưng vẫn cho phép transition fade */
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+/* Vòng tròn spinner */
+.canhan-spinner .spinner-circle {
+    width: 64px;
+    height: 64px;
+    border: 5px solid rgba(37, 99, 235, 0.18); /* Vòng nền mờ (track) */
+    border-top-color: #2563eb; /* Đoạn chạy màu chủ đạo (--pt-primary) */
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    box-shadow: 0 0 24px rgba(37, 99, 235, 0.25); /* Bóng mờ nhẹ */
+}
+
+/* Chữ Đang tải... */
+.canhan-spinner .loading-text {
+    font-size: 17px;
+    font-weight: 600;
+    color: #333;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+
+.canhan-spinner .loading-text span {
+    display: inline-block;
+    animation: blink 1.2s infinite;
+}
+
+.canhan-spinner .loading-text span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.canhan-spinner .loading-text span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+/* Animation xoay vòng */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Animation nhấp nháy */
+@keyframes blink {
+    0%, 100% {
+        opacity: 0.2;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+/* Hiển thị spinner */
+.canhan-spinner.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* Giảm chuyển động cho người dùng bật reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+    .canhan-spinner .spinner-circle {
+        animation-duration: 1.6s;
+    }
+    .canhan-spinner .loading-text span {
+        animation: none;
+        opacity: 1;
+    }
+}
+
+
+
+
+
+/* products list */
+.price-sale-products-canhan {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #EB5757;
+  margin-bottom: 10px;
+}
+.price-sale-products-canhan sup, 
+.price-sale-products-canhan sub, 
+.price-sale-products-canhan u {
+  color: #EB5757;
+}
+.price-products-canhan {
+  font-size: 0.8rem;
+  color: #6c757d;
+  text-decoration: line-through;
+}
+.price-products-canhan sup, 
+.price-products-canhan sub, 
+.price-products-canhan u {
+  color: #6c757d;
+}
+
+/* product detail */
+.price-sale-detail-canhan {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #EB5757;
+  margin-bottom: 10px;
+}
+.price-sale-detail-canhan sup, 
+.price-sale-detail-canhan sub, 
+.price-sale-detail-canhan u {
+  color: #EB5757;
+}
+.price-detail-canhan {
+  font-size: 1rem;
+  color: #6c757d;
+  text-decoration: line-through;
+  margin-left: 10px;
+}
+.price-detail-canhan sup, 
+.price-detail-canhan sub, 
+.price-detail-canhan u {
+  color: #6c757d;
+}
+
+/* price cart */
+.price-sale-cart-canhan {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #EB5757;
+  margin-bottom: 10px;
+}
+.price-sale-cart-canhan sup, 
+.price-sale-cart-canhan sub, 
+.price-sale-cart-canhan u {
+  color: #EB5757;
+}
+.price-cart-canhan {
+  font-size: 0.8rem;
+  color: #6c757d;
+  text-decoration: line-through;
+}
+.price-cart-canhan sup, 
+.price-cart-canhan sub, 
+.price-cart-canhan u {
+  color: #6c757d;
+}
+
+/* subtotal */
+.price-subtotal-canhan {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #000000;
+  margin-bottom: 10px;
+}
+.price-subtotal-canhan sup, 
+.price-subtotal-canhan sub, 
+.price-subtotal-canhan u {
+  color: #000000;
+}
+
+/* total */
+.price-total-canhan {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 10px;
+}
+.price-total-canhan sup, 
+.price-total-canhan sub, 
+.price-total-canhan u {
+  color: #000000;
+}
+
+
+
+
+/* Có sẵn của Bootstrap dùng cho tag <img>: .img-fluid .card-img-top .d-block .w-100 .h-100 */
+
+/* Hiệu ứng hover cho các card sản phẩm, dùng cho tag <div> chứa Product */
+.card-translateY-canhan:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+}
+.card-scale-canhan:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.card-border-canhan:hover {
+  border: 1px solid #bde0fe;
+}
+
+
+.variant-option {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 8px;
+  transition: all 0.2s ease;
+}
+.variant-option:hover {
+  border-color: #ccc; /* Màu viền khi hover */
+}
+.variant-option.active {
+  border-color: #007bff; /* Màu viền khi được chọn */
+  background-color: #e7f1ff; /* Nền nhạt khi được chọn */
+}
+
+/* Danh mục sản phẩm (partial categories) */
+.category-section {
+  position: relative;
+  padding: 40px 0 10px;
+}
+.category-wrapper {
+  overflow: hidden;
+}
+.category-list {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+.category-item {
+  flex: 0 0 auto;
+  width: 25%;
+  padding: 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+}
+.category-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+}
+.category-card:hover {
+  border-color: rgba(37, 99, 235, 0.35);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.1);
+  transform: translateY(-4px);
+  text-decoration: none;
+}
+.category-item img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  aspect-ratio: 1;
+  transition: transform 0.4s ease;
+}
+.category-card:hover img {
+  transform: scale(1.05);
+}
+.category-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 12px 10px 14px;
+}
+.category-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+.category-card:hover .category-name {
+  color: #2563eb;
+}
+.category-count {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+@media (max-width: 991.98px) {
+  .category-item {
+    width: 33.3333%;
+  }
+}
+@media (max-width: 767.98px) {
+  .category-item {
+    width: 50%;
+  }
+}
+.category-section .control-btn {
+  position: absolute;
+  top: 53%;
+  transform: translateY(-50%);
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 1px solid #e2e8f0;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  cursor: pointer;
+  z-index: 2;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.category-section .control-btn:hover {
+  background-color: #2563eb;
+  color: #fff;
+}
+.category-section .prev-btn {
+  left: 10px;
+}
+.category-section .next-btn {
+  right: 10px;
+}

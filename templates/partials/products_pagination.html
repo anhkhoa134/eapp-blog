@@ -1,0 +1,18 @@
+<div class="page-toolbar">
+    <span class="result-count">
+        <i class="bi bi-box-seam"></i>
+        {% if filtered_products_count %}
+            Tìm thấy <strong class="text-dark">{{ filtered_products_count }}</strong> sản phẩm
+        {% else %}
+            Danh sách sản phẩm
+        {% endif %}
+    </span>
+</div>
+
+<div class="row">
+    {% include 'partials/products.html' %}
+</div>
+
+<div class="mt-4">
+    {% include 'partials/pagination.html' with page_obj=products %}
+</div>

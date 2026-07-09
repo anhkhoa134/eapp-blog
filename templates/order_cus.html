@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% block title %}Đơn hàng đã mua{% endblock title %}
+
+{% block content %}
+<main class="container page-shell">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Trang Chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Đơn Hàng Đã Mua</li>
+        </ol>
+    </nav>
+
+    <section class="page-hero">
+        <div>
+            <span class="page-kicker"><i class="bi bi-bag-check"></i> Đơn hàng</span>
+            <h1 class="page-title">Đơn hàng đã mua</h1>
+            <p class="page-subtitle">Theo dõi các đơn hàng đã đặt và mở chi tiết từng đơn khi cần kiểm tra sản phẩm.</p>
+        </div>
+    </section>
+
+    <section class="row g-4 account-layout">
+        {% include 'partials/account_sidebar.html' %}
+
+        <div class="col-xl-9 col-lg-8">
+            <div class="account-card">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                    <div>
+                        <h2 class="account-card__title">Lịch sử đơn hàng</h2>
+                        <p class="account-card__subtitle mb-0">Danh sách đơn hàng được sắp xếp theo thời gian mới nhất.</p>
+                    </div>
+                    <a href="{% url 'product:product_all' %}" class="btn btn-outline-primary">
+                        <i class="bi bi-grid me-1"></i> Mua tiếp
+                    </a>
+                </div>
+
+                <div class="order-history-summary">
+                    <span><i class="bi bi-receipt me-1"></i>{{ orders|length }} đơn hàng</span>
+                    <span>Sắp xếp mới nhất trước</span>
+                </div>
+
+                <div class="table-responsive order-history-responsive">
+                    <table class="table align-middle account-table order-history-table">
+                        <thead>
+                            <tr>
+                                <th>Đơn hàng</th>
+                                <th class="text-start">Sản phẩm</th>
+                                <th>Tổng quan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                                <tr class="order-history-row">
+                                    <td class="order-history-id-cell">
+                                        <a href="{% url 'product:order_detail' order.id %}" class="order-history-id">#{{ order.id }}</a>
+                                        <span class="order-history-date">
+                                            <i class="bi bi-calendar3"></i>{{ order.created_at|date:"d/m/Y" }}
+                                        </span>
+                                    </td>
+                                    <td class="text-start">
+                                        <div class="order-items-stack">
+                                            {% for item in order.items.all %}
+                                                {% if forloop.counter <= 3 %}
+                                                    <div class="order-product-line">
+                                                        <div class="cart-product order-product-line__product">
+                                                            {% include 'partials/variant_line.html' with product=item.product variant=item.variant %}
+                                                        </div>
+                                                        <span class="order-product-line__price">{{ item.price }}đ x {{ item.quantity }}</span>
+                                                    </div>
+                                                {% elif forloop.counter == 4 %}
+                                                    <span class="order-product-more">
+                                                        <i class="bi bi-three-dots"></i> Xem chi tiết để xem thêm sản phẩm
+                                                    </span>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="order-history-meta">
+                                            <div>
+                                                <span class="order-history-label">Trạng thái</span>
+                                                {% if order.status_order == 'Giao thành công' %}
+                                                    <span class="badge rounded-pill bg-success-subtle text-success order-status-badge">Giao thành công</span>
+                                                {% elif order.status_order == 'Đang vận chuyển' %}
+                                                    <span class="badge rounded-pill bg-primary-subtle text-primary order-status-badge">Đang vận chuyển</span>
+                                                {% elif order.status_order == 'Đã huỷ' %}
+                                                    <span class="badge rounded-pill bg-danger-subtle text-danger order-status-badge">Đã huỷ</span>
+                                                {% else %}
+                                                    <span class="badge rounded-pill bg-warning-subtle text-warning order-status-badge">{{ order.status_order }}</span>
+                                                {% endif %}
+                                            </div>
+                                            <div>
+                                                <span class="order-history-label">Tổng tiền</span>
+                                                <strong class="order-history-total">{{ order.total_price }}đ</strong>
+                                            </div>
+                                            {% if order.payment_method_label %}
+                                                <div>
+                                                    <span class="order-history-label">Thanh toán</span>
+                                                    <span class="order-history-payment">{{ order.payment_method_label }}</span>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="3">
+                                        <div class="order-history-empty">
+                                            <i class="bi bi-bag"></i>
+                                            <span>Chưa có đơn hàng.</span>
+                                            <a href="{% url 'product:product_all' %}" class="btn btn-primary btn-sm">Mua sắm ngay</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="order-history-mobile">
+                    {% for order in orders %}
+                        <article class="order-history-card">
+                            <div class="order-history-card__head">
+                                <div>
+                                    <a href="{% url 'product:order_detail' order.id %}" class="order-history-id">#{{ order.id }}</a>
+                                    <span class="order-history-date">
+                                        <i class="bi bi-calendar3"></i>{{ order.created_at|date:"d/m/Y" }}
+                                    </span>
+                                </div>
+                                {% if order.status_order == 'Giao thành công' %}
+                                    <span class="badge rounded-pill bg-success-subtle text-success order-status-badge">Giao thành công</span>
+                                {% elif order.status_order == 'Đang vận chuyển' %}
+                                    <span class="badge rounded-pill bg-primary-subtle text-primary order-status-badge">Đang vận chuyển</span>
+                                {% elif order.status_order == 'Đã huỷ' %}
+                                    <span class="badge rounded-pill bg-danger-subtle text-danger order-status-badge">Đã huỷ</span>
+                                {% else %}
+                                    <span class="badge rounded-pill bg-warning-subtle text-warning order-status-badge">{{ order.status_order }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="order-items-stack">
+                                {% for item in order.items.all %}
+                                    {% if forloop.counter <= 2 %}
+                                        <div class="order-product-line">
+                                            <div class="cart-product order-product-line__product">
+                                                {% include 'partials/variant_line.html' with product=item.product variant=item.variant %}
+                                            </div>
+                                            <span class="order-product-line__price">{{ item.price }}đ x {{ item.quantity }}</span>
+                                        </div>
+                                    {% elif forloop.counter == 3 %}
+                                        <span class="order-product-more">
+                                            <i class="bi bi-three-dots"></i> Xem chi tiết để xem thêm sản phẩm
+                                        </span>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="order-history-card__foot">
+                                <div>
+                                    <span class="order-history-label">Tổng tiền</span>
+                                    <strong class="order-history-total">{{ order.total_price }}đ</strong>
+                                </div>
+                            </div>
+                        </article>
+                    {% empty %}
+                        <div class="order-history-empty">
+                            <i class="bi bi-bag"></i>
+                            <span>Chưa có đơn hàng.</span>
+                            <a href="{% url 'product:product_all' %}" class="btn btn-primary btn-sm">Mua sắm ngay</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock content %}

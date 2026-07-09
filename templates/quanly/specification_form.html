@@ -1,0 +1,98 @@
+{% extends 'quanly/quanly.html' %}
+{% load static %}
+{% block title %}Chi tiết nội dung{% endblock title %}
+
+{% block content %}
+
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h1>Sản Phẩm</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'quanly:dashboard' %}">Quản lý</a></li> 
+                <li class="breadcrumb-item"><a href="{% url 'quanly:product_view' %}">Sản phẩm</a></li> 
+                <li class="breadcrumb-item active">Thông số kỹ thuật</li>
+            </ol>
+        </nav>
+    </div>
+    <!-- End Page Title -->
+
+    <section class="section dashboard">
+        <div class="row">
+            <!-- Left side columns -->
+            <div class="col-lg-12">
+                <div class="row">
+                    
+                    <div class="col-12">
+                        <div class="card recent-sales overflow-auto">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between mt-3">
+                                    <!-- <h5 class="card-title">Thông số kỹ thuật 1</h5> -->
+                                    <ul class="nav nav-tabs " id="myTab" role="tablist">
+                                        <li class="nav-item" role="presentation"><button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true"><h5 class="card-title p-1">Thông số kỹ thuật 1</h5></button></li>
+                                        <li class="nav-item" role="presentation"><button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false"><h5 class="card-title p-1">Thông số kỹ thuật 2</h5></button></li>
+                                        <li class="nav-item" role="presentation"><button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false"><h5 class="card-title p-1">Thông số kỹ thuật 3</h5></button></li>
+                                        <li class="nav-item" role="presentation"><button class="nav-link" id="disabled-tab" data-bs-toggle="tab" data-bs-target="#disabled-tab-pane" type="button" role="tab" aria-controls="disabled-tab-pane" aria-selected="false"><h5 class="card-title p-1">Thông số kỹ thuật 4</h5></button></li>
+                                    </ul>                                
+                                </div>
+
+                                <div class="tab-content" id="myTabContent">
+                                    <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+                                        <form method="POST" action="{% url 'quanly:edit_specification' current_product.id %}" enctype="multipart/form-data">{% csrf_token %} 
+                                            {{form.media}}
+                                            {{form.as_p}}
+                                            <div class="modal-footer">
+                                                <a href="{% url 'quanly:product_view' %}" class="btn btn-secondary me-2">Hủy</a> 
+                                                <button type="submit" class="btn btn-primary">Lưu</button>
+                                            </div>                                
+                                        </form>        
+                                    </div>
+                                    <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+                                        <form method="POST" action="{% url 'quanly:edit_specification_2' current_product.id %}" enctype="multipart/form-data">{% csrf_token %}
+                                            {{form_2.media}}
+                                            {{form_2.as_p}}
+                                            <div class="modal-footer">
+                                                <a href="{% url 'quanly:product_view' %}" class="btn btn-secondary me-2">Hủy</a> 
+                                                <button type="submit" class="btn btn-primary">Lưu</button>
+                                            </div>                                
+                                        </form>
+                                    </div>
+                                    <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
+                                        <form method="POST" action="{% url 'quanly:edit_specification_3' current_product.id %}" enctype="multipart/form-data">{% csrf_token %}
+                                            {{form_3.media}}
+                                            {{form_3.as_p}}
+                                            <div class="modal-footer">
+                                                <a href="{% url 'quanly:product_view' %}" class="btn btn-secondary me-2">Hủy</a> 
+                                                <button type="submit" class="btn btn-primary">Lưu</button>
+                                            </div>                                
+                                        </form>
+                                    </div>
+                                    <div class="tab-pane fade" id="disabled-tab-pane" role="tabpanel" aria-labelledby="disabled-tab" tabindex="0">
+                                        <form method="POST" action="{% url 'quanly:edit_specification_4' current_product.id %}" enctype="multipart/form-data">{% csrf_token %}
+                                            {{form_4.media}}
+                                            {{form_4.as_p}}
+                                            <div class="modal-footer">
+                                                <a href="{% url 'quanly:product_view' %}" class="btn btn-secondary me-2">Hủy</a> 
+                                                <button type="submit" class="btn btn-primary">Lưu</button>
+                                            </div>                                
+                                        </form>
+                                    </div>
+                                </div>
+                            
+
+                                
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+            <!-- End Left side columns -->
+        </div>
+    </section>
+</main>
+<!-- End #main -->
+
+
+{% endblock content %}

@@ -1,0 +1,98 @@
+{% extends 'quanly/quanly.html' %}
+{% load static %}
+{% block title %}Danh Mục{% endblock title %}
+
+{% block content %}
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h1>Danh Mục</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'quanly:dashboard' %}">Quản lý</a></li>
+                <li class="breadcrumb-item active">Danh mục</li>
+            </ol>
+        </nav>
+    </div>
+    <!-- End Page Title -->
+    <section class="section dashboard">
+        <div class="row">
+            <!-- Left side columns -->
+            <div class="col-lg-8">
+                <div class="row">
+
+                    <!-- Category -->
+                    <div class="mb-3"
+                        hx-trigger="load, listChange from:body"
+                        hx-get="{% url 'quanly:category_list' %}"
+                        hx-target="this">
+                    </div>
+                    
+                    <!-- SubCategory -->
+                    <div class="mb-3"
+                        hx-trigger="load, listChange from:body"
+                        hx-get="{% url 'quanly:subcategory_list' %}"
+                        hx-target="this">
+                    </div>
+
+                </div>
+            </div>
+            <!-- End Left side columns -->
+             
+            <!-- Right side columns -->
+            <div class="col-lg-4">
+                <!-- Website Traffic -->
+                <div class="card">
+                    <div class="card-body pb-0">
+                        <h5 class="card-title">Thống kê</h5>
+                        <div id="trafficDonutChart" style="min-height: 400px;" class="echart"></div>
+                    </div>
+                </div>
+                <!-- End Website Traffic -->
+            </div>
+            <!-- End Right side columns -->
+        </div>
+    </section>
+</main>
+<!-- End #main -->
+
+<!-- Donut Chart -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const chartData = JSON.parse('{{ chart_data|safe }}');
+            echarts.init(document.querySelector("#trafficDonutChart")).setOption({
+                tooltip: {
+                trigger: 'item'
+                },
+                legend: {
+                top: '5%',
+                left: 'center'
+                },
+                series: [{
+                name: 'Số lượng sản phẩm',
+                type: 'pie',
+                radius: ['40%', '70%'],
+                avoidLabelOverlap: false,
+                label: {
+                    show: false,
+                    position: 'center'
+                },
+                emphasis: {
+                    label: {
+                    show: true,
+                    fontSize: '18',
+                    fontWeight: 'bold'
+                    }
+                },
+                labelLine: {
+                    show: false
+                },
+                data: chartData
+                }]
+            });
+        });
+</script>
+{% endblock content %}
+
+{% block vendor_js %}
+<script src="{% static 'vendor/echarts/echarts.min.js' %}"></script>
+{% endblock vendor_js %}

@@ -1,0 +1,18 @@
+<form class="modal-content" hx-post="{{ request.path }}" hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' enctype="multipart/form-data">
+    <div class="modal-header">
+        <h5 class="modal-title">Xoá Liên Hệ</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    <div class="modal-body">
+        Họ tên: {{current_contact.name}} <br>
+        Điện thoại: {{current_contact.phone}} <br>
+        Nhấn <b>Xóa</b> để xoá liên hệ này.
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button><span class="flex-grow-1"></span> <!-- để nút Remove nằm bên trái -->
+        <button type="button" class="btn btn-danger" hx-post="{% url 'quanly:delete_contact' current_contact.id %}">Xóa</button>
+    </div>
+</form>
+

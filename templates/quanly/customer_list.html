@@ -1,0 +1,91 @@
+<div id="customer-list-container">
+
+    <div class="col-12">
+        <div class="card recent-sales overflow-auto">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <h5 class="card-title">Khách hàng 
+                        <!-- <span>| Gần đây</span> -->
+                    </h5>
+                    <!-- <a data-bs-target="#addModal" type="button" class="card-title" data-bs-toggle="modal"
+                        hx-get="{% url 'quanly:add_post' %}" hx-target="#dialog">
+                        Thêm khách hàng
+                    </a> -->
+                </div>
+    
+                <div class="table-responsive">
+                    <table class="table table-borderless table-hover">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Mã KH</th>
+                                <th class="text-center">Tài khoản</th>
+                                <th>Người nhận</th>
+                                <th>Điện thoại</th>
+                                <th>Địa chỉ</th>
+                                <th class="text-center">Khách hàng</th>                        
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in page_obj %}
+                            <tr>
+                                <td class="text-center">#{{user.id}}</td>
+                                <td class="text-center">
+                                    <span data-bs-toggle="tooltip" data-bs-placement="right"
+                                        data-bs-custom-class="custom-tooltip" data-bs-html="true" 
+                                        data-bs-title="
+                                        Tên: {{ user.profile.fullname }} <br>
+                                        Điện thoại: <a href='tel:{{ user.profile.phone }}'>{{ user.profile.phone }}</a> <br>
+                                        Địa chỉ: {{ user.profile.address }} <br>
+                                        Giới tính: {{ user.profile.get_gender_display }} <br>
+                                        Email: {{ user.profile.email }} <br>
+                                        ">
+                                        <a href="#">{{ user.username }}</a>
+                                    </span>
+    
+                                    {% if user.username in users_with_unreceived_orders %}
+                                        <span data-bs-toggle="tooltip" data-bs-placement="right"
+                                            data-bs-custom-class="custom-tooltip" data-bs-html="true" 
+                                            data-bs-title="Khách hàng đã từng không nhận hàng">
+                                            &nbsp;<i class="bi bi-exclamation-circle-fill text-warning"></i>
+                                        </span>
+                                    {% endif %}
+                                </td>
+        
+                                <td>{{user.checkout_info.fullname}}</td> 
+                                <td><a href="tel:{{user.checkout_info.phone}}">{{user.checkout_info.phone}}</a></td>
+                                <td>{{user.checkout_info.address}}</td>
+        
+                                <td class="text-center">
+                                    {% if user.orders.count == 0 %}
+                                        <span class="text-gray-500"><i class="bi bi-exclamation-circle-fill"></i></span>
+                                    {% elif user.orders.count == 1 %}
+                                        <span class="badge bg-warning text-white bg-gradient">Mới: {{ user.orders.count }}</span>
+                                    {% elif user.orders.count <= 5 %}
+                                        <span class="badge bg-info text-white bg-gradient">Cũ: {{ user.orders.count }}</span>
+                                    {% else %}
+                                        <span class="badge bg-success text-white bg-gradient">Thân thiết: {{ user.orders.count }}</span>
+                                    {% endif %}
+                                </td>
+        
+                            </tr> 
+                            {% endfor %}
+                        </tbody>                        
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% include 'quanly/pagination.html' %}           
+    
+</div>
+
+
+
+{% block js %}
+    <script>
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    </script>
+{% endblock js %}

@@ -1,0 +1,64 @@
+<div id="email-list-container">
+    <div class="col-12">
+        <div class="card recent-sales overflow-auto">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <h5 class="card-title">Email</h5>
+                    <a data-bs-target="#addModal" type="button" class="card-title" data-bs-toggle="modal"
+                        hx-get="{% url 'quanly:send_marketing_email' %}" hx-target="#dialog">
+                        <i class="bi bi-envelope-plus"></i> Gửi tin
+                    </a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-borderless table-hover text-center align-middle">
+                        <thead>
+                            <tr>
+                                <th>Họ tên</th>
+                                <th>Điện thoại</th>
+                                <th>Email</th>
+                                <th>Ngày sinh</th>
+                                <th>Giới tính</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for email in page_obj_email %}
+                            <tr>
+                                <td>{{ email.name }}</td>
+                                <td>
+                                    {% if email.phone %}
+                                        <a href="tel:{{ email.phone }}">{{ email.phone }}</a>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if email.email %}
+                                        <a href="mailto:{{ email.email }}">{{ email.email }}</a>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if email.birth_date %}
+                                        {{ email.birth_date|date:"d/m/Y" }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if email.gender == "Chọn Giới tính" or not email.gender %}
+                                        -
+                                    {% else %}
+                                        {{ email.gender }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include 'quanly/pagination.html' with page_obj=page_obj_email %}
+</div>

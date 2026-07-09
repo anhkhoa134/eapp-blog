@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Trang Chủ{% endblock title %}
+
+{% block meta %}
+{% include 'partials/meta.html' %}
+{% endblock meta %}
+
+
+{% block content %}
+
+    <!-- Hero Start -->
+    <section class="hero-section">
+        <div class="container">
+            <div id="header-carousel" class="carousel slide hero-carousel" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#header-carousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                    <button type="button" data-bs-target="#header-carousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                    <button type="button" data-bs-target="#header-carousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                </div>
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="{% static 'website/img/hero-1.jpg' %}" alt="Khuyến mãi 10%">
+                        <div class="carousel-caption">
+                            <span class="hero-eyebrow">Ưu đãi hôm nay</span>
+                            <h2 class="hero-title">Khuyến mãi đến 10% cho các sản phẩm công nghệ chính hãng</h2>
+                            <a href="{% url 'product:product_all' %}" class="btn btn-light py-2 px-4 fw-semibold">Mua sắm ngay <i class="fa fa-arrow-right ml-2"></i></a>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img src="{% static 'website/img/hero-2.webp' %}" alt="Công nghệ chính hãng">
+                        <div class="carousel-caption">
+                            <span class="hero-eyebrow">Chính hãng 100%</span>
+                            <h2 class="hero-title">Công nghệ hoàn hảo, cuộc sống thông minh</h2>
+                            <a href="{% url 'product:product_all' %}" class="btn btn-light py-2 px-4 fw-semibold">Khám phá ngay <i class="fa fa-arrow-right ml-2"></i></a>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img src="{% static 'website/img/hero-3.webp' %}" alt="Giao hàng toàn quốc">
+                        <div class="carousel-caption">
+                            <span class="hero-eyebrow">Giao hàng toàn quốc</span>
+                            <h2 class="hero-title">Miễn phí vận chuyển, đổi trả trong 7 ngày</h2>
+                            <a href="{% url 'product:product_all' %}" class="btn btn-light py-2 px-4 fw-semibold">Xem sản phẩm <i class="fa fa-arrow-right ml-2"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#header-carousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Trước</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#header-carousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Sau</span>
+                </button>
+            </div>
+        </div>
+    </section>
+    <!-- Hero End -->
+
+    <!-- USP strip Start -->
+    <section class="container mt-4">
+        <div class="usp-strip row g-0">
+            <div class="col-6 col-lg-3">
+                <div class="usp-item">
+                    <span class="usp-icon"><i class="fa fa-shield-alt"></i></span>
+                    <div>
+                        <p class="usp-title">Sản phẩm chính hãng</p>
+                        <p class="usp-sub">Cam kết chất lượng 100%</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="usp-item">
+                    <span class="usp-icon"><i class="fa fa-shipping-fast"></i></span>
+                    <div>
+                        <p class="usp-title">Miễn phí vận chuyển</p>
+                        <p class="usp-sub">Giao nhanh toàn quốc</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="usp-item">
+                    <span class="usp-icon"><i class="fas fa-exchange-alt"></i></span>
+                    <div>
+                        <p class="usp-title">Đổi trả 7 ngày</p>
+                        <p class="usp-sub">Thủ tục đơn giản</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="usp-item">
+                    <span class="usp-icon"><i class="fa fa-headset"></i></span>
+                    <div>
+                        <p class="usp-title">Hỗ trợ 24/7</p>
+                        <p class="usp-sub">Tư vấn tận tình</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- USP strip End -->
+
+    <!-- Categories Start -->
+    {% include 'partials/categories' %}
+    <!-- Categories End -->
+
+    <!-- Promo banners Start -->
+    <section class="container mt-2">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="promo-banner">
+                    <img src="{% static 'website/img/offer-1.png' %}" alt="Camera khuyến mãi">
+                    <div class="promo-content">
+                        <span class="promo-tag">Giảm giá 10%</span>
+                        <h3 class="promo-title">Camera sắc nét, lưu giữ khoảnh khắc vàng</h3>
+                        <a href="{% url 'product:product_all' %}" class="btn btn-light btn-sm fw-semibold px-3">Xem Thêm</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="promo-banner promo-alt">
+                    <img src="{% static 'website/img/offer-2.png' %}" alt="Công nghệ khuyến mãi">
+                    <div class="promo-content">
+                        <span class="promo-tag">Giảm giá 10%</span>
+                        <h3 class="promo-title">Công nghệ hoàn hảo, cuộc sống thông minh</h3>
+                        <a href="{% url 'product:product_all' %}" class="btn btn-light btn-sm fw-semibold px-3">Xem Thêm</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Promo banners End -->
+
+    <!-- Featured products Start -->
+    <section class="container mt-5">
+        <div class="section-head">
+            <h2 class="section-title">Sản Phẩm Nổi Bật</h2>
+            <a class="view-all" href="{% url 'product:product_all' %}">Xem tất cả <i class="fa fa-arrow-right ml-1"></i></a>
+        </div>
+        <div class="row">
+            {% include 'partials/products.html' %}
+        </div>
+    </section>
+    <!-- Featured products End -->
+
+    <!-- Newsletter Start -->
+    <section class="container mt-4">
+        <div class="newsletter-band">
+            <div class="row align-items-center justify-content-center">
+                <div class="col-lg-5 text-center text-lg-start mb-3 mb-lg-0">
+                    <h2 class="mb-1">Đăng ký nhận tin</h2>
+                    <p class="mb-0">Nhận thông tin khuyến mãi, sản phẩm mới và tin tức công nghệ từ PTcom.</p>
+                </div>
+                <div class="col-lg-5">
+                    <form onsubmit="showSpinner()" action="{% url 'core:contact' %}" method="POST">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            <input type="email" name="email" class="form-control" placeholder="Nhập email của bạn" required>
+                            <button class="btn" type="submit">Đăng ký</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Newsletter End -->
+
+    <!-- Products by category Start -->
+    {% for category in categories %}
+    <section class="container mt-5">
+        <div class="section-head">
+            <h2 class="section-title">{{ category.name }}</h2>
+            <a class="view-all" href="{% url 'product:product_all' category.slug %}">Xem tất cả <i class="fa fa-arrow-right ml-1"></i></a>
+        </div>
+        <div class="row">
+            {% include 'partials/products.html' with products=category.products.all|slice:":8" %}
+        </div>
+    </section>
+    {% endfor %}
+    <!-- Products by category End -->
+
+    <!-- Vendor Start -->
+    <section class="container mt-5">
+        <div class="vendor-strip">
+            <div class="vendor-track">
+                <div class="vendor-item p-4">
+                    <img src="{% static 'website/img/vendor-1.jpg' %}" alt="Thương hiệu 1" loading="lazy">
+                </div>
+                <div class="vendor-item p-4">
+                    <img src="{% static 'website/img/vendor-2.jpg' %}" alt="Thương hiệu 2" loading="lazy">
+                </div>
+                <div class="vendor-item p-4">
+                    <img src="{% static 'website/img/vendor-3.jpg' %}" alt="Thương hiệu 3" loading="lazy">
+                </div>
+                <div class="vendor-item p-4">
+                    <img src="{% static 'website/img/vendor-4.jpg' %}" alt="Thương hiệu 4" loading="lazy">
+                </div>
+                <div class="vendor-item p-4">
+                    <img src="{% static 'website/img/vendor-5.jpg' %}" alt="Thương hiệu 5" loading="lazy">
+                </div>
+                <div class="vendor-item p-4">
+                    <img src="{% static 'website/img/vendor-6.jpg' %}" alt="Thương hiệu 6" loading="lazy">
+                </div>
+                <div class="vendor-item p-4">
+                    <img src="{% static 'website/img/vendor-7.jpg' %}" alt="Thương hiệu 7" loading="lazy">
+                </div>
+                <div class="vendor-item p-4">
+                    <img src="{% static 'website/img/vendor-8.jpg' %}" alt="Thương hiệu 8" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Vendor End -->
+
+{% endblock content %}

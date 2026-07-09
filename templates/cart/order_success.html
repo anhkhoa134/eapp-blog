@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Thành công tạo đơn hàng{% endblock title %}
+
+{% block meta %}
+{% include 'partials/meta.html' %}
+{% endblock meta %}
+
+{% block content %}
+<main class="container page-shell">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Trang Chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Thành Công Tạo Đơn Hàng</li>
+        </ol>
+    </nav>
+
+    <section class="page-hero">
+        <div>
+            <span class="page-kicker"><i class="bi bi-check2-circle"></i> Hoàn tất</span>
+            <h1 class="page-title">Đơn hàng #{{ order.id }} đã được tạo</h1>
+            <p class="page-subtitle">PTcom đã ghi nhận đơn hàng của bạn. Vui lòng kiểm tra lại thông tin nhận hàng và phương thức thanh toán bên dưới.</p>
+            <div class="checkout-steps">
+                <span class="checkout-step"><span class="checkout-step__number">1</span><i class="bi bi-cart3"></i> Giỏ hàng & giao hàng</span>
+                <span class="checkout-step active"><span class="checkout-step__number">2</span><i class="bi bi-check2-circle"></i> Hoàn tất</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="row g-4">
+        <div class="col-lg-6">
+            <div class="order-panel">
+                <h2 class="account-card__title">Thông tin đơn hàng</h2>
+                <ul class="order-info-list mt-3">
+                    <li><span>Ngày đặt hàng</span><strong>{{ order.created_at|date:"d-m-Y" }}</strong></li>
+                    <li><span>Người nhận hàng</span><strong>{{ order.fullname }}</strong></li>
+                    <li><span>Điện thoại</span><strong>{{ order.phone }}</strong></li>
+                    <li><span>Địa chỉ giao hàng</span><strong class="text-end">{{ order.shipping_address }}</strong></li>
+                    <li>
+                        <span>Phương thức thanh toán</span>
+                        <strong>{{ payment_method_display }}</strong>
+                    </li>
+                    <li><span>Trạng thái</span><strong>{{ order.get_status_order_display }}</strong></li>
+                    <li><span>Tổng tiền</span><strong class="order-total">{{ order.total_price }}đ</strong></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="order-panel">
+                {% if selected_paymentmethod or order.payment_method == 'BANK' %}
+                    <h2 class="account-card__title">Thông tin thanh toán</h2>
+                    <p class="account-card__subtitle">Vui lòng thanh toán theo thông tin bên dưới. Nội dung thanh toán: Họ tên + số điện thoại.</p>
+                    <div class="d-grid gap-3">
+                        {% if selected_paymentmethod %}
+                            <div class="payment-card">
+                                {% if selected_paymentmethod.image %}
+                                    <img src="{{ selected_paymentmethod.get_image }}" alt="QR {{ selected_paymentmethod.name }}">
+                                {% endif %}
+                                <div>
+                                    <p class="mb-2"><span class="text-muted">Phương thức:</span> <strong>{{ selected_paymentmethod.name }}</strong></p>
+                                    <p class="mb-2"><span class="text-muted">Số tài khoản / ví:</span> <strong>{{ selected_paymentmethod.account_number }}</strong></p>
+                                    <p class="mb-0"><span class="text-muted">Chủ tài khoản:</span> <strong>{{ selected_paymentmethod.account_name }}</strong></p>
+                                </div>
+                            </div>
+                        {% else %}
+                            {% for paymentmethod in paymentmethods %}
+                            <div class="payment-card">
+                                {% if paymentmethod.image %}
+                                    <img src="{{ paymentmethod.get_image }}" alt="QR {{ paymentmethod.name }}">
+                                {% endif %}
+                                <div>
+                                    <p class="mb-2"><span class="text-muted">Phương thức:</span> <strong>{{ paymentmethod.name }}</strong></p>
+                                    <p class="mb-2"><span class="text-muted">Số tài khoản / ví:</span> <strong>{{ paymentmethod.account_number }}</strong></p>
+                                    <p class="mb-0"><span class="text-muted">Chủ tài khoản:</span> <strong>{{ paymentmethod.account_name }}</strong></p>
+                                </div>
+                            </div>
+                            {% empty %}
+                                <div class="alert alert-info mb-0">Thông tin thanh toán sẽ được PTcom xác nhận trực tiếp với bạn.</div>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="payment-reminder">
+                            <div>
+                                <i class="bi bi-wallet2"></i>
+                            </div>
+                            <div>
+                                <p>Nếu bạn đã chuyển khoản, nhân viên PTcom sẽ kiểm tra thanh toán và liên hệ với bạn sớm nhất có thể.</p>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <h2 class="account-card__title">Thanh toán khi nhận hàng</h2>
+                    <p class="account-card__subtitle mb-0">Bạn thanh toán cho đơn vị giao hàng khi nhận và kiểm tra sản phẩm.</p>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <div class="d-flex flex-wrap justify-content-between gap-2 mt-4">
+        <a href="{% url 'account:order_cus' %}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left me-1"></i> Đơn hàng đã mua
+        </a>
+        <a href="{% url 'product:product_all' %}" class="btn btn-primary">
+            Tiếp tục mua sắm <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+    </div>
+</main>
+{% endblock content %}

@@ -1,0 +1,11 @@
+{% load static %}
+
+<div hx-get="{% url 'product:hx_menu_cart' %}" 
+    hx-trigger="update-menu-cart from:body" 
+    hx-swap="innerHTML">
+    <a href="{% url 'product:cart_view' %}" id="menu-cart-button" class="nav-link" style="position: relative; display: inline-block;"> 
+        Giỏ hàng
+        <i class="bi bi-cart-fill"></i>
+        <span class="badge bg-dark text-white ms-1 rounded-pill" style="position: absolute; top: 0; right: 0;">{{cart_items|length}}</span>
+    </a>
+</div>

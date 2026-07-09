@@ -1,0 +1,209 @@
+<div id="order-list-container">
+
+    <!-- Filter Form -->
+    <div class="col-12 filter-card mb-4">
+        <form hx-get="{% url 'quanly:order_list' %}" hx-target="#order-list-container"> 
+            <div class="row g-2 align-items-center">
+                <div class="col-6 col-md-3">
+                    {{form.min_price}}
+                </div>
+                <div class="col-6 col-md-3">
+                    {{form.max_price}}
+                </div>
+                <div class="col-6 col-md-2">
+                    {{form.is_paid}}
+                </div>
+                <div class="col-6 col-md-2">
+                    {{form.status_order}}
+                </div>
+                <div class="col-12 col-md-2 d-flex justify-content-md-end justify-content-start gap-2">
+                    <input type="submit" value="Lọc" class="btn btn-primary btn-sm px-3">
+                    <a class="btn btn-secondary btn-sm px-3" href="{% url 'quanly:order_view' %}">Hủy</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Order List -->
+    <div class="col-12">
+        <div class="card recent-sales overflow-auto">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <h5 class="card-title">
+                        Đơn hàng 
+                        <!-- <span>| Gần đây</span> -->
+                        <!-- Số đơn hàng hiển thị trên 1 Pagination {{ orders|length }} -->
+                        <span>| Có {{filtered_orders_count}}/{{ total_orders }} đơn hàng</span>
+                    </h5>
+                    <!-- <a data-bs-target="#addModal" type="button" class="card-title" data-bs-toggle="modal"
+                        hx-get="{% url 'quanly:add_order' %}" hx-target="#dialog">
+                        Thêm đơn hàng
+                    </a> -->
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-borderless table-hover">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Mã đơn</th>
+                                <th class="text-center">Tài khoản</th> 
+                                <th class="text-center">Khách hàng</th>
+                                <th class="text-center">Tổng tiền</th>
+                                <th class="text-center">Ngày đặt</th>
+                                <th class="text-center">Loại</th>
+                                <th class="text-center">Thanh toán</th>
+                                <th class="text-center">Trạng thái</th>
+                                <th class="text-center">Ghi chú</th>
+                                <th class="text-center">Sửa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                                {% for order in page_obj %}
+                                <tr id="order-{{order.id}}">
+                                    <td class="text-center">#{{order.id}}</td>
+                                    <td class="text-center">
+                                        <span data-bs-toggle="tooltip" data-bs-placement="right"
+                                            data-bs-custom-class="custom-tooltip" data-bs-html="true" 
+                                            data-bs-title="
+                                            Tên: {{ order.user.profile.fullname }} <br>
+                                            Điện thoại: <a href='tel:{{ order.user.profile.phone }}'>{{ order.user.profile.phone }}</a> <br>
+                                            Địa chỉ: {{ order.user.profile.address }} <br>
+                                            Giới tính: {{ order.user.profile.get_gender_display }} <br>
+                                            Email: {{ order.user.profile.email }} <br>
+                                            ">
+                                            <a href="#">{{ order.user }}</a>
+                                        </span>
+                                
+                                        {% if order.user.username in users_with_unreceived_orders %}
+                                            <span data-bs-toggle="tooltip" data-bs-placement="right"
+                                                data-bs-custom-class="custom-tooltip" data-bs-html="true" 
+                                                data-bs-title="Khách hàng đã từng không nhận hàng">
+                                                &nbsp;<i class="bi bi-exclamation-circle-fill text-warning"></i>
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if order.user.orders.count == 0 %}
+                                            <span><i class="bi bi-x-circle-fill"></i></span>
+                                        {% elif order.user.orders.count == 1 %}
+                                            <span class="badge bg-warning text-white bg-gradient">Mới: {{ order.user.orders.count }}</span>
+                                        {% elif order.user.orders.count <= 5 %}
+                                            <span class="badge bg-info text-white bg-gradient">Cũ: {{ order.user.orders.count }}</span>
+                                        {% else %}
+                                            <span class="badge bg-success text-white bg-gradient">Thân thiết: {{ order.user.orders.count }}</span>
+                                        {% endif %}
+                                    </td>
+                                
+                                    <td class="text-center">
+                                        <a class="link-primary fw-bold" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#detailorderModal-{{ order.id }}">{{order.total_price}}<sup><u>đ</u></sup></a>
+                                    </td>
+                                
+                                    <td class="text-center">{{order.created_at|date:"d/m/Y"}}</td>
+                                
+                                    <td class="text-center">{{order.payment_method_label}}</td>
+                                    <td class="text-center">
+                                        {% if order.is_paid == 'Đã thanh toán' %}
+                                            <span class="text-success"><i class="bi bi-check-circle-fill"></i></span>
+                                        {% else %}
+                                            <span class="text-danger"><i class="bi bi-x-circle-fill"></i></span>
+                                        {% endif %}
+                                    </td>
+                                
+                                    <td class="text-center">
+                                        {% if order.status_order == 'Giao thành công' %} <!-- Giao thành công hàng -->
+                                            <span class="badge rounded-pill bg-primary-subtle text-primary">{{order.status_order}}</span>
+                                        {% elif order.status_order == 'Đang vận chuyển' %}  <!-- Hàng đã đóng gói giao shipper -->
+                                            <span class="badge rounded-pill bg-warning-subtle text-warning">{{order.status_order}}</span>
+                                        {% elif order.status_order == 'Đã huỷ' %}  <!-- ko gọi đc KH or trả hàng -->
+                                            <span class="badge rounded-pill bg-secondary-subtle text-secondary">{{order.status_order}}</span>
+                                        {% else %} <!-- đơn hàng Chờ xử lý -->
+                                            <span class="badge rounded-pill bg-danger-subtle text-danger">{{order.status_order}}</span>
+                                        {% endif %}
+                                    </td>    
+                                
+                                    <td>{% if order.note %}{{order.note}}{% else %}{% endif %}</td>
+                                    <td class="text-center">
+                                        <a  style="cursor: pointer;" class="link-primary"
+                                            hx-get="{% url 'quanly:edit_order' order.id %}"
+                                            hx-target="#dialog">
+                                            <i class="bi bi-pencil-square"></i> <!-- Edit -->
+                                        </a>
+                                    </td> 
+                                </tr> 
+                                {% endfor %}                                
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% for order in page_obj %}
+    <div class="modal fade" id="detailorderModal-{{ order.id }}" tabindex="-1" aria-labelledby="detailorderModalLabel-{{ order.id }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="detailorderModalLabel-{{ order.id }}">Chi tiết đơn hàng</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="text-start mb-2">
+                        <b>Người nhận: </b>{{order.user.checkout_info.fullname}} <br>
+                        <b>Điện thoại: </b><a href="tel:{{order.user.checkout_info.phone}}">{{order.user.checkout_info.phone}}</a> <br>
+                        <b>Địa chỉ: </b>{{order.user.checkout_info.address}}
+                    </div>
+
+                    <div class="site-blocks-table rounded">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th>Giá</th>
+                                    <th>Số lượng</th>
+                                    <th>Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items.all %}
+                                <tr>
+                                    <td class="text-start">{{ item.product.get_icon }} {{ item.product.name }}</td>
+                                    <td>{{ item.price }}<sup><u>đ</u></sup></td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>{{ item.subtotal }}<sup><u>đ</u></sup></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="text-end me-4">
+                        <b>Tổng: </b>{{order.total_price}}<sup><u>đ</u></sup>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- Pagination -->
+    {% include 'quanly/pagination.html' %}
+
+</div>
+
+
+
+
+
+
+{% block js %}
+<script>
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+</script>
+{% endblock js %}
+    

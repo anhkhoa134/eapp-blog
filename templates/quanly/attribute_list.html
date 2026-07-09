@@ -1,0 +1,54 @@
+<div id="attribute-list-container">
+
+    <!-- Attribute List -->
+    <div class="col-12">
+        <div class="card recent-sales overflow-auto">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <h5 class="card-title">Thuộc tính</h5>
+                    <a data-bs-target="#addModal" type="button" class="card-title" data-bs-toggle="modal"
+                        hx-get="{% url 'quanly:add_attribute' %}" hx-target="#dialog">
+                        <i class="bi bi-plus-circle"></i> Thêm thuộc tính
+                    </a>
+                </div>
+
+                <div class="row g-3">
+                    {% for attributes in attribute_columns %}
+                    <div class="col-12 col-lg-6">
+                        <div class="table-responsive">
+                            <table class="table table-borderless table-hover text-center align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Thuộc tính</th>
+                                        <th>Giá trị</th>
+                                        <th>Sửa</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for attribute in attributes %}
+                                    <tr id="attribute-{{attribute.id}}">
+                                        <td>{{ attribute.key }}</td>
+                                        <td>{{ attribute.value }}</td>
+                                        <td>
+                                            <a style="cursor: pointer;" class="link-primary"
+                                                hx-get="{% url 'quanly:edit_attribute' attribute.id %}"
+                                                hx-target="#dialog">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% include 'quanly/pagination.html' with page_obj=page_obj_attribute %}
+
+</div>

@@ -1,0 +1,10 @@
+<div id="cart-menu">
+    <i class="fas fa-shopping-cart"></i>
+    <span class="cart-count">
+        {% if cart and cart.items %}
+            {{ cart.items.count }}
+        {% else %}
+            0
+        {% endif %}
+    </span>
+</div>

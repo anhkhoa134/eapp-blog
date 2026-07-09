@@ -1,0 +1,402 @@
+{% extends 'quanly/quanly.html' %}
+{% load static %}
+{% load custom_tags %}
+{% block title %}Dashboard{% endblock title %}
+
+{% block content %}
+
+<!-- Nhúng dữ liệu JSON vào script -->
+{{ doanhthu_category|json_script:"doanhthu_category" }}
+{{ soluong_category|json_script:"soluong_category" }}
+
+
+
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h1>Dashboard</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'quanly:dashboard' %}">Quản lý</a></li> 
+                <li class="breadcrumb-item active">Dashboard (toàn thời gian)</li>
+            </ol>
+        </nav>
+    </div>
+    <!-- End Page Title -->
+
+
+
+    <section class="section dashboard">
+        <div class="row">
+            <!-- Left side columns -->
+            <div class="col-lg-12">
+                <div class="row">
+                    <!-- Sales Card -->
+                    <div class="col-xxl-4 col-xl-4 col-md-4 col-sm-12">
+                        <div class="card info-card sales-card">
+                            <div class="card-body">
+                                <h5 class="card-title">Đơn hàng <span>| Tổng</span></h5>
+                                <div class="d-flex align-items-center">
+                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-cart"></i>
+                                    </div>
+                                    <div class="ps-3">
+                                        <h6>{{tong_donhang}}</h6>
+                                        <!-- <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">increase</span> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Sales Card -->
+
+                    <!-- Revenue Card -->
+                    <div class="col-xxl-4 col-xl-4 col-md-4 col-sm-12">
+                        <div class="card info-card revenue-card">
+                            <div class="card-body">
+                                <h5 class="card-title">Doanh thu <span>| Tổng</span></h5>
+                                <div class="d-flex align-items-center">
+                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-currency-dollar"></i>
+                                    </div>
+                                    <div class="ps-3">
+                                        <h6>{{tong_doanhso}}<sup><b>đ</b></sup></h6>
+                                        <!-- <span class="text-success small pt-1 fw-bold">8%</span> <span class="text-muted small pt-2 ps-1">increase</span> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Revenue Card -->
+
+                    <!-- Customers Card -->
+                    <div class="col-xxl-4 col-xl-4 col-md-4 col-sm-12">
+                        <div class="card info-card customers-card">
+                            <div class="card-body">
+                                <h5 class="card-title">Khách hàng <span>/ Tài khoản</span></h5>
+                                <div class="d-flex align-items-center">
+                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-people"></i>
+                                    </div>
+                                    <div class="ps-3">
+                                        <h6>{{tong_khachhang}} / {{tong_taikhoan}}</h6>
+                                        <!-- <span class="text-danger small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">decrease</span> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Customers Card -->
+
+
+                    <!-- Donut Chart -->
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-body pb-0">
+                                <h5 class="card-title">Doanh thu theo Danh Mục</h5>
+                                <div id="catDonutChart" style="min-height: 350px;" class="echart"></div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Top Selling -->
+                    <div class="col-lg-8">
+                        <div class="card top-selling overflow-auto">
+                            <div class="card-body pb-0">
+                                <h5 class="card-title">Những sản phẩm bán chậm</h5>
+                                <table class="table table-borderless">
+                                    <thead>
+                                        <tr>
+                                            <!-- <th scope="col">Preview</th> -->
+                                            <th scope="col">Sản phẩm</th>
+                                            <!-- <th scope="col">Price</th> -->
+                                            <th scope="col" class="text-center">Số lượng</th>
+                                            <th scope="col" class="text-center">Doanh thu</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for product, qty, total in combined_list %}
+                                        <tr>
+                                            <td>{{ product }}</td>
+                                            <!-- <td>$64</td> -->
+                                            <td class="text-center">{{ qty|thousands_separator }}</td>
+                                            <td class="text-primary fw-bold text-center">{{ total|thousands_separator }}<sup><u>đ</u></sup></td> 
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Top Selling -->
+
+
+
+                    <!-- Combo Chart -->
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Doanh thu - Số lượng - Khách hàng theo Tháng</h5>
+                                <div id="comboChart" style="min-height: 400px;" class="echart"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bar Chart -->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Top 5 doanh thu theo Sản Phẩm</h5>
+                                <div id="verticalBarChart" style="min-height: 400px;" class="echart"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Column Chart -->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Top 5 doanh thu theo Khách Hàng</h5>
+                                <div id="columnChart" style="min-height: 400px;" class="echart"></div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+            </div>
+            <!-- End Left side columns -->
+
+
+        </div>
+    </section>
+</main>
+<!-- End #main -->
+
+
+
+
+
+
+
+<!-- Donut Chart -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Lấy dữ liệu từ script tag đã nhúng
+        const salesData = JSON.parse(document.getElementById('doanhthu_category').textContent);
+
+        echarts.init(document.querySelector("#catDonutChart")).setOption({
+            tooltip: {
+                trigger: 'item'
+            },
+            legend: {
+                top: '5%',
+                left: 'center'
+            },
+            series: [{
+                name: 'Doanh thu (VNĐ)',
+                type: 'pie',
+                radius: ['40%', '70%'],
+                avoidLabelOverlap: false,
+                label: {
+                    show: false,
+                    position: 'center'
+                },
+                emphasis: {
+                    label: {
+                        show: true,
+                        fontSize: '18',
+                        fontWeight: 'bold'
+                    }
+                },
+                labelLine: {
+                    show: false
+                },
+                data: salesData  // Sử dụng dữ liệu truyền từ Django
+            }]
+        });
+    });
+</script>
+
+
+
+<!-- Bar Chart -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+      echarts.init(document.querySelector("#verticalBarChart")).setOption({
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'
+          }
+        },
+        // legend: {}, // thêm nhãn nếu có nhiều thanh Bar để so sánh
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        xAxis: [
+            {
+            type: 'category',
+            data: {{lst_product|safe}},
+            axisTick: {
+                alignWithLabel: true
+            },
+            axisLabel: {
+                rotate: 20
+            }
+            }
+        ],
+        yAxis: [
+            {
+            type: 'value'
+            }
+        ],
+        series: [
+            {
+            name: 'Doanh thu (VNĐ)',
+            type: 'bar',
+            barWidth: '60%',
+            data: {{lst_rev_product|safe}}
+            },
+        ]
+      });
+    });
+</script>
+
+
+<!-- Column Chart  -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        echarts.init(document.querySelector("#columnChart")).setOption({
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                type: 'shadow'
+                }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: [
+                {
+                type: 'category',
+                data: {{lst_customer|safe}},
+                axisTick: {
+                    alignWithLabel: true
+                }
+                }
+            ],
+            yAxis: [
+                {
+                type: 'value'
+                }
+            ],
+            series: [
+                {
+                name: 'Doanh thu (VNĐ)',
+                type: 'bar',
+                barWidth: '60%',
+                data: {{lst_rev_customer|safe}}
+                }
+            ]
+        });
+    });
+</script>
+
+<!-- Combo Chart  -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        echarts.init(document.querySelector("#comboChart")).setOption({
+            tooltip: {
+                trigger: 'axis',
+            },
+            legend: {
+                data: ['Evaporation', 'Precipitation', 'Temperature', 'abc']
+            },
+            xAxis: [
+                {
+                type: 'category',
+                data: {{ months|safe }},
+                axisPointer: {
+                    type: 'shadow'
+                }
+                }
+            ],
+            yAxis: [
+                {
+                type: 'value',
+                name: 'Số lượng',
+                axisLabel: {
+                    formatter: '{value} '
+                }
+                },
+                {
+                type: 'value',
+                name: 'Doanh thu',
+                axisLabel: {
+                    formatter: '{value} đ'
+                }
+                }
+            ],
+            series: [
+                {
+                    name: 'SL khách hàng',
+                    type: 'bar',
+                    tooltip: {
+                        valueFormatter: function (value) {
+                        return value.toLocaleString() + ' người';
+                        }
+                    },
+                    data: {{ customer_count|safe }}
+                },
+                {
+                    name: 'SL đơn hàng',
+                    type: 'bar',
+                    tooltip: {
+                        valueFormatter: function (value) {
+                        return value.toLocaleString() + ' đơn hàng';
+                        }
+                    },
+                    data: {{ order_count|safe }}
+                },    
+                {
+                    name: 'SL sản phẩm',
+                    type: 'bar',
+                    tooltip: {
+                        valueFormatter: function (value) {
+                        return value.toLocaleString() + ' sản phẩm';
+                        }
+                    },
+                    data: {{ total_quantity|safe }},
+                },
+                {
+                    name: 'Doanh thu',
+                    type: 'line',
+                    yAxisIndex: 1,
+                    tooltip: {
+                        valueFormatter: function (value) {
+                        return value.toLocaleString() + ' đ'; // .toLocaleString() thêm dấu phân cách phần nghìn
+                        }
+                    },
+                    data: {{ total_revenue|safe }}
+                },
+            ]
+        });
+    });
+</script>
+
+
+
+
+{% endblock content %}
+
+{% block vendor_js %}
+<script src="{% static 'vendor/echarts/echarts.min.js' %}"></script>
+{% endblock vendor_js %}

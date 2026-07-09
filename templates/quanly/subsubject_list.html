@@ -1,0 +1,51 @@
+<div id="subsubject-list-container">
+
+    <!-- Subject List -->
+    <div class="col-12" >
+        <div class="card recent-sales overflow-auto" >
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <h5 class="card-title">Chủ Đề Phụ 
+                        <!-- <span>| Gần đây</span> -->
+                    </h5>
+                    <a data-bs-target="#addModal" type="button" class="card-title" data-bs-toggle="modal"
+                        hx-get="{% url 'quanly:add_subsubject' %}" hx-target="#dialog">
+                        <i class="bi bi-plus-circle"></i> Thêm chủ đề phụ
+                    </a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-borderless table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Chủ đề</th>
+                                <th>Chủ đề phụ</th>
+                                <!-- <th class="text-center">Số sản phẩm</th> -->
+                                <th class="text-center">Sửa</th>
+                            </tr>
+                            </thead>
+                        <tbody>
+                            {% for subsubject in page_obj_subsubject %}
+                            <tr id="subsubject-{{subsubject.id}}">
+                                <td>{{subsubject.subject.get_icon}} {{subsubject.subject.title}}</td>
+                                <td>{{subsubject.get_icon}} {{subsubject.title}}</td>
+                                <!-- <td class="text-center">{{subsubject.posts.count}}</td> -->
+                                <td class="text-center"> 
+                                    <a  style="cursor: pointer;" class="link-primary"
+                                        hx-get="{% url 'quanly:edit_subsubject' subsubject.id %}"
+                                        hx-target="#dialog">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>    
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% include 'quanly/pagination.html' with page_obj=page_obj_subsubject %}
+
+</div>

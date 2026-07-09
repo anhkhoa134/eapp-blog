@@ -1,0 +1,99 @@
+{% load custom_tags %}
+
+<div id="productvariant-list-container">
+
+    <!-- ProductVariant List -->
+    <div class="col-12" >
+        <div class="card recent-sales overflow-auto" >
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <h5 class="card-title">Biến thể</h5>
+                    <a data-bs-target="#addModal" type="button" class="card-title" data-bs-toggle="modal"
+                        hx-get="{% url 'quanly:add_productvariant' %}" hx-target="#dialog">
+                        <i class="bi bi-plus-circle"></i> Thêm biến thể
+                    </a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-borderless table-hover text-center align-middle">
+                        <thead>
+                            <tr>
+                                <th class="text-start">Sản phẩm</th>
+                                <th class="text-start">Thuộc tính</th>
+                                <th>Giá</th>
+                                <th>Tồn kho</th>
+                                <th>Sửa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for productvariant in page_obj_productvariant %}
+                            <tr id="productvariant-{{productvariant.id}}">
+                                <td class="text-start">
+                                    <div class="fw-semibold">
+                                        {% if productvariant.product.category %}
+                                            {% if productvariant.slug %}
+                                                <a class="variant-product-link" href="{% url 'product:product_detail' slug_category=productvariant.product.category.slug slug_product=productvariant.product.slug variant_slug=productvariant.slug %}">
+                                                    {{ productvariant.product.get_icon }} {{ productvariant.product }}
+                                                </a>
+                                            {% else %}
+                                                <a class="variant-product-link" href="{% url 'product:product_detail' slug_category=productvariant.product.category.slug slug_product=productvariant.product.slug %}">
+                                                    {{ productvariant.product.get_icon }} {{ productvariant.product }}
+                                                </a>
+                                            {% endif %}
+                                        {% else %}
+                                            {{ productvariant.product.get_icon }} {{ productvariant.product }}
+                                        {% endif %}
+                                    </div>
+                                    <small class="text-muted">{{ productvariant.name }}</small>
+                                </td>
+                                <td class="text-start">
+                                    <div class="variant-table-attributes">
+                                        {% for variant_attribute in productvariant.attributes.all %}
+                                            <span>{{ variant_attribute.attribute.key }}: {{ variant_attribute.attribute.value }}</span>
+                                        {% empty %}
+                                            <span class="is-empty">Mặc định</span>
+                                        {% endfor %}
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    {% if productvariant.price_sale and productvariant.price_sale < productvariant.price %}
+                                        <div class="variant-price">
+                                            <span class="variant-price__old">{{ productvariant.price|intcomma }}<sup>đ</sup></span>
+                                            <span class="variant-price__discount">
+                                                <i class="bi bi-arrow-down-short"></i>
+                                                -{{ productvariant.price|discount_percent:productvariant.price_sale|floatformat:0 }}%
+                                            </span>
+                                            <span class="variant-price__sale">{{ productvariant.price_sale|intcomma }}<sup>đ</sup></span>
+                                        </div>
+                                    {% elif productvariant.price_sale %}
+                                        <span class="variant-price__regular">{{ productvariant.price_sale|intcomma }}<sup>đ</sup></span>
+                                    {% else %}
+                                        <span class="variant-price__regular">{{ productvariant.price|intcomma }}<sup>đ</sup></span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if productvariant.stock %}
+                                        <span class="badge bg-success-subtle text-success">{{ productvariant.stock }}</span>
+                                    {% else %}
+                                        <span class="badge bg-danger-subtle text-danger">0</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a style="cursor: pointer;" class="link-primary"
+                                        hx-get="{% url 'quanly:edit_productvariant' productvariant.id %}"
+                                        hx-target="#dialog">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>   
+                </div>
+            </div>
+        </div>
+    </div>
+ 
+    <!-- Pagination -->
+    {% include 'quanly/pagination.html' with page_obj=page_obj_productvariant %}
+ 
+ </div>

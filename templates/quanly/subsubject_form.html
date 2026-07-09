@@ -1,0 +1,23 @@
+<form class="modal-content" hx-post="{{ request.path }}" hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' enctype="multipart/form-data">
+    <div class="modal-header">
+        {% if current_subject %}
+            <h5 class="modal-title">Sửa chủ đề phụ: <b>{{current_subsubject.title}}</b></h5>
+        {% else %}
+            <h5 class="modal-title">Thêm chủ đề phụ</h5>
+        {% endif %}
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        {{subsubject_form.media}}
+        {{subsubject_form.as_p}}
+    </div>
+    <div class="modal-footer">
+        {% if current_subsubject %} <!-- thêm tính năng Xóa cho button Edit -->
+            <button type="button" class="btn btn-danger" hx-post="{% url 'quanly:delete_subsubject' current_subsubject.id %}">Xóa</button><span class="flex-grow-1"></span> <!-- để nút Remove nằm bên trái -->
+        {% endif %}
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="submit" class="btn btn-primary">Lưu</button>
+    </div>
+ </form>
+ 
+ 

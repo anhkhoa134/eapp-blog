@@ -1,0 +1,49 @@
+<div id="paymentmethod-list-container">
+    <div class="col-12">
+        <div class="card recent-sales overflow-auto">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <h5 class="card-title">Thanh toán</h5>
+                    <a data-bs-target="#addModal" type="button" class="card-title" data-bs-toggle="modal"
+                        hx-get="{% url 'quanly:add_paymentmethod' %}" hx-target="#dialog">
+                        <i class="bi bi-plus-circle"></i> Thêm thanh toán
+                    </a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-borderless table-hover text-center align-middle">
+                        <thead>
+                            <tr>
+                                <th>Phương thức thanh toán</th>
+                                <th>Chủ tài khoản</th>
+                                <th>Số tài khoản</th>
+                                <th>QR code</th>
+                                <th>Sửa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for paymentmethod in page_obj_paymentmethod %}
+                            <tr id="paymentmethod-{{paymentmethod.id}}">
+                                <td>{{ paymentmethod.name }}</td>
+                                <td>{{ paymentmethod.account_name }}</td>
+                                <td>{{ paymentmethod.account_number }}</td>
+                                <td>
+                                    {{ paymentmethod.get_icon }}
+                                    <a href="{{ paymentmethod.get_image }}" target="_blank">Link ảnh</a>
+                                </td>
+                                <td>
+                                    <a style="cursor: pointer;" class="link-primary"
+                                        hx-get="{% url 'quanly:edit_paymentmethod' paymentmethod.id %}"
+                                        hx-target="#dialog">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include 'quanly/pagination.html' with page_obj=page_obj_paymentmethod %}
+</div>

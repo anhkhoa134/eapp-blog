@@ -1,0 +1,121 @@
+<form class="modal-content attribute-form" hx-post="{{ request.path }}" hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' enctype="multipart/form-data">
+    <div class="modal-header">
+        {% if current_attribute %}
+            <h5 class="modal-title">Sửa thuộc tính: <b>{{ current_attribute.key }}</b></h5>
+        {% else %}
+            <h5 class="modal-title">Thêm thuộc tính</h5>
+        {% endif %}
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        {{ attribute_form.non_field_errors }}
+
+        <div class="attribute-form-field">
+            {{ attribute_form.key.label_tag }}
+            {{ attribute_form.key }}
+            {{ attribute_form.key.errors }}
+        </div>
+
+        <div class="attribute-quick-panel">
+            <div class="attribute-quick-title">Chọn nhanh</div>
+            <div class="attribute-quick-options" data-attribute-presets>
+                <button type="button" data-key="Màu" data-values="Đen|Trắng|Xám|Bạc|Xanh|Đỏ|Vàng|Hồng|Tím">Màu</button>
+                <button type="button" data-key="RAM" data-values="4GB|8GB|12GB|16GB|24GB|32GB|64GB">RAM</button>
+                <button type="button" data-key="Dung lượng" data-values="64GB|128GB|256GB|512GB|1TB|2TB">Dung lượng</button>
+                <button type="button" data-key="Kích thước" data-values="XS|S|M|L|XL|XXL">Kích thước</button>
+                <button type="button" data-key="Ổ cứng" data-values="SSD 128GB|SSD 256GB|SSD 512GB|SSD 1TB|HDD 1TB">Ổ cứng</button>
+                <button type="button" data-key="Màn hình" data-values="13 inch|14 inch|15.6 inch|16 inch|24 inch|27 inch">Màn hình</button>
+                <button type="button" data-key="Bảo hành" data-values="1 tháng|3 tháng|6 tháng|12 tháng|24 tháng">Bảo hành</button>
+                <button type="button" data-key="Tình trạng" data-values="Mới|Like new|Đã qua sử dụng|Trưng bày">Tình trạng</button>
+            </div>
+        </div>
+
+        <div class="attribute-form-field">
+            {{ attribute_form.value.label_tag }}
+            {{ attribute_form.value }}
+            {{ attribute_form.value.errors }}
+        </div>
+
+        <div class="attribute-quick-panel">
+            <div class="attribute-quick-title">Giá trị nhanh</div>
+            <div class="attribute-quick-options" data-value-presets></div>
+        </div>
+    </div> 
+    <div class="modal-footer">
+        {% if current_attribute %} <!-- thêm tính năng Xóa cho button Edit -->
+            <button type="button" class="btn btn-danger" hx-post="{% url 'quanly:delete_attribute' current_attribute.id %}">Xóa</button><span class="flex-grow-1"></span> <!-- để nút Remove nằm bên trái -->
+        {% endif %}
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="submit" class="btn btn-primary">Lưu</button>
+    </div>
+ </form>
+
+<script>
+    (function () {
+        const form = document.querySelector('.attribute-form');
+        if (!form) {
+            return;
+        }
+
+        const keyInput = form.querySelector('[name="key"]');
+        const valueInput = form.querySelector('[name="value"]');
+        const presetButtons = Array.from(form.querySelectorAll('[data-attribute-presets] button'));
+        const valuePresets = form.querySelector('[data-value-presets]');
+
+        const setActivePreset = function (key) {
+            presetButtons.forEach(function (button) {
+                button.classList.toggle('active', button.dataset.key.toLowerCase() === key.toLowerCase());
+            });
+        };
+
+        const renderValuePresets = function (values) {
+            valuePresets.innerHTML = '';
+            values.forEach(function (value) {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.textContent = value;
+                button.addEventListener('click', function () {
+                    valueInput.value = value;
+                    valueInput.focus();
+                });
+                valuePresets.appendChild(button);
+            });
+        };
+
+        const applyPreset = function (button, shouldFillKey) {
+            if (shouldFillKey) {
+                keyInput.value = button.dataset.key;
+            }
+            setActivePreset(button.dataset.key);
+            renderValuePresets(button.dataset.values.split('|'));
+        };
+
+        presetButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                applyPreset(button, true);
+                valueInput.focus();
+            });
+        });
+
+        keyInput.addEventListener('input', function () {
+            const match = presetButtons.find(function (button) {
+                return button.dataset.key.toLowerCase() === keyInput.value.trim().toLowerCase();
+            });
+            if (match) {
+                applyPreset(match, false);
+            } else {
+                setActivePreset('');
+                valuePresets.innerHTML = '';
+            }
+        });
+
+        const initialMatch = presetButtons.find(function (button) {
+            return button.dataset.key.toLowerCase() === keyInput.value.trim().toLowerCase();
+        });
+        if (initialMatch) {
+            applyPreset(initialMatch, false);
+        } else if (!keyInput.value.trim() && presetButtons[0]) {
+            renderValuePresets(presetButtons[0].dataset.values.split('|'));
+        }
+    })();
+</script>

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block title %}Đăng Nhập{% endblock title %}
+
+{% block meta %}
+{% include 'partials/meta.html' %}
+{% endblock meta %}
+
+{% block content %}
+<main class="container page-shell">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Trang Chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Đăng Nhập</li>
+        </ol>
+    </nav>
+
+    <section class="auth-shell">
+        <div class="auth-card text-center">
+            <span class="auth-card__icon"><i class="bi bi-person-lock"></i></span>
+            <h1 class="auth-card__title">Đăng nhập</h1>
+            <p class="auth-card__subtitle">Truy cập tài khoản để xem giỏ hàng, đơn hàng và thông tin giao hàng của bạn.</p>
+
+            {% url 'account:check_username_login' as check_username_login_url %}
+            <form method="POST" action="{% url 'account:login' %}" hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' autocomplete="off" class="text-start">
+                {% csrf_token %}
+                <div class="form-floating mb-3">
+                    {% render_field form.username class="form-control" placeholder="" hx-post=check_username_login_url hx-swap="outerhtml" hx-trigger="keyup delay:0.5s" hx-target="#username-error-login" %}
+                    <label class="form-label">Tên tài khoản</label>
+                    <div id="username-error-login"></div>
+                </div>
+                <div class="mb-3">
+                    <div class="password-field form-floating">
+                        {% render_field form.password1 class="form-control" placeholder="" %}
+                        <label class="form-label">Mật khẩu</label>
+                        <button class="password-toggle" type="button" aria-label="Hiện mật khẩu" aria-pressed="false" title="Hiện mật khẩu">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-lg w-100" type="submit">Đăng nhập</button>
+            </form>
+
+            <div class="auth-links">
+                <span>Bạn chưa có tài khoản? <a href="{% url 'account:register' %}">Đăng ký</a></span>
+                <a href="{% url 'account:password_reset_request' %}">Quên mật khẩu</a>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock content %}

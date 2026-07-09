@@ -1,0 +1,204 @@
+{% extends 'quanly/quanly.html' %}
+{% load static %}
+{% load custom_tags %}
+{% block title %}Dashboard{% endblock title %}
+
+{% block content %}
+
+<!-- Nhúng dữ liệu JSON vào script -->
+{{ doanhthu_category|json_script:"doanhthu_category" }}
+{{ soluong_category|json_script:"soluong_category" }}
+
+
+
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h1>Dashboard</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'quanly:dashboard' %}">Quản lý</a></li> 
+                <li class="breadcrumb-item active">Dashboard (tháng này)</li>
+            </ol>
+        </nav>
+    </div>
+    <!-- End Page Title -->
+
+
+
+    <section class="section dashboard">
+        <div class="row">
+            <!-- Left side columns -->
+            <div class="col-lg-12">
+                <div class="row">
+                    <!-- Sales Card -->
+                    <div class="col-xxl-4 col-xl-4 col-md-4 col-sm-12">
+                        <div class="card info-card sales-card">
+                            <div class="card-body">
+                                <h5 class="card-title">Đơn hàng <span>| Tổng</span></h5>
+                                <div class="d-flex align-items-center">
+                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-cart"></i>
+                                    </div>
+                                    <div class="ps-3">
+                                        <h6>{{tong_donhang}}</h6>
+                                        <!-- <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">increase</span> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Sales Card -->
+
+                    <!-- Revenue Card -->
+                    <div class="col-xxl-4 col-xl-4 col-md-4 col-sm-12">
+                        <div class="card info-card revenue-card">
+                            <div class="card-body">
+                                <h5 class="card-title">Doanh thu <span>| Tổng</span></h5>
+                                <div class="d-flex align-items-center">
+                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-currency-dollar"></i>
+                                    </div>
+                                    <div class="ps-3">
+                                        <h6>{{tong_doanhso}}<sup><b>đ</b></sup></h6>
+                                        <!-- <span class="text-success small pt-1 fw-bold">8%</span> <span class="text-muted small pt-2 ps-1">increase</span> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Revenue Card -->
+
+                    <!-- Customers Card -->
+                    <div class="col-xxl-4 col-xl-4 col-md-4 col-sm-12">
+                        <div class="card info-card customers-card">
+                            <div class="card-body">
+                                <h5 class="card-title">Khách hàng</h5>
+                                <div class="d-flex align-items-center">
+                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-people"></i>
+                                    </div>
+                                    <div class="ps-3">
+                                        <h6>{{tong_khachhang}}</h6>
+                                        <!-- <span class="text-danger small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">decrease</span> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Customers Card -->
+
+
+
+                    <!-- Line Chart: Thứ -->
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Doanh thu theo Thứ</h5>
+                                <div id="thulineChart" style="min-height: 350px;" class="echart"></div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Line Chart: Giờ -->
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Doanh thu theo Giờ</h5>
+                                <div id="giolineChart" style="min-height: 350px;" class="echart"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Line Chart: Ngày -->
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Doanh thu theo Ngày</h5>
+                                <div id="ngaylineChart" style="min-height: 350px;" class="echart"></div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+            </div>
+            <!-- End Left side columns -->
+
+
+        </div>
+    </section>
+</main>
+<!-- End #main -->
+
+
+
+
+
+
+
+
+<!-- Revenue Charts -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const formatCurrency = value => Number(value || 0).toLocaleString();
+
+        function initRevenueChart(selector, categories, data) {
+            const chartElement = document.querySelector(selector);
+            if (!chartElement) {
+                return;
+            }
+
+            echarts.init(chartElement).setOption({
+                color: ['#1e3a8a'],
+                tooltip: {
+                    trigger: 'axis',
+                    valueFormatter: value => `${formatCurrency(value)} VNĐ`
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: categories
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLabel: {
+                        formatter: value => formatCurrency(value)
+                    }
+                },
+                series: [{
+                    name: 'Doanh thu (VNĐ)',
+                    type: 'line',
+                    smooth: true,
+                    symbolSize: 7,
+                    lineStyle: {
+                        width: 2
+                    },
+                    areaStyle: {
+                        opacity: 0.25
+                    },
+                    data: data
+                }]
+            });
+        }
+
+        initRevenueChart("#giolineChart", {{ lst_hours|safe }}, {{ lst_rev_hours|safe }});
+        initRevenueChart("#ngaylineChart", {{ lst_days|safe }}, {{ lst_rev_days|safe }});
+        initRevenueChart("#thulineChart", {{ lst_weekday|safe }}, {{ lst_rev_weekday|safe }});
+    });
+</script>
+
+
+
+{% endblock content %}
+
+{% block vendor_js %}
+<script src="{% static 'vendor/echarts/echarts.min.js' %}"></script>
+{% endblock vendor_js %}

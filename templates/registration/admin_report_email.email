@@ -1,0 +1,11 @@
+{% block subject %}Báo cáo gửi email sinh nhật - {{ date }}{% endblock %}
+
+{% block html %}
+<p>Hôm nay đã gửi {{ sent_count }} email sinh nhật đến các khách hàng sau:</p>
+<ul>
+    {% for email in sent_emails %}
+    <li>{{ email }}</li>
+    {% endfor %}
+</ul>
+<p>- Hệ thống PTcom -</p>
+{% endblock %}

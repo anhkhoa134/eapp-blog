@@ -1,0 +1,102 @@
+<div id="cart-items"{% if cart_items_oob %} hx-swap-oob="outerHTML"{% endif %}>
+    <div class="table-responsive">
+        <table class="table table-hover text-center align-middle cart-table">
+            <thead>
+                <tr>
+                    <th class="text-start">Sản phẩm</th>
+                    <th style="width: 18%;">Số lượng</th>
+                    <th style="width: 18%;">Đơn giá</th>
+                    <th style="width: 18%;">Thành tiền</th>
+                    <th style="width: 5%;">Xoá</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if cart and cart.items.all %}
+                    {% for item in cart.items.all %}
+                        <tr>
+                            <td class="text-start">
+                                <div class="cart-product">
+                                    {% include 'partials/variant_line.html' with product=item.product variant=item.variant %}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="quantity-control">
+                                    <button class="btn btn-outline-primary btn-sm"
+                                        hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+                                        hx-post="{% url 'product:decrease_cart_item' item.id %}"
+                                        hx-target="#cart-menu"
+                                        hx-swap="outerHTML"
+                                        aria-label="Giảm số lượng">
+                                        <i class="bi bi-dash"></i>
+                                    </button>
+                                    <input type="number" min="1" pattern="[0-9]*" inputmode="numeric" autocomplete="off"
+                                        class="form-control text-center" name="quantity" value="{{ item.quantity }}"
+                                        hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+                                        hx-post="{% url 'product:update_cart_item' item.id %}"
+                                        hx-trigger="change"
+                                        hx-target="#cart-menu"
+                                        hx-swap="outerHTML">
+                                    <button class="btn btn-outline-primary btn-sm"
+                                        hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+                                        hx-post="{% url 'product:increase_cart_item' item.id %}"
+                                        hx-target="#cart-menu"
+                                        hx-swap="outerHTML"
+                                        aria-label="Tăng số lượng">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td>
+                                {% if item.variant.price_sale %}
+                                    <div class="small text-muted text-decoration-line-through">{{ item.variant.price }}đ</div>
+                                    <div class="fw-bold text-danger">{{ item.variant.price_sale }}đ</div>
+                                {% else %}
+                                    <div class="fw-bold text-danger">{{ item.variant.price }}đ</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="fw-bold text-dark">{{ item.total_price }}đ</span>
+                            </td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-outline-danger"
+                                    hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+                                    hx-post="{% url 'product:remove_from_cart' item.id %}"
+                                    hx-target="#cart-menu"
+                                    hx-swap="outerHTML"
+                                    aria-label="Xoá sản phẩm">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="cart-empty">
+                                <i class="fas fa-shopping-cart"></i>
+                                <p class="mb-0">Giỏ hàng trống.</p>
+                            </div>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="cart-total-box">
+        <span>Tổng cộng</span>
+        {% if cart and cart.total_price %}
+            <strong>{{ cart.total_price }}đ</strong>
+        {% else %}
+            <strong>0đ</strong>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener("input", function(event) {
+        if (event.target.type === "number" && event.target.name === "quantity") {
+            event.target.value = event.target.value.replace(/[^0-9]/g, '');
+        }
+    });
+</script>

@@ -1,0 +1,41 @@
+<div class="page-toolbar">
+    <span class="result-count">
+        <i class="bi bi-file-earmark-text"></i>
+        Có <strong class="text-dark">{{ filtered_posts_count }}</strong>/<strong class="text-dark">{{ total_posts }}</strong> bài viết
+    </span>
+</div>
+
+<div class="row g-4">
+    {% for post in posts %}
+        <div class="col-sm-6 col-xl-4">
+            <article class="post-card">
+                <a {% include 'partials/href_post.html' %} class="post-card__media ratio ratio-4x3">
+                    <img src="{{ post.get_thumbnail }}" alt="{{ post.title }}" loading="lazy">
+                </a>
+                <div class="post-card__body">
+                    <div class="post-card__meta">
+                        <span><i class="bi bi-calendar3 me-1"></i>{{ post.created_at|date:'d-m-Y' }}</span>
+                    </div>
+                    <a {% include 'partials/href_post.html' %} class="text-decoration-none">
+                        <h2 class="post-card__title">{{ post.title }}</h2>
+                    </a>
+                    <div class="post-card__tags">
+                        {% if post.subject %}
+                            <a {% include 'partials/href_subject.html' %} class="pill-link">{{ post.subject }}</a>
+                        {% endif %}
+                        {% if post.subsubject %}
+                            <a {% include 'partials/href_subsubject.html' %} class="pill-link">{{ post.subsubject }}</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </article>
+        </div>
+    {% empty %}
+        <div class="col-12">
+            <div class="content-card text-center py-5 px-3">
+                <i class="bi bi-journal-x display-6 text-muted d-block mb-3"></i>
+                <p class="mb-0">Không có bài viết nào được tìm thấy.</p>
+            </div>
+        </div>
+    {% endfor %}
+</div>

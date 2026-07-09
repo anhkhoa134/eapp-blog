@@ -1,0 +1,8 @@
+<h6><i class="bi bi-diagram-3"></i> Danh mục phụ</h6>
+{% for subcategory in subcategories %}
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="subcategories" value="{{ subcategory.id }}" id="subcategory{{ forloop.counter }}"
+               {% if subcategory.id|stringformat:"s" in selected_subcategories %}checked{% endif %}>
+        <label class="form-check-label" for="subcategory{{ forloop.counter }}">{{ subcategory.name }}</label>
+    </div>
+{% endfor %}

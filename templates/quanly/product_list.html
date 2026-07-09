@@ -1,0 +1,207 @@
+{% load static %}
+{% load custom_tags %}
+<div id="product-list-container">
+
+    <!-- Filter Form -->
+    <div class="col-12 filter-card mb-4">
+        <form hx-get="{% url 'quanly:product_list' %}" hx-target="#product-list-container"> 
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <div class="flex-fill" style="min-width: 160px; max-width: 220px;">
+                    {{ form.name }}
+                </div>
+                <div class="flex-fill" style="min-width: 160px; max-width: 220px;">
+                    {{ form.category }}
+                </div>
+                <div class="flex-fill" style="min-width: 160px; max-width: 220px;">
+                    {{ form.subcategory }}
+                </div>
+                <div class="flex-fill" style="min-width: 160px; max-width: 220px;">
+                    {{ form.is_stock }}
+                </div>
+                <div class="flex-fill" style="min-width: 160px; max-width: 220px;">
+                    <select name="sort_by" class="form-select">
+                        <option value="-id" {% if request.GET.sort_by == '-id' %}selected{% endif %}>Sản phẩm mới nhất</option>
+                        <option value="id" {% if request.GET.sort_by == 'id' %}selected{% endif %}>Sản phẩm cũ nhất</option>
+                        <option value="name_asc" {% if request.GET.sort_by == 'name_asc' %}selected{% endif %}>Tên: A -> Z</option>
+                        <option value="name_desc" {% if request.GET.sort_by == '-name_desc' or request.GET.sort_by == 'name_desc' %}selected{% endif %}>Tên: Z -> A</option>
+                        <option value="price_asc" {% if request.GET.sort_by == 'price_asc' %}selected{% endif %}>Giá tăng dần</option>
+                        <option value="price_desc" {% if request.GET.sort_by == 'price_desc' %}selected{% endif %}>Giá giảm dần</option>
+                    </select>
+                </div>
+                <div class="d-flex justify-content-start gap-2">
+                    <input type="submit" value="Lọc" class="btn btn-primary btn-sm px-3">
+                    <a class="btn btn-secondary btn-sm px-3" href="{% url 'quanly:product_view' %}">Hủy</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Product List -->
+    <div class="col-12">
+        <div class="card recent-sales overflow-auto">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">
+                        Sản phẩm 
+                        <span>| Có {{filtered_products_count}}/{{ total_products }} sản phẩm</span>
+                    </h5>
+                    
+                    <div class="d-flex gap-2">
+                        <!-- Tải file mẫu ZIP -->
+                        <a class="card-title" 
+                           href="{% static 'quanly/products.zip' %}"
+                           download="products.zip"
+                           hx-disable
+                           onclick="event.stopImmediatePropagation();"
+                           style="cursor: pointer;">
+                            <i class="bi bi-download"></i>
+                            Tải file mẫu ZIP
+                        </a>
+                        <!-- Upload file ZIP -->
+                        <a class="card-title" onclick="document.getElementById('zip-input-import').click();" style="cursor: pointer;">
+                            <i class="bi bi-file-earmark-zip"></i>
+                            Tải lên file ZIP
+                        </a>
+                        <input type="file" name="file" accept=".zip" id="zip-input-import" style="display: none;" required
+                            hx-encoding="multipart/form-data"
+                            hx-post="{% url 'quanly:upload_product_zip' %}"
+                            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                            hx-trigger="change"
+                            hx-target="body"
+                            hx-swap="outerHTML"
+                            onsubmit="showSpinner()">
+
+                        <a data-bs-target="#addModal" type="button" class="card-title" data-bs-toggle="modal"
+                            hx-get="{% url 'quanly:add_product' %}" hx-target="#dialog">
+                            <i class="bi bi-plus-circle"></i> Thêm sản phẩm
+                        </a>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-borderless table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Danh mục</th>
+                                <th>Sản phẩm</th>
+                                <!-- <th class="text-center">Nổi bật</th> -->
+                                <th class="text-center">Giá</th>
+                                <th class="text-center">Số lượng tồn</th>
+                                <th class="text-center">Sửa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in page_obj_product %}
+                            <tr id="product-{{product.id}}">
+                                <td>
+                                    <div style="display:flex; flex-direction:column; gap:3px;">
+                                        {% if product.category %}
+                                            <span style="font-size:0.85em; font-weight:600; color:#343a40;">
+                                                {{product.category.get_icon}} {{product.category|truncatechars:18}}
+                                            </span>
+                                        {% endif %}
+                                        {% if product.subcategory %}
+                                            <span style="display:inline-flex; align-items:center; gap:3px; font-size:0.76em; color:#6c757d;">
+                                                <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 2 L2 8 L8 8" stroke="#adb5bd" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                                {{product.subcategory.get_icon}} {{product.subcategory|truncatechars:18}}
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    <a class="admin-title-link" {% include 'partials/href_product.html' %}>
+                                        <span class="admin-title-body">
+                                            <span class="admin-title-icon">{{product.get_icon}}</span>
+                                            <span class="admin-title-text">{{product.name}}</span>
+                                        </span>
+                                        {% if product.featured %}
+                                            <span class="admin-featured-icon text-warning" title="Nổi bật" aria-label="Nổi bật">
+                                                <i class="bi bi-star-fill"></i>
+                                            </span>
+                                        {% endif %}
+                                    </a>
+                                </td>
+                                <!-- <td class="text-center">
+                                    {% if product.featured %}
+                                    <span class="text-success"><i class="bi bi-check-circle-fill"></i></span>
+                                    {% endif %}
+                                </td> -->
+                                <td class="text-center">
+                                    {% if product.price_sale %}
+                                        <div style="display:inline-flex; flex-direction:column; align-items:center; gap:3px;">
+                                            <span style="font-size:0.78em; color:#b0b8c1; text-decoration:line-through; letter-spacing:0.01em;">
+                                                {{product.price}}<sup>đ</sup>
+                                            </span>
+                                            <span style="
+                                                display:inline-flex; align-items:center; gap:2px;
+                                                background: #fff0f0;
+                                                color: #e63946;
+                                                font-size:0.73em; font-weight:700;
+                                                padding:2px 8px;
+                                                border-radius:6px;
+                                                border: 1px solid #ffc9cc;
+                                                letter-spacing:0.04em;
+                                                box-shadow: 0 1px 3px rgba(230,57,70,0.10);
+                                            ">
+                                                <svg width="9" height="9" viewBox="0 0 10 10" fill="none" style="flex-shrink:0;"><path d="M5 8L5 2M5 2L2 5M5 2L8 5" stroke="#e63946" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" transform="rotate(180 5 5)"/></svg>
+                                                -{{product.get_percentage|floatformat:0}}%
+                                            </span>
+                                            <span style="font-size:1em; font-weight:700; color:#e63946; letter-spacing:0.01em;">
+                                                {{product.price_sale}}<sup>đ</sup>
+                                            </span>
+                                        </div>
+                                    {% else %}
+                                        <span style="font-size:0.95em; font-weight:600; color:#212529; letter-spacing:0.01em;">
+                                            {{product.price}}<sup>đ</sup>
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if product.stock and product.stock > 0 %}
+                                        <span style="
+                                            display:inline-flex; align-items:center;
+                                            background:#f0faf4;
+                                            color:#2d9e5f;
+                                            font-size:0.8em; font-weight:700;
+                                            padding:3px 10px;
+                                            border-radius:6px;
+                                            border:1px solid #b7e4ca;
+                                            box-shadow:0 1px 3px rgba(45,158,95,0.08);
+                                            letter-spacing:0.02em;
+                                        ">{{ product.stock }}</span>
+                                    {% else %}
+                                        <span style="
+                                            display:inline-flex; align-items:center;
+                                            background:#fff5f5;
+                                            color:#c0392b;
+                                            font-size:0.75em; font-weight:600;
+                                            padding:3px 9px;
+                                            border-radius:6px;
+                                            border:1px solid #f5c6cb;
+                                            box-shadow:0 1px 3px rgba(192,57,43,0.08);
+                                            letter-spacing:0.03em;
+                                        ">Hết hàng</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <a style="cursor: pointer;" class="link-primary"
+                                        hx-get="{% url 'quanly:edit_product' product.id %}"
+                                        hx-target="#dialog"> 
+                                        <i class="bi bi-pencil-square"></i> <!-- Edit -->
+                                    </a>
+                                    &nbsp;&nbsp;
+                                    <a href="{% url 'quanly:edit_specification' product.id %}"><i class="bi bi-credit-card-2-front"></i></a> 
+                                </td> 
+                            </tr> 
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% include 'quanly/pagination.html' with page_obj=page_obj_product %}
+
+</div>

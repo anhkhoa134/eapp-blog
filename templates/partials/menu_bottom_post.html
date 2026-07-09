@@ -1,0 +1,14 @@
+<!-- {% for subject in subjects %}
+    <li><a href="{% url 'post:subject' subject.slug %}" class="text-capitalize">{{ subject.title }}</a></li>
+{% endfor %}     -->
+
+{% for subject in subjects %}
+<div class="col-lg-4 col-md-6">
+    <a href="{% url 'post:subject' subject.slug %}"><h5 style="font-size: large; font-weight:600;">{{subject}}</h5></a>
+    <ul>
+        {% for subsubject in subject.subsubjects.all %}
+        <li><i class="bi bi-chevron-compact-right text-primary"></i> <a class="text-secondary" style="font-size: small; font-weight:500;" href="{% url 'post:subsubject' subsubject.slug %}">{{subsubject}}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+{% endfor %}

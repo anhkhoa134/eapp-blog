@@ -1,0 +1,21 @@
+<form class="modal-content" hx-post="{{ request.path }}" hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' enctype="multipart/form-data">
+    <div class="modal-header">
+        {% if current_category %}
+            <h5 class="modal-title">Sửa danh mục: <b>{{current_category.name}}</b></h5>
+        {% else %}
+            <h5 class="modal-title">Thêm danh mục</h5>
+        {% endif %}
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        {{ form.as_p }}    
+    </div> 
+    <div class="modal-footer">
+        {% if current_category %} <!-- thêm tính năng Xóa cho button Edit -->
+            <button type="button" class="btn btn-danger" hx-post="{% url 'quanly:delete_category' current_category.id %}">Xóa</button><span class="flex-grow-1"></span> <!-- để nút Remove nằm bên trái -->
+        {% endif %}
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="submit" class="btn btn-primary">Lưu</button>
+    </div>
+ </form>
+

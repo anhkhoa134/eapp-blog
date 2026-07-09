@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ post.title }}{% endblock title %}
+
+{% block meta %}
+{% include 'partials/meta_post.html' %}
+{% endblock meta %}
+
+{% block content %}
+<main class="container page-shell">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Trang Chủ</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'post:post_all' %}">Tất Cả Bài Viết</a></li>
+            {% if post.subject %}
+                <li class="breadcrumb-item"><a {% include 'partials/href_subject.html' %}>{{ post.subject.title }}</a></li>
+            {% endif %}
+            {% if post.subsubject %}
+                <li class="breadcrumb-item"><a {% include 'partials/href_subsubject.html' %}>{{ post.subsubject.title }}</a></li>
+            {% endif %}
+            <li class="breadcrumb-item active" aria-current="page">{{ post.title }}</li>
+        </ol>
+    </nav>
+
+    <section class="row g-4 mt-2">
+        <article class="col-lg-8">
+            <div class="article-card">
+                <h1 class="article-card__title">{{ post.title }}</h1>
+                <div class="article-card__meta">
+                    <span><i class="bi bi-calendar3 me-1"></i>{{ post.created_at|date:'d-m-Y' }}</span>
+                    {% if post.subject %}<span><i class="bi bi-bookmark me-1"></i>{{ post.subject.title }}</span>{% endif %}
+                    {% if post.subsubject %}<span><i class="bi bi-tag me-1"></i>{{ post.subsubject.title }}</span>{% endif %}
+                </div>
+                <img src="{{ post.get_image }}" class="article-card__image" alt="{{ post.title }}">
+                <div class="rich-content">
+                    {{ post.description|safe|linebreaks }}
+                    <div class="ck-content">
+                        {{ post.postcontent.content|safe }}
+                    </div>
+                </div>
+            </div>
+
+            <nav class="d-flex justify-content-between gap-2 mt-4" aria-label="Pagination">
+                {% if previous_post %}
+                    <a class="btn btn-outline-primary" href="{% url 'post:post_detail' previous_post.subject.slug previous_post.slug %}">
+                        <i class="bi bi-arrow-left me-1"></i> Bài viết trước
+                    </a>
+                {% else %}
+                    <span class="btn btn-outline-secondary disabled">Bài viết trước</span>
+                {% endif %}
+
+                {% if next_post %}
+                    <a class="btn btn-outline-primary" href="{% url 'post:post_detail' next_post.subject.slug next_post.slug %}">
+                        Bài viết sau <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                {% else %}
+                    <span class="btn btn-outline-secondary disabled">Bài viết sau</span>
+                {% endif %}
+            </nav>
+        </article>
+
+        <aside class="col-lg-4">
+            <div class="sidebar-panel">
+                <h2 class="h5 mb-3">Bài viết liên quan</h2>
+                {% for post in related_posts %}
+                    <div class="related-item">
+                        <a {% include 'partials/href_post.html' %} class="related-item__thumb ratio ratio-1x1">
+                            <img src="{{ post.get_thumbnail }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ post.title }}">
+                        </a>
+                        <div>
+                            <a {% include 'partials/href_post.html' %} class="related-item__title">{{ post.title }}</a>
+                            <div class="small text-muted mt-1">{{ post.created_at|date:'d-m-Y' }}</div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted mb-0">Chưa có bài viết liên quan.</p>
+                {% endfor %}
+            </div>
+        </aside>
+    </section>
+</main>
+
+<section class="container mt-4">
+    <div class="comment-panel">
+        <div class="section-head">
+            <h2 class="section-title">Bình luận</h2>
+        </div>
+
+        <div id="comments-section" class="comment-list">
+            {% for comment in post.comments.all %}
+                <div class="comment-item">
+                    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                        <strong class="text-dark"><i class="bi bi-person-circle me-2"></i>{{ comment.user.username }}</strong>
+                        <small class="text-muted">{{ comment.created_at|date:"H:i d-m-Y" }}</small>
+                        {% if user.is_authenticated %}
+                            <button class="btn btn-sm btn-outline-primary ms-auto"
+                                hx-get="{% url 'post:add_reply' comment.id %}"
+                                hx-target="#reply-form-{{ comment.id }}"
+                                hx-swap="outerHTML">
+                                <i class="bi bi-reply-fill"></i> Phản hồi
+                            </button>
+                        {% else %}
+                            <a href="{% url 'account:login' %}?next={{ request.path }}" class="btn btn-sm btn-outline-primary ms-auto">
+                                <i class="bi bi-reply-fill"></i> Phản hồi
+                            </a>
+                        {% endif %}
+                    </div>
+                    <p class="mb-0">{{ comment.content }}</p>
+                    <div id="reply-form-{{ comment.id }}"></div>
+
+                    <div class="comment-replies">
+                        {% for reply in comment.replies.all %}
+                            <div id="comment-{{ reply.id }}" class="comment-item bg-white">
+                                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                                    <strong class="text-dark"><i class="bi bi-person-circle me-2"></i>{{ reply.user.username }}</strong>
+                                    <small class="text-muted">{{ reply.created_at|date:"H:i d-m-Y" }}</small>
+                                    {% if user.is_authenticated %}
+                                        <button class="btn btn-sm btn-outline-primary ms-auto"
+                                            hx-get="{% url 'post:add_reply' comment.id reply.id %}"
+                                            hx-target="#reply-form-{{ reply.id }}"
+                                            hx-swap="outerHTML">
+                                            <i class="bi bi-reply-fill"></i> Phản hồi
+                                        </button>
+                                    {% else %}
+                                        <a href="{% url 'account:login' %}?next={{ request.path }}" class="btn btn-sm btn-outline-primary ms-auto">
+                                            <i class="bi bi-reply-fill"></i> Phản hồi
+                                        </a>
+                                    {% endif %}
+                                </div>
+                                <p class="mb-0">{{ reply.content }}</p>
+                                <div id="reply-form-{{ reply.id }}"></div>
+                            </div>
+                        {% endfor %}
+                        <div id="comment-{{ comment.id }}"></div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="comment-item text-muted">Chưa có bình luận.</div>
+            {% endfor %}
+        </div>
+
+        {% if user.is_authenticated %}
+            <form hx-post="{% url 'post:add_comment' post.id %}"
+                hx-target="#comments-section"
+                hx-swap="beforeend"
+                hx-on="htmx:afterRequest: this.style.display='none';"
+                method="POST"
+                class="mt-4">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <textarea name="content" class="form-control" placeholder="Viết nội dung của bạn" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-chat-dots-fill"></i> Bình luận
+                </button>
+            </form>
+        {% else %}
+            <div class="mt-4">
+                <a href="{% url 'account:login' %}?next={{ request.path }}" class="btn btn-primary">
+                    <i class="bi bi-chat-dots-fill"></i> Đăng nhập để bình luận
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock content %}

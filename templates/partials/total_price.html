@@ -1,0 +1,5 @@
+<span hx-get="{% url 'product:hx_total_price' %}" 
+        hx-trigger="update-menu-cart from:body" 
+        hx-swap="innerHTML">
+        {{total_price_vnd}}<sup><u>đ</u></sup>
+</span>

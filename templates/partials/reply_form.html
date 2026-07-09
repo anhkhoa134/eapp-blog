@@ -1,0 +1,18 @@
+<form {% if reply %}
+        hx-post="{% url 'post:add_reply' comment.id reply.id %}" 
+    {% else %}
+        hx-post="{% url 'post:add_reply' comment.id %}"
+    {% endif %}
+    hx-target="#comment-{{ comment.id }}" 
+    hx-swap="afterend" 
+    hx-on="htmx:afterRequest: this.style.display='none';" 
+    method="POST" 
+    class="mt-2 mb-3">
+    {% csrf_token %}
+    <div class="mb-2">
+        <textarea name="content" class="form-control" placeholder="Viết nội dung của bạn" rows="2">{% if reply.id %}@{{ reply.user.username }}{% else %}@{{ comment.user.username }}{% endif %} </textarea>
+    </div>
+    <button type="submit" class="btn btn-sm btn-primary">
+        <i class="bi bi-chat-dots-fill"></i> Bình luận
+    </button>
+</form>

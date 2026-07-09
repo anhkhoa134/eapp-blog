@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Chi tiết đơn hàng {{ order.id }}{% endblock title %}
+
+{% block meta %}
+{% include 'partials/meta.html' %}
+{% endblock meta %}
+
+{% block content %}
+<main class="container page-shell">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Trang Chủ</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'account:order_cus' %}">Đơn Hàng Đã Mua</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Đơn #{{ order.id }}</li>
+        </ol>
+    </nav>
+
+    <section class="page-hero">
+        <div>
+            <span class="page-kicker"><i class="bi bi-receipt"></i> Chi tiết đơn hàng</span>
+            <h1 class="page-title">
+                Đơn hàng #{{ order.id }}
+                {% if order.status_order == 'Giao thành công' %}
+                    <span class="badge rounded-pill bg-success-subtle text-success">Giao thành công</span>
+                {% elif order.status_order == 'Đang vận chuyển' %}
+                    <span class="badge rounded-pill bg-primary-subtle text-primary">Đang vận chuyển</span>
+                {% elif order.status_order == 'Đã huỷ' %}
+                    <span class="badge rounded-pill bg-danger-subtle text-danger">Đã huỷ</span>
+                {% else %}
+                    <span class="badge rounded-pill bg-warning-subtle text-warning">Đang xử lý</span>
+                {% endif %}
+            </h1>
+            <p class="page-subtitle">Kiểm tra thông tin giao hàng, trạng thái xử lý và các sản phẩm trong đơn.</p>
+        </div>
+    </section>
+
+    <section class="row g-4">
+        <div class="col-lg-5">
+            <div class="order-panel">
+                <h2 class="account-card__title">Thông tin nhận hàng</h2>
+                <ul class="order-info-list mt-3">
+                    <li><span>Ngày đặt hàng</span><strong>{{ order.created_at|date:"d-m-Y" }}</strong></li>
+                    <li><span>Người nhận hàng</span><strong>{{ order.fullname }}</strong></li>
+                    <li><span>Điện thoại</span><strong>{{ order.phone }}</strong></li>
+                    <li><span>Địa chỉ</span><strong class="text-end">{{ order.shipping_address }}</strong></li>
+                    <li>
+                        <span>Thanh toán</span>
+                        <strong>{{ payment_method_display }}</strong>
+                    </li>
+                    <li><span>Tổng tiền</span><strong class="order-total">{{ order.total_price }}đ</strong></li>
+                </ul>
+
+                <div class="order-status-card">
+                    {% if order.status_order == 'Giao thành công' %}
+                        <div class="progress" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="width: 100%">Giao thành công</div>
+                        </div>
+                    {% elif order.status_order == 'Đang vận chuyển' %}
+                        <div class="progress" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" style="width: 50%">Đang vận chuyển</div>
+                        </div>
+                    {% elif order.status_order == 'Đã huỷ' %}
+                        <div class="progress" role="progressbar" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" style="width: 10%">Đã huỷ</div>
+                        </div>
+                    {% else %}
+                        <div class="progress" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" style="width: 25%">Đang xử lý</div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if selected_paymentmethod %}
+                    <div class="payment-card">
+                        {% if selected_paymentmethod.image %}
+                            <img src="{{ selected_paymentmethod.get_image }}" alt="QR {{ selected_paymentmethod.name }}">
+                        {% endif %}
+                        <div>
+                            <p class="mb-2"><span class="text-muted">Phương thức:</span> <strong>{{ selected_paymentmethod.name }}</strong></p>
+                            <p class="mb-2"><span class="text-muted">Số tài khoản / ví:</span> <strong>{{ selected_paymentmethod.account_number }}</strong></p>
+                            <p class="mb-0"><span class="text-muted">Chủ tài khoản:</span> <strong>{{ selected_paymentmethod.account_name }}</strong></p>
+                        </div>
+                    </div>
+                {% elif order.payment_method == 'BANK' %}
+                    <div class="alert alert-info mb-0">Nếu cần xác nhận thông tin chuyển khoản, vui lòng liên hệ PTcom hoặc kiểm tra email xác nhận đơn hàng.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="order-panel">
+                <h2 class="account-card__title">Sản phẩm trong đơn</h2>
+                <div class="table-responsive mt-3">
+                    <table class="table table-hover text-center align-middle order-table">
+                        <thead>
+                            <tr>
+                                <th class="text-start">Sản phẩm</th>
+                                <th style="width: 5%;">SL</th>
+                                <th style="width: 15%;">Đơn giá</th>
+                                <th style="width: 15%;">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order.items.all %}
+                                <tr>
+                                    <td class="text-start">
+                                        <div class="cart-product">
+                                            {% include 'partials/variant_line.html' with product=item.product variant=item.variant %}
+                                        </div>
+                                    </td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>{{ item.price }}đ</td>
+                                    <td class="fw-bold">{{ item.subtotal }}đ</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="d-flex flex-wrap justify-content-between gap-2 mt-4">
+        <a href="{% url 'account:order_cus' %}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left me-1"></i> Đơn hàng đã mua
+        </a>
+        <a href="{% url 'product:product_all' %}" class="btn btn-primary">
+            Tiếp tục mua sắm <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+    </div>
+</main>
+{% endblock content %}

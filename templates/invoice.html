@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Hóa đơn{% endblock title %}
+
+{% block content %}
+<main class="container page-shell">
+    <div id="invoice_wrapper" class="invoice-panel">
+        <div class="d-flex flex-wrap justify-content-between gap-3 mb-4">
+            <div class="invoice-brand">
+                <a href="{% url 'core:home' %}" class="invoice-mark">PT</a>
+                <div>
+                    <strong class="text-dark">PTcom</strong><br>
+                    <span class="text-muted">88 Bùi Công Trừng, Đông Thạnh, Hóc Môn, TP.HCM</span>
+                </div>
+            </div>
+            <div class="text-lg-end">
+                <h1 class="h3 mb-1">HÓA ĐƠN</h1>
+                <span class="text-muted">ID: {{ order_last_items.0.order }}</span>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped invoice-table">
+                <thead>
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th class="text-center">Giá</th>
+                        <th class="text-center">Số lượng</th>
+                        <th class="text-end">Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order_last_items %}
+                        <tr>
+                            <td>{{ item.product.name }}</td>
+                            <td class="text-center">{{ item.price }}đ</td>
+                            <td class="text-center">{{ item.quantity }}</td>
+                            <td class="text-end">{{ item.subtotal }}đ</td>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <td colspan="3" class="text-end fw-bold">Tổng</td>
+                        <td class="text-end fw-bold">{{ total_price_vnd }}đ</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row g-4 mt-4">
+            <div class="col-md-6">
+                <p class="mb-1"><strong>Tài khoản:</strong> {{ request.user|title }}</p>
+                <p class="mb-1"><strong>Người nhận:</strong> {{ info.fullname }}</p>
+                <p class="mb-1"><strong>Điện thoại:</strong> {{ info.phone }}</p>
+                <p class="mb-0"><strong>Địa chỉ:</strong> {{ info.address }}</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <p class="mb-1 text-muted">Tổng thanh toán</p>
+                <h2 class="order-total">{{ total_price_vnd }}đ</h2>
+            </div>
+        </div>
+
+        <div class="text-center border-top mt-4 pt-4">
+            <p class="mb-0 text-muted"><strong>Xin chào {{ request.user|title }}!</strong> Cảm ơn bạn đã tin tưởng và lựa chọn sản phẩm của PTcom.</p>
+        </div>
+    </div>
+
+    <div class="text-center mb-5">
+        <a href="javascript:window.print()" class="btn btn-outline-primary"><i class="bi bi-printer"></i> Print</a>
+        <a id="invoice_download_btn" class="btn btn-primary"><i class="bi bi-file-earmark-arrow-down"></i> Download</a>
+    </div>
+</main>
+{% endblock content %}
+
+{% block js %}
+<script src="{% static 'vendor/html2canvas/html2canvas.min.js' %}"></script>
+<script src="{% static 'vendor/jspdf/jspdf.min.js' %}"></script>
+<script src="{% static 'canhan/js/invoice.js' %}"></script>
+{% endblock js %}

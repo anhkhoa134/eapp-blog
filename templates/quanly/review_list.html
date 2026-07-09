@@ -1,0 +1,51 @@
+
+<div id="review-list-container">
+    <!-- review List -->
+    <div class="col-12" >
+        <div class="card recent-sales overflow-auto" >
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <h5 class="card-title">Đánh giá 
+                        <!-- <span>| Gần đây</span> -->
+                    </h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-borderless table-hover text-center">
+                        <thead>
+                            <tr>
+                                <th>Tài khoản</th>
+                                <th>Sản phẩm</th>
+                                <th>Đánh giá</th>
+                                <th>Nội dung</th>
+                                <th>Ngày</th>
+                                <th>Xoá</th>                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for review in page_obj %}
+                            <tr id="review-{{review.id}}">
+                                <td>{{ review.user.username }}</td>
+                                <td><a {% include 'partials/href_review.html' %}>{{ review.product.name }}</a></td>
+                                <td>{{ review.rating }}</td>
+                                <td>{{ review.comment|truncatechars:20 }}</td>
+                                <td>{{ review.created_at|date:"H:i d-m-Y" }}</td>                
+                                <td>
+                                    <a  style="cursor: pointer;" class="link-danger"
+                                        hx-get="{% url 'quanly:delete_review' review.id %}"
+                                        hx-target="#dialog">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% include 'quanly/pagination.html' %}
+
+</div>

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Thiết lập mật khẩu mới{% endblock title %}
+
+{% block content %}
+<main class="container page-shell">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Trang Chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Thiết lập mật khẩu</li>
+        </ol>
+    </nav>
+
+    <section class="auth-shell">
+        <div class="auth-card text-center">
+            <span class="auth-card__icon"><i class="bi bi-shield-lock"></i></span>
+            <h1 class="auth-card__title">Thiết lập mật khẩu mới</h1>
+            {% if form %}
+                <p class="auth-card__subtitle">Nhập mật khẩu mới cho tài khoản của bạn.</p>
+                <form method="post" class="text-start">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <div class="password-field">
+                            {{ form.new_password1 }}
+                            <button class="password-toggle" type="button" aria-label="Hiện mật khẩu" aria-pressed="false" title="Hiện mật khẩu">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        {{ form.new_password1.help_text|safe }}
+                    </div>
+                    <div class="mb-3">
+                        <div class="password-field">
+                            {{ form.new_password2 }}
+                            <button class="password-toggle" type="button" aria-label="Hiện mật khẩu" aria-pressed="false" title="Hiện mật khẩu">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg w-100">Thiết lập mật khẩu mới</button>
+                </form>
+            {% else %}
+                <p class="auth-card__subtitle">Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.</p>
+                <a href="{% url 'account:password_reset_request' %}" class="btn btn-primary btn-lg w-100">Gửi lại yêu cầu</a>
+            {% endif %}
+        </div>
+    </section>
+</main>
+{% endblock content %}

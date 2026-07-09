@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block title %}Sản phẩm yêu thích{% endblock title %}
+
+{% block content %}
+<main class="container page-shell">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Trang Chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Sản phẩm yêu thích</li>
+        </ol>
+    </nav>
+
+    <section class="page-hero">
+        <div>
+            <span class="page-kicker"><i class="bi bi-heart"></i> Yêu thích</span>
+            <h1 class="page-title">Sản phẩm yêu thích</h1>
+            <p class="page-subtitle">Lưu lại các sản phẩm bạn quan tâm để xem lại hoặc thêm vào giỏ hàng nhanh hơn.</p>
+        </div>
+        <a href="{% url 'product:product_all' %}" class="btn btn-outline-primary">
+            <i class="bi bi-grid me-1"></i> Xem sản phẩm
+        </a>
+    </section>
+
+    <section class="row g-4 account-layout">
+        {% include 'partials/account_sidebar.html' %}
+
+        <div class="col-xl-9 col-lg-8">
+            <div class="account-card">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                    <div>
+                        <h2 class="account-card__title">Danh sách yêu thích</h2>
+                        <p class="account-card__subtitle mb-0">Các sản phẩm được lưu gần nhất hiển thị trước.</p>
+                    </div>
+                    <span class="result-count">
+                        <i class="bi bi-heart-fill"></i>
+                        <strong class="text-dark">{{ wishlist_items|length }}</strong> sản phẩm
+                    </span>
+                </div>
+
+                {% if wishlist_items %}
+                    <div class="row wishlist-grid">
+                        {% for item in wishlist_items %}
+                            {% with product=item.product %}
+                                <div class="col-6 col-md-4 col-xl-3 mb-4">
+                                    <div class="product-card">
+                                        {% if product.price_sale and product.price %}
+                                            <span class="badge-sale">-{{ product.get_percentage|floatformat:0 }}%</span>
+                                        {% endif %}
+
+                                        <a class="btn-wishlist is-active" href="{% url 'product:remove_from_wishlist' product.id %}" title="Bỏ yêu thích" aria-label="Bỏ yêu thích">
+                                            <i class="fas fa-heart"></i>
+                                        </a>
+
+                                        {% if product.category %}
+                                            <a href="{% url 'product:product_detail' slug_category=product.category.slug slug_product=product.slug %}" class="product-thumb ratio ratio-1x1">
+                                                <img src="{{ product.get_thumbnail }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ product.name }}" loading="lazy">
+                                            </a>
+                                        {% else %}
+                                            <a href="{% url 'product:product_all' %}" class="product-thumb ratio ratio-1x1">
+                                                <img src="{{ product.get_thumbnail }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ product.name }}" loading="lazy">
+                                            </a>
+                                        {% endif %}
+
+                                        <div class="product-body">
+                                            {% if product.category %}
+                                                <a href="{% url 'product:product_detail' slug_category=product.category.slug slug_product=product.slug %}" class="text-decoration-none">
+                                                    <h3 class="product-name" title="{{ product.name }}">{{ product.name }}</h3>
+                                                </a>
+                                            {% else %}
+                                                <a href="{% url 'product:product_all' %}" class="text-decoration-none">
+                                                    <h3 class="product-name" title="{{ product.name }}">{{ product.name }}</h3>
+                                                </a>
+                                            {% endif %}
+
+                                            <div class="product-price">
+                                                {% if product.price_sale %}
+                                                    <span class="price-current">{{ product.price_sale }}₫</span>
+                                                    <span class="price-old">{{ product.price }}₫</span>
+                                                {% else %}
+                                                    <span class="price-regular">{{ product.price }}₫</span>
+                                                {% endif %}
+                                            </div>
+
+                                            <a class="btn-add-cart"
+                                                href=""
+                                                hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+                                                hx-post="{% url 'product:add_to_cart_simple' product.id %}"
+                                                hx-target="#cart-menu"
+                                                hx-swap="outerHTML">
+                                                <i class="fas fa-shopping-cart"></i>Thêm vào giỏ
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endwith %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="order-history-empty">
+                        <i class="bi bi-heart"></i>
+                        <span>Chưa có sản phẩm yêu thích.</span>
+                        <a href="{% url 'product:product_all' %}" class="btn btn-primary btn-sm">Khám phá sản phẩm</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock content %}
