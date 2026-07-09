@@ -35,18 +35,18 @@
                     <span class="btn-add-cart disabled" aria-disabled="true">
                         <i class="bi bi-x-circle"></i>Hết hàng
                     </span>
-                {% elif user.is_authenticated %}
+                {% elif user.is_authenticated or commerce_config.allow_guest_cart %}
                     <a class="btn-add-cart"
                         href=""
                         hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
                         hx-post="{% url 'product:add_to_cart_simple' product.id %}"
                         hx-target="#cart-menu"
                         hx-swap="outerHTML">
-                        <i class="fas fa-shopping-cart"></i>Thêm vào giỏ
+                        <i class="fas fa-shopping-cart"></i>Thêm vào giỏ hàng
                     </a>
                 {% else %}
-                    <a class="btn-add-cart" href="{% url 'account:login' %}?next={{ request.path }}">
-                        <i class="fas fa-shopping-cart"></i>Thêm vào giỏ
+                    <a class="btn-add-cart" href="{% url 'account:login' %}?next={{ request.path }}&auth_message=cart">
+                        <i class="fas fa-shopping-cart"></i>Thêm vào giỏ hàng
                     </a>
                 {% endif %}
             </div>

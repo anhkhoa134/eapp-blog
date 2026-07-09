@@ -129,27 +129,13 @@
                     hx-swap="outerHTML">
                     <input type="hidden" name="variant_id" value="{{ active_variant.id }}">
 
-                    {% if active_variant %}
-                        <div class="selected-variant">
-                            <span>Biến thể đã chọn</span>
-                            <strong>{{ active_variant.attribute_values_summary }}</strong>
-                            <div class="selected-variant__attrs">
-                                {% for variant_attribute in active_variant.attributes.all %}
-                                    <span>{{ variant_attribute.attribute.key }}: {{ variant_attribute.attribute.value }}</span>
-                                {% empty %}
-                                    <span>Mặc định</span>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    {% endif %}
-
                     {% if variants %}
                         <div class="variant-group">
                             <div class="variant-label">Chọn biến thể</div>
                             <div class="variant-options">
                                 {% for variant in variants %}
                                 <a class="variant-chip {% if active_variant and active_variant.id == variant.id %}active{% endif %}" {% include 'partials/href_product.html' %}>
-                                    <span class="variant-chip__name">{{ variant.attribute_values_summary }}</span>
+                                    <span class="variant-chip__name">{{ variant.attribute_summary }}</span>
                                     <span class="variant-chip__meta">
                                         {% if variant.price_sale %}
                                             {{ variant.price_sale }}đ
@@ -167,18 +153,16 @@
                     {% endif %}
 
                     <div class="d-flex flex-wrap gap-2 pt-2">
-                        {% if user.is_authenticated %}
+                        {% if user.is_authenticated or commerce_config.allow_guest_cart %}
                             <button type="submit" class="btn btn-primary px-4">
                                 <i class="me-1 fa fa-shopping-cart"></i> Thêm vào giỏ hàng
                             </button>
                         {% else %}
-                            <a href="{% url 'account:login' %}?next={{ request.path }}" class="btn btn-primary px-4">
+                            <a href="{% url 'account:login' %}?next={{ request.path }}&auth_message=cart" class="btn btn-primary px-4">
                                 <i class="me-1 fa fa-shopping-cart"></i> Thêm vào giỏ hàng
                             </a>
                         {% endif %}
-                        <a href="{% url 'product:product_all' %}" class="btn btn-outline-primary">
-                            <i class="bi bi-arrow-left me-1"></i> Tiếp tục mua sắm
-                        </a>
+                        {% include 'partials/wishlist_button.html' with product=product in_wishlist=in_wishlist button_variant='detail' %}
                     </div>
                 </form>
             </div>

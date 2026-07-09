@@ -99,3 +99,32 @@ class QuanlyMenuConfig(models.Model):
     @property
     def any_above_system(self):
         return self.any_above_content or self.any_content
+
+
+class CommerceBehaviorConfig(models.Model):
+    """Cấu hình hành vi thương mại của website (singleton, chỉnh trong Django admin)."""
+
+    allow_guest_cart = models.BooleanField(
+        default=False,
+        verbose_name='Cho phép thêm giỏ hàng khi chưa đăng nhập',
+    )
+    allow_guest_wishlist = models.BooleanField(
+        default=False,
+        verbose_name='Cho phép thêm yêu thích khi chưa đăng nhập',
+    )
+
+    class Meta:
+        verbose_name = 'Cấu hình thương mại'
+        verbose_name_plural = 'Cấu hình thương mại'
+
+    def __str__(self):
+        return 'Cấu hình thương mại'
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def load(cls):
+        obj, _ = cls.objects.get_or_create(pk=1)
+        return obj

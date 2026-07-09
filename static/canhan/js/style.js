@@ -110,7 +110,7 @@ function showMessage(message, type) {
     newToast.id = ''; // Remove ID to avoid duplicates
     document.getElementById('toastContainer').appendChild(newToast);
 
-    const toast_HTMX = new bootstrap.Toast(newToast, { delay: 1000 });
+    const toast_HTMX = new bootstrap.Toast(newToast, { delay: 1500 });
     toast_HTMX.show();
 }
 
@@ -185,7 +185,7 @@ if (toast_message) {
     if (message !== "") {
         var bootstrapToast = new bootstrap.Toast(toast_message, {
         autohide: true, // Tự động ẩn toast sau khoảng thời gian đã đặt
-        delay: 1000 // Thời gian hiển thị toast (0.5 giây)
+        delay: 1500 // Thời gian hiển thị toast (1.5 giây)
         });
         bootstrapToast.show(); // Hiển thị toast
     }

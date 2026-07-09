@@ -17,6 +17,7 @@ from templated_email import send_templated_mail
 from App_Account.forms import CustomPasswordChangeForm, RegisterForm
 from App_Account.models import Checkout_info, Profile
 from App_Product.models import Order
+from App_Product.cart_access import merge_guest_commerce_to_user
 from App_Account.password_validation import get_password_strength_errors
 
 logger = logging.getLogger(__name__)
@@ -113,9 +114,14 @@ def check_password2(request):
     return HttpResponse("<div style='color: red;'>Xác nhận mật khẩu không trùng với mật khẩu mới.</div>")
 
 def login_user(request):
+    guest_session_key = request.session.session_key
     # Lưu 'next_url' vào session nếu có trong GET
     if 'next' in request.GET:
         request.session['next_url'] = request.GET.get('next')
+    if request.method == "GET" and request.GET.get('auth_message') == 'cart':
+        messages.info(request, "Vui lòng đăng nhập tài khoản để thêm sản phẩm vào giỏ hàng.")
+    if request.method == "GET" and request.GET.get('auth_message') == 'wishlist':
+        messages.info(request, "Vui lòng đăng nhập tài khoản để thêm sản phẩm vào yêu thích.")
     next_url = request.session.get('next_url')  # Lấy 'next_url' từ session
     # print('login_user: next_url: ', next_url)
     
@@ -128,6 +134,7 @@ def login_user(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
+            merge_guest_commerce_to_user(request, user, guest_session_key)
             
             # Xóa 'next_url' khỏi session sau khi đăng nhập thành công
             request.session.pop('next_url', None)

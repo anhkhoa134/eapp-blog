@@ -159,6 +159,8 @@
                         Bài Viết
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdownPost">
+                        <li><a class="dropdown-item" href="{% url 'post:post_all' %}">Tất cả bài viết</a></li>
+                        <li><hr class="dropdown-divider"></li>
                         {% for subject in subjects %}
                             <li><a class="dropdown-item" href="{% url 'post:subject' subject.slug %}">{{ subject.title }}</a></li>
                         {% endfor %}
@@ -195,7 +197,7 @@
                 </li>
                 {% endfor %}
                 <li class="nav-item">
-                    <a class="nav-link {% if request.path|strip_slashes == 'bai-viet' %}active{% endif %}" href="{% url 'post:post_all' %}"><i class="fa fa-newspaper mr-2"></i>Bài Viết</a>
+                    <a class="nav-link {% if request.path|strip_slashes == 'bai-viet' %}active{% endif %}" href="{% url 'post:post_all' %}"><i class="fa fa-newspaper mr-2"></i>Tất Cả Bài Viết</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {% if request.path|strip_slashes == 'lien-he' %}active{% endif %}" href="{% url 'core:contact' %}"><i class="fa fa-headset mr-2"></i>Liên Hệ</a>

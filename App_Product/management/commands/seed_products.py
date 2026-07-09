@@ -138,6 +138,28 @@ def seed_product_variants(product, variants_data, default_variant):
     )
 
 
+def seed_category_images(categories_by_name, user):
+    for category in categories_by_name.values():
+        representative_product = (
+            Product.objects
+            .filter(category=category)
+            .exclude(image='')
+            .order_by('id')
+            .first()
+        )
+        if not representative_product or not representative_product.image:
+            continue
+
+        category.request = MockRequest(user)
+        representative_product.image.open('rb')
+        try:
+            product_image_name = os.path.basename(representative_product.image.name)
+            category_image_name = f"category_{category.slug}_{product_image_name}"
+            category.image.save(category_image_name, File(representative_product.image.file), save=True)
+        finally:
+            representative_product.image.close()
+
+
 def seed_products():
     # Setup folders
     project_root = settings.BASE_DIR
@@ -269,6 +291,8 @@ def seed_products():
 
         except Exception as e:
             print(f"Error seeding product '{name}': {e}")
+
+    seed_category_images(categories_by_name, user)
 
     print("Database seeding completed successfully!")
 

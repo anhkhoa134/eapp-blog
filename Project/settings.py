@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+import sys
 from django.contrib.messages import constants as messages
 
 from environ import Env
@@ -10,6 +11,7 @@ if ENVIRONMENT == 'dev':
     DEBUG = True
 else:
     DEBUG = False
+TESTING = 'test' in sys.argv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -198,10 +200,11 @@ STORAGES = {
         },
     },
     'staticfiles': {
-        # WhiteNoise: nén gzip/brotli + hash tên file để cache vĩnh viễn (thay CDN)
-        # Lưu ý: phải chạy lại `collectstatic` sau mỗi lần đổi static;
-        # template tham chiếu file static không tồn tại sẽ gây lỗi 500 khi DEBUG=False
-        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        'BACKEND': (
+            'django.contrib.staticfiles.storage.StaticFilesStorage'
+            if DEBUG or TESTING
+            else 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+        ),
     },
 }
 

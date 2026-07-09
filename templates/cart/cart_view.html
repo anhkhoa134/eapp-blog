@@ -47,7 +47,17 @@
                 <h2 class="account-card__title">Giao hàng & thanh toán</h2>
                 <p class="account-card__subtitle">Thông tin này sẽ được dùng để liên hệ, giao hàng và xác nhận thanh toán.</p>
                 {% if cart and cart.items.exists %}
-                    {% include 'cart/checkout_form.html' %}
+                    {% if request.user.is_authenticated or commerce_config.allow_guest_cart %}
+                        {% include 'cart/checkout_form.html' %}
+                    {% else %}
+                        <div class="cart-empty">
+                            <i class="bi bi-person-lock"></i>
+                            <p>Vui lòng đăng nhập tài khoản để xác nhận đơn hàng.</p>
+                            <a href="{% url 'account:login' %}?next={{ request.path }}" class="btn btn-primary">
+                                Đăng nhập để thanh toán
+                            </a>
+                        </div>
+                    {% endif %}
                 {% else %}
                     <div class="cart-empty">
                         <i class="fas fa-shopping-cart"></i>

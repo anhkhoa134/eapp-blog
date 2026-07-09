@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.shortcuts import redirect
 from django.urls import reverse
 
-from .models import QuanlyMenuConfig
+from .models import CommerceBehaviorConfig, QuanlyMenuConfig
 
 
 class QuanlyMenuConfigForm(forms.ModelForm):
@@ -51,3 +51,23 @@ class QuanlyMenuConfigAdmin(admin.ModelAdmin):
     def changelist_view(self, request, extra_context=None):
         config = QuanlyMenuConfig.load()
         return redirect(reverse('admin:App_Quanly_quanlymenuconfig_change', args=[config.pk]))
+
+
+@admin.register(CommerceBehaviorConfig)
+class CommerceBehaviorConfigAdmin(admin.ModelAdmin):
+    fieldsets = (
+        ('Tài khoản khách', {
+            'fields': ('allow_guest_cart', 'allow_guest_wishlist'),
+            'description': 'Nếu tắt, khách chưa đăng nhập sẽ được chuyển tới trang đăng nhập khi thêm giỏ hàng hoặc yêu thích.',
+        }),
+    )
+
+    def has_add_permission(self, request):
+        return not CommerceBehaviorConfig.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def changelist_view(self, request, extra_context=None):
+        config = CommerceBehaviorConfig.load()
+        return redirect(reverse('admin:App_Quanly_commercebehaviorconfig_change', args=[config.pk]))

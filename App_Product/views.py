@@ -13,6 +13,15 @@ from django.utils import timezone
 from templated_email import send_templated_mail
 
 from App_Account.models import Checkout_info
+from App_Product.cart_access import (
+    add_product_to_wishlist,
+    commerce_behavior,
+    get_cart_for_request,
+    get_owned_cart_item,
+    get_wishlist_items_for_request,
+    remove_product_from_wishlist,
+    wishlist_product_ids,
+)
 from App_Product.models import (
     Cart,
     CartItem,
@@ -26,14 +35,11 @@ from App_Product.models import (
     Review,
     SubCategory,
     VariantAttribute,
-    Wishlist,
 )
 
 
 def _wishlist_product_ids(request):
-    if request.user.is_authenticated:
-        return set(request.user.wishlist.values_list('product_id', flat=True))
-    return set()
+    return wishlist_product_ids(request)
 
 def generate_response(message, type='bg-success'):
     # print(message, type)
@@ -87,19 +93,15 @@ def _payment_method_display(payment_method, paymentmethod=None):
 
 
 def hx_menu_cart(request):
-    cart = None
-    cart_items = []
-    if request.user.is_authenticated:
-        cart = Cart.objects.filter(user=request.user).prefetch_related('items').first()
-        cart_items = list(cart.items.all()) if cart else []
+    cart = get_cart_for_request(request)
+    cart_items = list(cart.items.all()) if cart else []
     return render(request, 'partials/menu_cart.html', {'cart': cart, 'cart_items': cart_items})
 
 
 def hx_total_price(request):
     total_price_vnd = 0
-    if request.user.is_authenticated:
-        cart = Cart.objects.filter(user=request.user).prefetch_related('items__product', 'items__variant').first()
-        total_price_vnd = cart.total_price() if cart else 0
+    cart = get_cart_for_request(request)
+    total_price_vnd = cart.total_price() if cart else 0
     return render(request, 'partials/total_price.html', {'total_price_vnd': total_price_vnd})
 
 def product_all(request, slug_category=None, slug_subcategory=None):
@@ -296,69 +298,55 @@ def product_detail(request, slug_category, slug_product, variant_slug=None):
         
         'variants': variants,
         'active_variant': active_variant,
+        'in_wishlist': product.id in _wishlist_product_ids(request),
     }
     return render(request, 'product_detail.html', context)
 
-@login_required
 def cart_view(request):
-    cart, created = Cart.objects.get_or_create(user=request.user)
-    cart = _get_prefetched_cart(cart)
+    if not request.user.is_authenticated and not commerce_behavior().allow_guest_cart:
+        return redirect(f"{reverse('account:login')}?next={request.path}&auth_message=cart")
+
+    cart = get_cart_for_request(request, create=request.user.is_authenticated)
+    if cart:
+        cart = _get_prefetched_cart(cart)
     paymentmethods = PaymentMethod.objects.all().order_by('id')
     return render(request, 'cart/cart_view.html', {
         'cart': cart,
         'paymentmethods': paymentmethods,
     })
 
-@login_required
-def add_to_cart_simple(request, product_id):
-    if request.method == 'POST':
-        product = get_object_or_404(Product, id=product_id)
-        cart, created = Cart.objects.get_or_create(user=request.user)
-
-        # Tìm ProductVariant có price_sale hoặc price thấp nhất
-        cheapest_variant = _product_variants(product).first()
-
-        if not cheapest_variant:
-            response = JsonResponse({"error": "Không tìm thấy biến thể hợp lệ."}, status=400)
-            response["HX-Trigger"] = json.dumps({"showMessage": {"message": "Sản phẩm không có biến thể hợp lệ.", "type": "bg-danger"}})
-            return response
-
-        # Kiểm tra nếu biến thể đã có trong giỏ hàng
-        cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product, variant=cheapest_variant)
-
-        if not created:
-            # Nếu đã có trong giỏ hàng, tăng số lượng
-            cart_item.quantity += 1
-            cart_item.save()
-
-        # Render lại giỏ hàng và gửi thông báo thành công
-        response = render(request, 'cart/cart_update.html', {'cart': _get_prefetched_cart(cart)})
-        response["HX-Trigger"] = json.dumps({"showMessage": {"message": "Sản phẩm đã được thêm vào giỏ hàng.", "type": "bg-success"}})
-        return response
-
-    return redirect('product:cart_view')
-
-@login_required
-def add_to_cart_detail(request, product_id):
+def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     if request.method == 'POST':
-        cart, created = Cart.objects.get_or_create(user=request.user)
+        if not request.user.is_authenticated and not commerce_behavior().allow_guest_cart:
+            response = JsonResponse({"error": "Vui lòng đăng nhập tài khoản để thêm sản phẩm vào giỏ hàng."}, status=401)
+            response["HX-Trigger"] = json.dumps({
+                "showMessage": {"message": "Vui lòng đăng nhập tài khoản để thêm sản phẩm vào giỏ hàng.", "type": "bg-info"}
+            })
+            return response
+
+        cart = get_cart_for_request(request, create=True)
 
         variant_id = request.POST.get('variant_id')
-        # print('variant_id:', variant_id)
 
-        # Kiểm tra xem người dùng đã chọn biến thể chưa
-        if not variant_id:
+        if not variant_id and request.resolver_match and request.resolver_match.url_name == 'add_to_cart_detail':
             response = JsonResponse({"error": "Vui lòng chọn một biến thể sản phẩm."}, status=400)
             response["HX-Trigger"] = json.dumps({
                 "showMessage": {"message": "Vui lòng chọn một biến thể sản phẩm.", "type": "bg-danger"}
             })
             return response
 
-        # Lấy biến thể sản phẩm được chọn
-        active_variant = get_object_or_404(ProductVariant, id=variant_id, product=product)
+        if variant_id:
+            active_variant = get_object_or_404(ProductVariant, id=variant_id, product=product)
+        else:
+            active_variant = _product_variants(product).first()
+            if not active_variant:
+                response = JsonResponse({"error": "Không tìm thấy biến thể hợp lệ."}, status=400)
+                response["HX-Trigger"] = json.dumps({
+                    "showMessage": {"message": "Sản phẩm không có biến thể hợp lệ.", "type": "bg-danger"}
+                })
+                return response
 
-        # Kiểm tra xem biến thể đã có trong giỏ hàng chưa
         cart_item, created = CartItem.objects.get_or_create(
             cart=cart, product=product, variant=active_variant
         )
@@ -367,7 +355,6 @@ def add_to_cart_detail(request, product_id):
             cart_item.quantity += 1
             cart_item.save()
 
-        # Tạo thông báo thành công
         response = render(request, 'cart/cart_update.html', {'cart': _get_prefetched_cart(cart)})
         response["HX-Trigger"] = json.dumps({
             "showMessage": {"message": "Sản phẩm đã được thêm vào giỏ hàng.", "type": "bg-success"}
@@ -378,9 +365,11 @@ def add_to_cart_detail(request, product_id):
         return redirect('product:product_detail', slug_category=product.category.slug, slug_product=product.slug)
     return redirect('product:product_all')
 
-@login_required
+
 def remove_from_cart(request, cart_item_id):
-    cart_item = get_object_or_404(CartItem, id=cart_item_id, cart__user=request.user)
+    cart_item = get_owned_cart_item(request, cart_item_id)
+    if not cart_item:
+        return redirect('product:cart_view')
 
     if request.method == 'POST':
         cart_item.delete()  # Xóa sản phẩm khỏi giỏ hàng
@@ -391,9 +380,10 @@ def remove_from_cart(request, cart_item_id):
 
     return redirect('product:cart_view')
 
-@login_required
 def update_cart_item(request, cart_item_id):
-    cart_item = get_object_or_404(CartItem, id=cart_item_id, cart__user=request.user)
+    cart_item = get_owned_cart_item(request, cart_item_id)
+    if not cart_item:
+        return redirect('product:cart_view')
 
     if request.method == 'POST':
         new_quantity = int(request.POST.get('quantity', 1))  # Lấy số lượng mới từ form
@@ -413,10 +403,11 @@ def update_cart_item(request, cart_item_id):
 
     return redirect('product:cart_view')
 
-@login_required
 def decrease_cart_item(request, cart_item_id):
     if request.method == 'POST':
-        cart_item = get_object_or_404(CartItem, id=cart_item_id, cart__user=request.user)
+        cart_item = get_owned_cart_item(request, cart_item_id)
+        if not cart_item:
+            return redirect('product:cart_view')
 
         if cart_item.quantity > 1:
             cart_item.quantity -= 1
@@ -432,10 +423,11 @@ def decrease_cart_item(request, cart_item_id):
 
     return redirect('product:cart_view')
 
-@login_required
 def increase_cart_item(request, cart_item_id):
     if request.method == 'POST':
-        cart_item = get_object_or_404(CartItem, id=cart_item_id, cart__user=request.user)
+        cart_item = get_owned_cart_item(request, cart_item_id)
+        if not cart_item:
+            return redirect('product:cart_view')
         cart_item.quantity += 1
         cart_item.save()
         
@@ -447,12 +439,14 @@ def increase_cart_item(request, cart_item_id):
 
     return redirect('product:cart_view')
 
-@login_required
 def checkout(request):
     if request.method != 'POST':
         return redirect('product:cart_view')
 
-    cart = getattr(request.user, 'cart', None)
+    if not request.user.is_authenticated and not commerce_behavior().allow_guest_cart:
+        return redirect(f"{reverse('account:login')}?next={reverse('product:cart_view')}&auth_message=cart")
+
+    cart = get_cart_for_request(request)
     if not cart or not cart.items.exists():
         # Giỏ hàng trống, chuyển hướng về trang giỏ hàng với thông báo lỗi
         messages.error(request, "Giỏ hàng của bạn đang trống.")
@@ -465,6 +459,7 @@ def checkout(request):
         fullname = request.POST.get('fullname')
         phone = request.POST.get('phone')
         shipping_address = request.POST.get('shipping_address')
+        email = request.POST.get('email', '').strip()
         payment_method = request.POST.get('payment_method')
         selected_paymentmethod = _get_order_paymentmethod(payment_method)
 
@@ -476,16 +471,18 @@ def checkout(request):
             })
 
         if fullname and phone and shipping_address and payment_method:
-            # Lưu thông tin giao hàng vào Checkout_info
-            info, created = Checkout_info.objects.get_or_create(user=request.user)
-            info.fullname = fullname
-            info.phone = phone
-            info.address = shipping_address
-            info.save()
+            order_user = request.user if request.user.is_authenticated else None
+            if request.user.is_authenticated:
+                # Lưu thông tin giao hàng vào Checkout_info
+                info, created = Checkout_info.objects.get_or_create(user=request.user)
+                info.fullname = fullname
+                info.phone = phone
+                info.address = shipping_address
+                info.save()
             
             # Tạo đơn hàng
             order = Order.objects.create(
-                user=request.user,
+                user=order_user,
                 shipping_address=shipping_address,
                 payment_method=payment_method,
                 fullname=fullname,
@@ -517,33 +514,41 @@ def checkout(request):
             cart.items.all().delete()
             
             # Thông tin đơn hàng 
-            user = request.user.username
-            email = request.user.profile.email
-            fullname = request.user.checkout_info.fullname
-            phone = request.user.checkout_info.phone
-            address = request.user.checkout_info.address
+            user = request.user.username if request.user.is_authenticated else 'Khách vãng lai'
+            if request.user.is_authenticated:
+                email = request.user.profile.email
+            address = shipping_address
             price = order.total_price_vnd()
-            domain = request.build_absolute_uri('/')
             
             # Gửi email cho khách hàng 
-            url_chitiet_donhang = request.build_absolute_uri(reverse('product:order_detail', args=[order.id]))
-            send_templated_mail(
-                template_name='order_email_customer',  # Không cần .html ở đây
-                from_email=None,
-                recipient_list=[email],
-                context={
-                    'order_id': order.id,
-                    'url_chitiet_donhang': url_chitiet_donhang,
-                    'site_name': 'PTcom',
-                    'user': user,
-                    'email': email,
-                    'fullname':fullname,
-                    'phone': phone,
-                    'address': address,
-                    'price': price,
-                    'date_today': timezone.now().strftime('%d-%m-%Y'),
-                },
-            )
+            if request.user.is_authenticated:
+                url_chitiet_donhang = request.build_absolute_uri(reverse('product:order_detail', args=[order.id]))
+            else:
+                guest_order_ids = request.session.get('guest_order_ids', [])
+                if order.id not in guest_order_ids:
+                    guest_order_ids.append(order.id)
+                    request.session['guest_order_ids'] = guest_order_ids
+                    request.session.modified = True
+                url_chitiet_donhang = request.build_absolute_uri(reverse('product:order_success', args=[order.id]))
+
+            if email:
+                send_templated_mail(
+                    template_name='order_email_customer',  # Không cần .html ở đây
+                    from_email=None,
+                    recipient_list=[email],
+                    context={
+                        'order_id': order.id,
+                        'url_chitiet_donhang': url_chitiet_donhang,
+                        'site_name': 'PTcom',
+                        'user': user,
+                        'email': email,
+                        'fullname':fullname,
+                        'phone': phone,
+                        'address': address,
+                        'price': price,
+                        'date_today': timezone.now().strftime('%d-%m-%Y'),
+                    },
+                )
             
             # Gửi email cho quản lý
             quanly_email = get_user_model().objects.get(username='quanly').email
@@ -593,9 +598,13 @@ def checkout(request):
         'paymentmethods': paymentmethods,
     })
 
-@login_required
 def order_success(request, order_id):
-    order = get_object_or_404(Order, id=order_id, user=request.user)
+    guest_order_ids = request.session.get('guest_order_ids', [])
+    if request.user.is_authenticated:
+        orders = Order.objects.filter(Q(user=request.user) | Q(user__isnull=True, id__in=guest_order_ids))
+    else:
+        orders = Order.objects.filter(user__isnull=True, id__in=guest_order_ids)
+    order = get_object_or_404(orders, id=order_id)
     selected_paymentmethod = _get_order_paymentmethod(order.payment_method)
     paymentmethods = PaymentMethod.objects.all().order_by('id') if order.payment_method == 'BANK' else []
     return render(request, 'cart/order_success.html', {
@@ -628,6 +637,7 @@ def _wishlist_button_response(request, product, in_wishlist, message, type='bg-s
     response = render(request, 'partials/wishlist_button.html', {
         'product': product,
         'in_wishlist': in_wishlist,
+        'button_variant': request.POST.get('button_variant', ''),
     })
     response['HX-Trigger'] = json.dumps({
         'showMessage': {
@@ -637,15 +647,19 @@ def _wishlist_button_response(request, product, in_wishlist, message, type='bg-s
     })
     return response
 
-@login_required
 def add_to_wishlist(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    wishlist_item, created = Wishlist.objects.get_or_create(user=request.user, product=product)
-    if created:
-        # Thông báo rằng sản phẩm đã được thêm vào Wishlist
-        message = f"Đã thêm {product.name} vào danh sách yêu thích."
-    else:
-        message = f"{product.name} đã có trong danh sách yêu thích."
+    if not request.user.is_authenticated and not commerce_behavior().allow_guest_wishlist:
+        if _is_htmx_request(request):
+            response = JsonResponse({"error": "Vui lòng đăng nhập tài khoản để thêm sản phẩm vào yêu thích."}, status=401)
+            response["HX-Trigger"] = json.dumps({
+                "showMessage": {"message": "Vui lòng đăng nhập tài khoản để thêm sản phẩm vào yêu thích.", "type": "bg-info"}
+            })
+            return response
+        return redirect(f"{reverse('account:login')}?next={request.path}&auth_message=wishlist")
+
+    wishlist_item, created = add_product_to_wishlist(request, product)
+    message = "Sản phẩm đã được thêm vào yêu thích."
     if _is_htmx_request(request):
         return _wishlist_button_response(request, product, True, message, 'bg-success' if created else 'bg-info')
     if created:
@@ -656,19 +670,23 @@ def add_to_wishlist(request, product_id):
         return redirect('product:product_detail', slug_category=product.category.slug, slug_product=product.slug)
     return redirect('product:product_all')
 
-@login_required
 def remove_from_wishlist(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    Wishlist.objects.filter(user=request.user, product=product).delete()
-    message = f"Đã bỏ {product.name} khỏi danh sách yêu thích."
+    if not request.user.is_authenticated and not commerce_behavior().allow_guest_wishlist:
+        return redirect(f"{reverse('account:login')}?next={request.path}&auth_message=wishlist")
+
+    remove_product_from_wishlist(request, product)
+    message = "Sản phẩm đã được bỏ khỏi yêu thích."
     if _is_htmx_request(request):
         return _wishlist_button_response(request, product, False, message, 'bg-success')
     messages.success(request, message)
     return redirect('product:wishlist_view')
 
-@login_required
 def wishlist_view(request):
-    wishlist_items = Wishlist.objects.filter(user=request.user).select_related('product', 'product__category').order_by('-added_at')
+    if not request.user.is_authenticated and not commerce_behavior().allow_guest_wishlist:
+        return redirect(f"{reverse('account:login')}?next={request.path}&auth_message=wishlist")
+
+    wishlist_items = get_wishlist_items_for_request(request)
     return render(request, 'wishlist.html', {'wishlist_items': wishlist_items})
 
 @login_required

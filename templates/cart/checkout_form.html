@@ -2,16 +2,22 @@
     {% csrf_token %}
     <div>
         <label for="fullname" class="form-label">Họ và tên</label>
-        <input type="text" class="form-control" id="fullname" name="fullname" value="{{ request.user.checkout_info.fullname }}" required>
+        <input type="text" class="form-control" id="fullname" name="fullname" value="{% if request.user.is_authenticated %}{{ request.user.checkout_info.fullname }}{% endif %}" required>
     </div>
     <div>
         <label for="phone" class="form-label">Số điện thoại</label>
-        <input type="text" class="form-control" id="phone" name="phone" value="{{ request.user.checkout_info.phone }}" required>
+        <input type="text" class="form-control" id="phone" name="phone" value="{% if request.user.is_authenticated %}{{ request.user.checkout_info.phone }}{% endif %}" required>
     </div>
     <div>
         <label for="shipping_address" class="form-label">Địa chỉ giao hàng</label>
-        <input type="text" class="form-control" id="shipping_address" name="shipping_address" value="{{ request.user.checkout_info.address }}" required>
+        <input type="text" class="form-control" id="shipping_address" name="shipping_address" value="{% if request.user.is_authenticated %}{{ request.user.checkout_info.address }}{% endif %}" required>
     </div>
+    {% if not request.user.is_authenticated %}
+    <div>
+        <label for="email" class="form-label">Email <span class="text-muted">(không bắt buộc)</span></label>
+        <input type="email" class="form-control" id="email" name="email">
+    </div>
+    {% endif %}
     <div>
         <label for="payment_method" class="form-label">Phương thức thanh toán</label>
         <select class="form-select" id="payment_method" name="payment_method" required>

@@ -1,18 +1,28 @@
+import shutil
+import tempfile
+from io import BytesIO
+from unittest.mock import patch
+
+from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
+from PIL import Image as PILImage
 
 from App_Account.forms import CustomPasswordChangeForm
-from App_Product.management.commands.seed_products import seed_product_variants
+from App_Quanly.models import CommerceBehaviorConfig
+from App_Product.management.commands.seed_products import MockRequest, seed_category_images, seed_product_variants
 from App_Product.models import (
     Attribute,
     Cart,
     CartItem,
     Category,
+    Order,
     PaymentMethod,
     Product,
     ProductVariant,
     VariantAttribute,
+    Wishlist,
 )
 
 
@@ -73,7 +83,7 @@ class ProductVariantCartTests(TestCase):
         self.assertContains(response, 'Chọn biến thể')
         self.assertContains(response, 'Màu: Nâu')
         self.assertContains(response, 'Kiểu: Khóa kéo')
-        self.assertContains(response, 'Đen / Nút bấm')
+        self.assertContains(response, 'Màu: Đen, Kiểu: Nút bấm')
 
     def test_add_to_cart_detail_uses_selected_variant(self):
         self.client.force_login(self.user)
@@ -95,6 +105,26 @@ class ProductVariantCartTests(TestCase):
         self.assertEqual(response.status_code, 200)
         cart_item = CartItem.objects.get(cart__user=self.user, product=self.product)
         self.assertEqual(cart_item.variant, self.brown_variant)
+
+    def test_guest_add_to_cart_when_enabled(self):
+        CommerceBehaviorConfig.objects.create(allow_guest_cart=True)
+        url = reverse('product:add_to_cart_simple', kwargs={'product_id': self.product.id})
+
+        response = self.client.post(url, HTTP_HX_REQUEST='true')
+
+        self.assertEqual(response.status_code, 200)
+        cart = Cart.objects.get(user__isnull=True)
+        cart_item = CartItem.objects.get(cart=cart, product=self.product)
+        self.assertEqual(cart_item.variant, self.brown_variant)
+
+    def test_guest_add_to_wishlist_when_enabled(self):
+        CommerceBehaviorConfig.objects.create(allow_guest_wishlist=True)
+        url = reverse('product:add_to_wishlist', kwargs={'product_id': self.product.id})
+
+        response = self.client.post(url, HTTP_HX_REQUEST='true')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(Wishlist.objects.filter(user__isnull=True, product=self.product).exists())
 
     def test_product_detail_without_variant_slug_uses_cheapest_variant(self):
         url = reverse(
@@ -203,6 +233,26 @@ class ProductVariantCartTests(TestCase):
 
         self.assertRedirects(response, reverse('product:cart_view'))
 
+    @patch('App_Product.views.send_templated_mail')
+    def test_guest_checkout_when_guest_cart_enabled(self, mocked_send_mail):
+        CommerceBehaviorConfig.objects.create(allow_guest_cart=True)
+        User.objects.create_user(username='quanly', password='test-pass-123', email='quanly@example.com')
+        self.client.post(reverse('product:add_to_cart_simple', kwargs={'product_id': self.product.id}))
+
+        response = self.client.post(reverse('product:checkout'), {
+            'fullname': 'Khach vang lai',
+            'phone': '0900000000',
+            'shipping_address': '123 Nguyen Trai',
+            'payment_method': 'COD',
+        })
+
+        order = Order.objects.get(phone='0900000000')
+        self.assertIsNone(order.user)
+        self.assertEqual(order.fullname, 'Khach vang lai')
+        self.assertRedirects(response, reverse('product:order_success', args=[order.id]))
+        self.assertIn(order.id, self.client.session.get('guest_order_ids', []))
+        self.assertEqual(mocked_send_mail.call_count, 1)
+
 
 class SeedProductVariantTests(TestCase):
     def test_seed_product_variants_reuses_default_variant_and_updates_stock(self):
@@ -248,6 +298,41 @@ class SeedProductVariantTests(TestCase):
                 attributes__attribute__value='512GB',
             ).exists()
         )
+
+
+class SeedCategoryImageTests(TestCase):
+    def setUp(self):
+        self.media_root = tempfile.mkdtemp()
+        self.settings_override = override_settings(MEDIA_ROOT=self.media_root)
+        self.settings_override.enable()
+
+    def tearDown(self):
+        self.settings_override.disable()
+        shutil.rmtree(self.media_root, ignore_errors=True)
+
+    def test_seed_category_images_uses_product_image_from_same_category(self):
+        user = User.objects.create_user(username='seed-admin', password='test-pass-123')
+        category = Category.objects.create(name='Điện thoại & Máy tính')
+        product = Product(
+            category=category,
+            name='iPhone 15 Pro Max 256GB',
+            price=29990000,
+            price_sale=27990000,
+            stock=12,
+            is_stock=True,
+        )
+        product.request = MockRequest(user)
+
+        image_buffer = BytesIO()
+        PILImage.new('RGB', (20, 20), color='red').save(image_buffer, format='JPEG')
+        product.image.save('iphone-seed.jpg', ContentFile(image_buffer.getvalue()), save=True)
+
+        seed_category_images({category.name: category}, user)
+
+        category.refresh_from_db()
+        self.assertTrue(category.image)
+        self.assertIn('/categories/', category.image.name)
+        self.assertTrue(category.image.name.endswith('.webp'))
 
 
 class PasswordStrengthValidationTests(TestCase):

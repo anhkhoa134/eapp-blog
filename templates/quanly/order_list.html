@@ -62,19 +62,31 @@
                                 <tr id="order-{{order.id}}">
                                     <td class="text-center">#{{order.id}}</td>
                                     <td class="text-center">
-                                        <span data-bs-toggle="tooltip" data-bs-placement="right"
-                                            data-bs-custom-class="custom-tooltip" data-bs-html="true" 
-                                            data-bs-title="
-                                            Tên: {{ order.user.profile.fullname }} <br>
-                                            Điện thoại: <a href='tel:{{ order.user.profile.phone }}'>{{ order.user.profile.phone }}</a> <br>
-                                            Địa chỉ: {{ order.user.profile.address }} <br>
-                                            Giới tính: {{ order.user.profile.get_gender_display }} <br>
-                                            Email: {{ order.user.profile.email }} <br>
-                                            ">
-                                            <a href="#">{{ order.user }}</a>
-                                        </span>
+                                        {% if order.user %}
+                                            <span data-bs-toggle="tooltip" data-bs-placement="right"
+                                                data-bs-custom-class="custom-tooltip" data-bs-html="true" 
+                                                data-bs-title="
+                                                Tên: {{ order.user.profile.fullname }} <br>
+                                                Điện thoại: <a href='tel:{{ order.user.profile.phone }}'>{{ order.user.profile.phone }}</a> <br>
+                                                Địa chỉ: {{ order.user.profile.address }} <br>
+                                                Giới tính: {{ order.user.profile.get_gender_display }} <br>
+                                                Email: {{ order.user.profile.email }} <br>
+                                                ">
+                                                <a href="#">{{ order.user }}</a>
+                                            </span>
+                                        {% else %}
+                                            <span data-bs-toggle="tooltip" data-bs-placement="right"
+                                                data-bs-custom-class="custom-tooltip" data-bs-html="true"
+                                                data-bs-title="
+                                                Tên: {{ order.fullname }} <br>
+                                                Điện thoại: <a href='tel:{{ order.phone }}'>{{ order.phone }}</a> <br>
+                                                Địa chỉ: {{ order.shipping_address }} <br>
+                                                ">
+                                                <a href="#">Khách vãng lai</a>
+                                            </span>
+                                        {% endif %}
                                 
-                                        {% if order.user.username in users_with_unreceived_orders %}
+                                        {% if order.user and order.user.username in users_with_unreceived_orders %}
                                             <span data-bs-toggle="tooltip" data-bs-placement="right"
                                                 data-bs-custom-class="custom-tooltip" data-bs-html="true" 
                                                 data-bs-title="Khách hàng đã từng không nhận hàng">
@@ -83,7 +95,9 @@
                                         {% endif %}
                                     </td>
                                     <td class="text-center">
-                                        {% if order.user.orders.count == 0 %}
+                                        {% if not order.user %}
+                                            <span class="badge bg-secondary text-white bg-gradient">Khách</span>
+                                        {% elif order.user.orders.count == 0 %}
                                             <span><i class="bi bi-x-circle-fill"></i></span>
                                         {% elif order.user.orders.count == 1 %}
                                             <span class="badge bg-warning text-white bg-gradient">Mới: {{ order.user.orders.count }}</span>
@@ -149,9 +163,9 @@
 
                 <div class="modal-body">
                     <div class="text-start mb-2">
-                        <b>Người nhận: </b>{{order.user.checkout_info.fullname}} <br>
-                        <b>Điện thoại: </b><a href="tel:{{order.user.checkout_info.phone}}">{{order.user.checkout_info.phone}}</a> <br>
-                        <b>Địa chỉ: </b>{{order.user.checkout_info.address}}
+                        <b>Người nhận: </b>{{ order.fullname }} <br>
+                        <b>Điện thoại: </b><a href="tel:{{ order.phone }}">{{ order.phone }}</a> <br>
+                        <b>Địa chỉ: </b>{{ order.shipping_address }}
                     </div>
 
                     <div class="site-blocks-table rounded">

@@ -419,7 +419,7 @@ Lưu ý nghiệp vụ:
 Lưu ý riêng cho danh sách và chi tiết sản phẩm:
 
 - Trang list/search/category sản phẩm không được lọc cứng `is_stock=True`. Sản phẩm hết hàng vẫn phải hiển thị để người dùng thấy kết quả tìm kiếm/danh mục, nhưng card phải ghi rõ `Hết hàng`.
-- Card sản phẩm hết hàng phải tắt hoặc vô hiệu hóa hành động `Thêm vào giỏ`, không chỉ đổi màu chữ.
+- Card sản phẩm hết hàng phải tắt hoặc vô hiệu hóa hành động `thêm vào giỏ hàng`, không chỉ đổi màu chữ.
 - Nếu vẫn có filter tồn kho trong sidebar, đó phải là lựa chọn của người dùng (`Còn hàng`/`Hết hàng`), không phải điều kiện mặc định ẩn sản phẩm.
 - Search theo tên, ví dụ `?product_name=Pro+Max`, phải tìm được cả product hết hàng nếu tên match.
 - Giá trên card nên dùng `product.price_sale`/`product.price` đã được đồng bộ từ biến thể rẻ nhất; đừng tự query variant trong template nếu view/model đã chuẩn hóa giá.
@@ -434,7 +434,7 @@ Lưu ý riêng cho biến thể sản phẩm:
 - Nút thêm giỏ ở list dùng variant rẻ nhất qua `_product_variants(product).first()`; nếu đổi logic UI phải giữ behavior chọn variant mặc định rõ ràng.
 - Filter thuộc tính ở list đang dựa vào `variants__attributes__attribute__key/value`; khi thay UI filter, giữ name/value của checkbox hoặc cập nhật view đồng bộ.
 - Cart/order/email/invoice nên hiển thị tên hoặc thuộc tính biến thể đã chọn, không chỉ tên product gốc.
-- Test tối thiểu: detail hiện đủ biến thể, chọn biến thể thêm vào giỏ đúng variant, list search vẫn thấy product hết hàng và ghi `Hết hàng`.
+- Test tối thiểu: detail hiện đủ biến thể, chọn biến thể thêm vào giỏ hàng đúng variant, list search vẫn thấy product hết hàng và ghi `Hết hàng`.
 
 #### Nhóm B: Branding, meta, partial hệ thống
 
@@ -500,17 +500,41 @@ Lưu ý:
 - Trang giỏ hàng và thông tin giao hàng/checkout nên gộp trong cùng một màn hình nếu UX hiện tại đang dùng flow một trang; không tạo lại trang checkout riêng chỉ để nhập giao hàng/thanh toán.
 - Test với cart rỗng, cart có item, checkout khi chưa đủ thông tin và order detail.
 
+Nếu project có cấu hình cho phép khách chưa đăng nhập thao tác thương mại, phải giữ đúng hành vi theo cấu hình thay vì hard-code `@login_required` trong template/view:
+
+- Cấu hình hiện tại nằm ở `App_Quanly.models.CommerceBehaviorConfig` với hai cờ `allow_guest_cart` và `allow_guest_wishlist`.
+- Mặc định hai cờ này là `False`, nghĩa là khách chưa đăng nhập vẫn được chuyển tới login và thấy toast nhắc đăng nhập.
+- Khi `allow_guest_cart=True`, khách chưa đăng nhập được thêm giỏ hàng, cập nhật số lượng, xóa item và checkout bằng giỏ theo `session_key`.
+- Khi `allow_guest_wishlist=True`, khách chưa đăng nhập được thêm/bỏ yêu thích bằng wishlist theo `session_key`.
+- Guest cart/wishlist phải merge vào tài khoản sau khi đăng nhập bằng helper tương đương `merge_guest_commerce_to_user(request, user, old_session_key)`.
+- `Cart` và `Wishlist` cần hỗ trợ cả `user` và `session_key`; không query trực tiếp `Cart.objects.get(user=request.user)` ở mọi nơi nếu flow guest đang bật.
+- Context processor layout phải truyền `commerce_config` và cart hiện hành để badge giỏ hàng, card sản phẩm, product detail và wishlist button biết nên POST HTMX hay redirect login.
+- Nút list/detail nên kiểm tra `user.is_authenticated or commerce_config.allow_guest_cart` trước khi render form POST thêm giỏ.
+- Nút wishlist nên kiểm tra `user.is_authenticated or commerce_config.allow_guest_wishlist` trước khi render HTMX add/remove; nếu không thì link về login với query như `auth_message=wishlist`.
+- Toast khi redirect login nên ngắn và rõ: cần đăng nhập để thêm giỏ hàng hoặc thêm yêu thích.
+
+Checkout guest:
+
+- Nếu `allow_guest_cart=True`, checkout không được phụ thuộc `request.user.checkout_info`.
+- Guest checkout tạo `Order(user=None)` và lưu thông tin nhận hàng vào các field trên `Order`: `fullname`, `phone`, `shipping_address`, `payment_method`.
+- `Số điện thoại` là bắt buộc; `Email` không bắt buộc. Nếu guest nhập email thì gửi email xác nhận cho khách, nếu bỏ trống thì vẫn tạo đơn và chỉ gửi thông báo cho quản lý.
+- Form `templates/cart/checkout_form.html` nên đặt thứ tự field: `Họ và tên`, `Số điện thoại`, `Địa chỉ giao hàng`, `Email (không bắt buộc)`, `Phương thức thanh toán`.
+- Trang thành công đơn guest phải kiểm tra quyền bằng session, ví dụ lưu `guest_order_ids` trong session rồi cho xem `order_success` nếu order id nằm trong session đó.
+- `order_detail` của tài khoản vẫn nên yêu cầu user đăng nhập và chỉ xem đơn của chính user; guest chỉ cần trang thành công theo session.
+- Trang quản lý đơn hàng phải render được cả `order.user is None`, dùng `order.fullname`, `order.phone`, `order.shipping_address` cho đơn khách vãng lai; không gọi thẳng `order.user.checkout_info`.
+
 #### HTMX action feedback cho cart/wishlist
 
 Khi cập nhật UI sản phẩm, không biến các action nhỏ thành full-page redirect nếu flow cũ hoặc UX hiện tại đang dùng HTMX:
 
-- Nút "Thêm vào giỏ" trên product card phải dùng HTMX POST, swap lại `#cart-menu`/cart partial và giữ toast qua `HX-Trigger`.
+- Nút "thêm vào giỏ hàng" trên product card phải dùng HTMX POST, swap lại `#cart-menu`/cart partial và giữ toast qua `HX-Trigger`.
 - Nút "Thêm vào yêu thích" trên product card phải dùng HTMX POST, swap chính nút tim bằng partial thay vì redirect sang trang chi tiết hoặc trang wishlist.
 - Response HTMX nên trả partial nhỏ đúng target, ví dụ `cart/cart_update.html` cho cart hoặc `partials/wishlist_button.html` cho wishlist.
 - Request thường vẫn cần `href`/redirect fallback để link hoạt động khi không có JavaScript hoặc HTMX.
 - Sau request thành công, giữ feedback ngoài toast: icon giỏ hàng đổi tạm sang dấu check, icon yêu thích đổi sang tim đầy và có effect pop/pulse nhẹ.
 - Nếu thêm trạng thái active ban đầu, truyền danh sách product id đã yêu thích từ view, tránh query DB trong từng product card.
 - Test bằng request HTMX để chắc response trả `200`, có `HX-Trigger`, và không có `Location` redirect header.
+- Nếu guest cart/wishlist được bật, thêm test cho cả user đăng nhập và khách chưa đăng nhập; nếu tắt, test redirect/login toast vẫn hoạt động.
 
 #### Nhóm E: Static utility/landing phụ
 
@@ -531,6 +555,7 @@ Các phần được phép thay:
 - `templates/quanly/marketing_email_form.html`: placeholder/default copy có brand cũ.
 - email sender/context liên quan nếu admin gửi email marketing.
 - mọi logo/favicon/domain cũ còn sót trong template admin.
+- Singleton cấu hình nghiệp vụ nhỏ trong Django admin, ví dụ `CommerceBehaviorConfig`, nếu task yêu cầu bật/tắt hành vi website như guest cart hoặc guest wishlist.
 
 Không thay trong nhóm này:
 
@@ -834,6 +859,9 @@ Không yêu cầu user copy file thủ công nếu file đã nằm trong repo.
 - [ ] Nhóm auth/account đã thay
 - [ ] Nhóm comment/review giữ đủ form nghiệp vụ
 - [ ] Nhóm cart/order/checkout đã thay
+- [ ] Cấu hình `CommerceBehaviorConfig` đã được giữ/kiểm tra nếu project có guest cart/wishlist
+- [ ] Guest checkout nếu bật: không yêu cầu đăng nhập, số điện thoại bắt buộc, email không bắt buộc, đơn `user=None` hiển thị được trong quản lý
+- [ ] Guest cart/wishlist nếu bật: dùng `session_key`, badge/header cập nhật đúng, merge vào user sau login
 - [ ] Nhóm static utility/landing phụ đã thay
 - [ ] Admin/quanly chỉ thay branding/favicon/logo/title/footer, không đổi UI quản trị
 - [ ] Missing/legacy route đã audit

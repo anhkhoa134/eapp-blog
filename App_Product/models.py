@@ -788,11 +788,14 @@ def delete_uploaded_files(sender, instance, **kwargs):
 ######################################## Cart, CartItem, Order, OrderItem ########################################
 class Cart(models.Model):
     user = models.OneToOneField(User, related_name='cart', on_delete=models.CASCADE, null=True, blank=True)
+    session_key = models.CharField(max_length=40, null=True, blank=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Cart of {self.user.username}"
+        if self.user:
+            return f"Cart of {self.user.username}"
+        return f"Guest cart {self.session_key or self.pk}"
     
     def total_price(self):
         return sum(item.total_price() for item in self.items.all())
@@ -846,7 +849,8 @@ class Order(models.Model):
         ordering = ('-id', )
         
     def __str__(self):
-        return f"Order #{self.id} by {self.user.username}"
+        customer = self.user.username if self.user else (self.fullname or 'Khách vãng lai')
+        return f"Order #{self.id} by {customer}"
 
     def calculate_total(self):
         self.total_price = sum(item.subtotal for item in self.items.all())
@@ -900,7 +904,8 @@ class OrderItem(models.Model):
 
 
 class Wishlist(models.Model):
-    user = models.ForeignKey(User, related_name='wishlist', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='wishlist', on_delete=models.CASCADE, null=True, blank=True)
+    session_key = models.CharField(max_length=40, null=True, blank=True, db_index=True)
     product = models.ForeignKey(Product, related_name='wishlisted_by', on_delete=models.CASCADE)
     added_at = models.DateTimeField(auto_now_add=True)
 
@@ -908,7 +913,8 @@ class Wishlist(models.Model):
         unique_together = ('user', 'product')  # Ensure the same product isn't added to wishlist multiple times
 
     def __str__(self):
-        return f"{self.user.username} - {self.product.name} (Wishlist)"
+        owner = self.user.username if self.user else f"Guest {self.session_key or self.pk}"
+        return f"{owner} - {self.product.name} (Wishlist)"
 
 class Compare(models.Model):
     user = models.ForeignKey(User, related_name='comparisons', on_delete=models.CASCADE)
@@ -929,4 +935,3 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.product.name} - Rating: {self.rating} sao"
-

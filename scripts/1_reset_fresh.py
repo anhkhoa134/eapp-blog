@@ -16,6 +16,9 @@ Các lệnh hay dùng, chạy từ thư mục gốc repo:
   # Reset/migrate nhưng không seed data và không hỏi tạo account seed
   python scripts/1_reset_fresh.py --skip-seed
 
+  # Không reset/migrate, chỉ chạy seed data
+  python scripts/1_reset_fresh.py --seed-only
+
   # Giữ DB hiện tại, chỉ dọn migration/cache/staticfiles rồi chạy migrate/seed
   python scripts/1_reset_fresh.py --keep-db
 
@@ -130,6 +133,74 @@ def prompt_yes_no(question: str, default: bool = False) -> bool:
     return answer in {"y", "yes"}
 
 
+def run_seed_data(base_dir: Path, manage_py: Path, dry_run: bool) -> None:
+    if dry_run:
+        print("(dry-run) would ask: create/update seed account superadmin?")
+        print("(dry-run) would ask: create/update seed account quanly?")
+        print(f"(dry-run) would run: {sys.executable} manage.py shell -c <create confirmed seed accounts>")
+        for command in ("seed_products", "seed_posts", "seed_quanly", "seed_paymentmethods"):
+            print(f"(dry-run) would run: {sys.executable} manage.py {command}")
+        print()
+        return
+
+    print("\n🌱 Seeding domain app data...")
+    create_superadmin = prompt_yes_no(
+        "Tạo/cập nhật tài khoản seed superadmin (password 123456)?",
+        default=False,
+    )
+    create_quanly = prompt_yes_no(
+        "Tạo/cập nhật tài khoản seed quanly (password 123456)?",
+        default=False,
+    )
+
+    if create_superadmin or create_quanly:
+        accounts: list[tuple[str, str, bool]] = []
+        if create_superadmin:
+            accounts.append(("superadmin", "superadmin@example.com", True))
+        if create_quanly:
+            accounts.append(("quanly", "quanly@example.com", True))
+
+        account_lines = [
+            "from django.contrib.auth import get_user_model",
+            "User=get_user_model()",
+            f"accounts={accounts!r}",
+            "for username,email,is_superuser in accounts:",
+            "    user,created=User.objects.get_or_create(username=username, defaults={'email': email})",
+            "    user.email=email",
+            "    user.is_staff=True",
+            "    user.is_superuser=is_superuser",
+            "    user.set_password('123456')",
+            "    user.save()",
+            "    print(('Created' if created else 'Updated') + f' seed account: {username}')",
+        ]
+        subprocess.run(
+            [sys.executable, str(manage_py), "shell", "-c", "\n".join(account_lines)],
+            cwd=base_dir,
+            check=True,
+        )
+    else:
+        print("Skipped creating seed accounts.")
+        print("WARNING: Nếu chưa có user nào, seed_paymentmethods sẽ dùng user seed do seed_quanly tạo.")
+
+    seed_commands = (
+        ("seed_products",),
+        ("seed_posts",),
+        ("seed_quanly",),
+        ("seed_paymentmethods",),
+    )
+    try:
+        for command_args in seed_commands:
+            subprocess.run([sys.executable, str(manage_py), *command_args], cwd=base_dir, check=True)
+        print("✅ Seed data completed.")
+        if create_superadmin:
+            print("   Seed account: username=superadmin, password=123456")
+        if create_quanly:
+            print("   Seed account: username=quanly, password=123456")
+    except subprocess.CalledProcessError as exc:
+        print(f"❌ Lỗi khi chạy seed data: {exc}")
+        raise SystemExit(1)
+
+
 # ──────────────────────────────────────────────
 # Main
 # ──────────────────────────────────────────────
@@ -148,13 +219,28 @@ def main() -> None:
                         help="Giữ thư mục logs/.")
     parser.add_argument("--skip-seed", action="store_true",
                         help="Không tạo admin seed và không chạy seed data sau migrate.")
+    parser.add_argument("--seed-only", action="store_true",
+                        help="Không reset/migrate; chỉ chạy seed data.")
     args = parser.parse_args()
 
     base_dir = Path(__file__).resolve().parent.parent
+    manage_py = base_dir / "manage.py"
+    if not manage_py.exists():
+        print(f"❌ Không tìm thấy manage.py tại: {manage_py}")
+        raise SystemExit(1)
 
     print(f"BASE_DIR: {base_dir}")
     if args.dry_run:
         print("(dry-run — không thay đổi file)\n")
+    if args.seed_only and args.skip_seed:
+        print("❌ Không thể dùng đồng thời --seed-only và --skip-seed.")
+        raise SystemExit(1)
+
+    if args.seed_only:
+        if not args.dry_run:
+            (base_dir / "logs").mkdir(parents=True, exist_ok=True)
+        run_seed_data(base_dir, manage_py, args.dry_run)
+        return
 
     # ── Migrations ──
     total_mig = 0
@@ -226,21 +312,12 @@ def main() -> None:
         logs_dir.mkdir(parents=True, exist_ok=True)
 
     # ── Re-run migrations (mặc định) ──
-    manage_py = base_dir / "manage.py"
-    if not manage_py.exists():
-        print(f"❌ Không tìm thấy manage.py tại: {manage_py}")
-        raise SystemExit(1)
-
     if args.dry_run:
         print(f"\n(dry-run) would run: {sys.executable} manage.py makemigrations")
-        print(f"(dry-run) would run: {sys.executable} manage.py migrate\n")
+        print(f"(dry-run) would run: {sys.executable} manage.py migrate")
+        print(f"(dry-run) would run: {sys.executable} manage.py collectstatic --noinput\n")
         if not args.skip_seed:
-            print("(dry-run) would ask: create/update seed account superadmin?")
-            print("(dry-run) would ask: create/update seed account quanly?")
-            print(f"(dry-run) would run: {sys.executable} manage.py shell -c <create confirmed seed accounts>")
-            for command in ("seed_products", "seed_posts", "seed_quanly", "seed_paymentmethods"):
-                print(f"(dry-run) would run: {sys.executable} manage.py {command}")
-            print()
+            run_seed_data(base_dir, manage_py, args.dry_run)
     else:
         print("\n🔄 Re-running migrations...")
         try:
@@ -251,63 +328,16 @@ def main() -> None:
             print(f"❌ Lỗi khi chạy migrations: {exc}")
             raise SystemExit(1)
 
+        print("\n📦 Collecting static files...")
+        try:
+            subprocess.run([sys.executable, str(manage_py), "collectstatic", "--noinput"], cwd=base_dir, check=True)
+            print("✅ Static manifest rebuilt.")
+        except subprocess.CalledProcessError as exc:
+            print(f"❌ Lỗi khi chạy collectstatic: {exc}")
+            raise SystemExit(1)
+
         if not args.skip_seed:
-            print("\n🌱 Seeding domain app data...")
-            create_superadmin = prompt_yes_no(
-                "Tạo/cập nhật tài khoản seed superadmin (password 123456)?",
-                default=False,
-            )
-            create_quanly = prompt_yes_no(
-                "Tạo/cập nhật tài khoản seed quanly (password 123456)?",
-                default=False,
-            )
-
-            if create_superadmin or create_quanly:
-                accounts: list[tuple[str, str, bool]] = []
-                if create_superadmin:
-                    accounts.append(("superadmin", "superadmin@example.com", True))
-                if create_quanly:
-                    accounts.append(("quanly", "quanly@example.com", True))
-
-                account_lines = [
-                    "from django.contrib.auth import get_user_model",
-                    "User=get_user_model()",
-                    f"accounts={accounts!r}",
-                    "for username,email,is_superuser in accounts:",
-                    "    user,created=User.objects.get_or_create(username=username, defaults={'email': email})",
-                    "    user.email=email",
-                    "    user.is_staff=True",
-                    "    user.is_superuser=is_superuser",
-                    "    user.set_password('123456')",
-                    "    user.save()",
-                    "    print(('Created' if created else 'Updated') + f' seed account: {username}')",
-                ]
-                subprocess.run(
-                    [sys.executable, str(manage_py), "shell", "-c", "\n".join(account_lines)],
-                    cwd=base_dir,
-                    check=True,
-                )
-            else:
-                print("Skipped creating seed accounts.")
-                print("WARNING: Nếu chưa có user nào, seed_paymentmethods sẽ dùng user seed do seed_quanly tạo.")
-
-            seed_commands = (
-                ("seed_products",),
-                ("seed_posts",),
-                ("seed_quanly",),
-                ("seed_paymentmethods",),
-            )
-            try:
-                for command_args in seed_commands:
-                    subprocess.run([sys.executable, str(manage_py), *command_args], cwd=base_dir, check=True)
-                print("✅ Seed data completed.")
-                if create_superadmin:
-                    print("   Seed account: username=superadmin, password=123456")
-                if create_quanly:
-                    print("   Seed account: username=quanly, password=123456")
-            except subprocess.CalledProcessError as exc:
-                print(f"❌ Lỗi khi chạy seed data: {exc}")
-                raise SystemExit(1)
+            run_seed_data(base_dir, manage_py, args.dry_run)
         else:
             print("\nSkipped seed data (--skip-seed).")
 
