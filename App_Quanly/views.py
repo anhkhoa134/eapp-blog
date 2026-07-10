@@ -1145,33 +1145,50 @@ def process_product_images(request, product, image_folder):
 
 
 ############# Specification #############
+SPECIFICATION_FORM_CONFIGS = (
+    ('form', ProductSpecification, SpecificationForm),
+    ('form_2', ProductSpecification_2, SpecificationForm_2),
+    ('form_3', ProductSpecification_3, SpecificationForm_3),
+    ('form_4', ProductSpecification_4, SpecificationForm_4),
+)
+
+
+def build_specification_context(current_product, bound_form_name=None, bound_form=None):
+    context = {'current_product': current_product}
+
+    for form_name, model, form_class in SPECIFICATION_FORM_CONFIGS:
+        if form_name == bound_form_name and bound_form is not None:
+            context[form_name] = bound_form
+            continue
+
+        current_specification = get_object_or_404(model, product=current_product)
+        context[form_name] = form_class(instance=current_specification)
+
+    return context
+
+
 @quanly_required
-def edit_specification(request, id):
+def edit_specification_generic(request, id, model, form_class, form_name, template_name='quanly/specification_form.html'):
     current_product = get_object_or_404(Product, id=id)
-    current_specification = get_object_or_404(ProductSpecification, product=current_product)
-    current_specification_2 = get_object_or_404(ProductSpecification_2, product=current_product)
-    current_specification_3 = get_object_or_404(ProductSpecification_3, product=current_product)
-    current_specification_4 = get_object_or_404(ProductSpecification_4, product=current_product)
+    current_specification = get_object_or_404(model, product=current_product)
 
     if request.method == 'POST':
-        form = SpecificationForm(request.POST, request.FILES, instance=current_specification)
+        form = form_class(request.POST, request.FILES, instance=current_specification)
 
         if form.is_valid():
             form.save()
             messages.success(request, f"Cập nhật {current_product.name}.")
             return redirect('quanly:product_view')
 
-    else:
-        form = SpecificationForm(instance=current_specification)
-        form_2 = SpecificationForm_2(instance=current_specification_2)
-        form_3 = SpecificationForm_3(instance=current_specification_3)
-        form_4 = SpecificationForm_4(instance=current_specification_4)
-    
-    return render(request, 'quanly/specification_form.html', { 'current_product':current_product,
-                                                                        'form': form,
-                                                                        'form_2': form_2,
-                                                                        'form_3': form_3,
-                                                                        'form_4': form_4, })
+        context = build_specification_context(current_product, form_name, form)
+        return render(request, template_name, context)
+
+    context = build_specification_context(current_product)
+    return render(request, template_name, context)
+
+
+def edit_specification(request, id):
+    return edit_specification_generic(request, id, ProductSpecification, SpecificationForm, 'form')
 
 # def edit_specification_2(request, id):
 #     current_product = get_object_or_404(Product, id=id)
@@ -1189,33 +1206,14 @@ def edit_specification(request, id):
 #         form_2 = SpecificationForm_2(instance=current_specification_2)
     
 #     return render(request, 'quanly/specification_form.html', {'form_2': form_2,})
-
-
-def edit_specification_generic(request, id, model, form_class, template_name='quanly/specification_form.html'):
-    current_product = get_object_or_404(Product, id=id)
-    current_specification = get_object_or_404(model, product=current_product)
-
-    if request.method == 'POST':
-        form = form_class(request.POST, request.FILES, instance=current_specification)
-
-        if form.is_valid():
-            form.save()
-            messages.success(request, f"Cập nhật {current_product.name}.")
-            return redirect('quanly:product_view')
-
-    else:
-        form = form_class(instance=current_specification)
-    
-    return render(request, template_name, {'form': form})
-
 def edit_specification_2(request, id):
-    return edit_specification_generic(request, id, ProductSpecification_2, SpecificationForm_2)
+    return edit_specification_generic(request, id, ProductSpecification_2, SpecificationForm_2, 'form_2')
 
 def edit_specification_3(request, id):
-    return edit_specification_generic(request, id, ProductSpecification_3, SpecificationForm_3)
+    return edit_specification_generic(request, id, ProductSpecification_3, SpecificationForm_3, 'form_3')
 
 def edit_specification_4(request, id):
-    return edit_specification_generic(request, id, ProductSpecification_4, SpecificationForm_4)
+    return edit_specification_generic(request, id, ProductSpecification_4, SpecificationForm_4, 'form_4')
 
 
 

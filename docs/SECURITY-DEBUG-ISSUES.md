@@ -234,6 +234,9 @@ Sự cố production cũ chủ yếu đến từ:
 - WhiteNoise manifest hoặc template static gây 500
 - context processor crash làm trang render không đầy đủ
 - JavaScript gắn event vào element không tồn tại
+- modal HTMX admin trỏ nhầm `data-bs-target` sang modal không tồn tại (`#addModal`) thay vì để `#dialog` tự mở qua JS
+- script inline trong fragment HTMX chạy lại gây `$ is not defined` hoặc `redeclaration` nếu dùng jQuery/biến global
+- signal receiver viết sai vị trí, ví dụ `@receiver(...)` treo trước class khác, gây 500 khi xóa cascade
 
 Codebase hiện tại đã có các điểm giảm rủi ro:
 
@@ -241,6 +244,7 @@ Codebase hiện tại đã có các điểm giảm rủi ro:
 - view `home` bắt exception và render collection rỗng.
 - logging đã bật cho Django request error và warning của `App_Core`.
 - `scripts/3_security_tools.py server` test trực tiếp các đường lỗi 500 cũ.
+- quy ước HTMX/admin và signal receiver được ghi trong `docs/FRONTEND-SKILL.md` và `docs/BACKEND-SKILL.md`.
 
 Khi site chỉ hiện layout base, trả 500, hoặc mất CSS/JS:
 
@@ -250,6 +254,15 @@ tail -50 logs/error.log
 python manage.py collectstatic --noinput
 python manage.py check
 ```
+
+Khi lỗi chỉ xảy ra trong modal quản lý:
+
+```bash
+rg -n "data-bs-target=\"#addModal\"|\\$\\(|\\.ajax|@receiver\\(" templates/quanly App_Post App_Product App_Quanly
+python manage.py check
+```
+
+Sau đó test lại flow trên browser: mở add/edit modal 2 lần liên tiếp, bấm `Lưu`, bấm `Xóa` trên bản ghi test và kiểm tra console + network không còn 500.
 
 Nếu lỗi liên quan static manifest, sửa đường dẫn `{% static %}` trong template hoặc khôi phục static file bị thiếu, rồi chạy lại `collectstatic`.
 
