@@ -35,6 +35,7 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.ngrok-free.app', env('VPS'), env('D
 LOGIN_URL = '/dang-nhap/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+CSRF_FAILURE_VIEW = 'App_Core.views.csrf_failure' # Lỗi CSRF ở trang login -> redirect về login kèm thông báo, nơi khác -> trang 403
 
 # SESSION_COOKIE_AGE = 1800  # Thời gian tính bằng giây, ở đây là 30 phút
 # SESSION_EXPIRE_AT_BROWSER_CLOSE = True # Session sẽ hết hạn khi đóng trình duyệt

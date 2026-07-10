@@ -8,11 +8,13 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from templated_email import send_templated_mail
 
 from App_Core.forms import ContactForm
+from App_Core.middleware import generate_response
 from App_Core.models import Contact
 from App_Post.models import Post, Subject
 from App_Product.models import Category, Product, SubCategory
@@ -27,18 +29,6 @@ def _wishlist_product_ids(request):
     return set()
 
 
-def generate_response(message, type='bg-success'):
-    return HttpResponse(
-        status=204,
-        headers={
-            'HX-Trigger': json.dumps({
-                'listChange': None,
-                'showMessage': {'message': message, 'type': type}
-            })
-        }
-    )
-
-
 def handler404(request, exception, template_name='404.html'):
     logger.error(f"404 Error: {request.path} - {exception}")
     return render(request, 'partials/error_404_500.html', status=404)
@@ -46,6 +36,15 @@ def handler404(request, exception, template_name='404.html'):
 def handler500(request, *args, **argv):
     logger.error(f"500 Error: {request.path} - {args} - {argv}")
     return render(request, 'partials/error_404_500.html', status=500)
+
+def csrf_failure(request, reason=""):
+    # CSRF lệch ở trang đăng nhập (token cũ do cache/back-forward/phiên đổi):
+    # đưa về form login với thông báo thay vì trang Forbidden 403 thô
+    logger.warning(f"CSRF failure: {request.path} - {reason}")
+    if request.path == reverse('account:login'):
+        messages.error(request, "Tài khoản đã đăng nhập ở một nơi khác hoặc phiên đăng nhập đã thay đổi. Vui lòng đăng nhập lại.")
+        return redirect('account:login')
+    return render(request, 'partials/error_404_500.html', status=403)
 
 @login_required
 @csrf_exempt

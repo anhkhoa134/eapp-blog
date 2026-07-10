@@ -12,6 +12,8 @@ from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 from templated_email import send_templated_mail
 
 from App_Account.forms import CustomPasswordChangeForm, RegisterForm
@@ -113,6 +115,11 @@ def check_password2(request):
         return HttpResponse("<div style='color: green;'>Xác nhận mật khẩu trùng khớp.</div>")
     return HttpResponse("<div style='color: red;'>Xác nhận mật khẩu không trùng với mật khẩu mới.</div>")
 
+# never_cache: không cache trang login để hidden CSRF token trong form không bị cũ (back/forward, browser cache)
+# ensure_csrf_cookie: luôn set cookie csrftoken khi GET, tránh lệch token giữa form và cookie
+@never_cache
+@ensure_csrf_cookie
+@csrf_protect
 def login_user(request):
     guest_session_key = request.session.session_key
     # Lưu 'next_url' vào session nếu có trong GET

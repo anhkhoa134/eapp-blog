@@ -1,3 +1,37 @@
+// <!-- CSRF: đồng bộ token mới nhất từ cookie csrftoken trước khi submit form / gửi HTMX request -->
+// Tránh lỗi "CSRF verification failed" khi hidden token trong HTML bị cũ (trang cache, back/forward, token rotate)
+function getCsrfCookie() {
+    const match = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/);
+    return match ? decodeURIComponent(match[1]) : null;
+}
+
+// Form thường: cập nhật hidden input csrfmiddlewaretoken theo cookie ngay trước khi submit
+document.addEventListener('submit', (event) => {
+    const form = event.target;
+    if (!form || !form.querySelector) {
+        return;
+    }
+    const input = form.querySelector('input[name="csrfmiddlewaretoken"]');
+    const token = getCsrfCookie();
+    if (input && token) {
+        input.value = token;
+    }
+}, true);
+
+// HTMX request: set header X-CSRFToken và đồng bộ csrfmiddlewaretoken trong body theo cookie
+if (window.htmx) {
+    document.body.addEventListener('htmx:configRequest', (event) => {
+        const token = getCsrfCookie();
+        if (!token) {
+            return;
+        }
+        event.detail.headers['X-CSRFToken'] = token;
+        if (event.detail.parameters && event.detail.parameters.csrfmiddlewaretoken) {
+            event.detail.parameters.csrfmiddlewaretoken = token;
+        }
+    });
+}
+
 // <!-- Spinner cho loading page + upload file: hiển thị ngay lập tức -->
 // Hiển thị spinner
 function showSpinner() {
