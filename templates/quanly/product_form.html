@@ -93,88 +93,102 @@
 <script>
     // Đoạn script này dùng để tải danh sách danh mục phụ (subcategories) dựa trên danh mục chính (category) được chọn
     // Tạo combobox phụ thuộc - khi chọn danh mục chính thì danh sách danh mục phụ sẽ thay đổi theo
-    $(document).ready(function() {
-        // Lưu giá trị subcategory hiện tại nếu đang trong trường hợp edit
-        var currentSubcategoryId = $('#subcategory').val();
+    (function () {
+        const categorySelect = document.getElementById('category');
+        const subcategorySelect = document.getElementById('subcategory');
 
-        // Thiết lập token CSRF cho tất cả các request AJAX để bảo mật
-        $.ajaxSetup({
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}'
-            }
-        });
+        if (!categorySelect || !subcategorySelect) {
+            return;
+        }
 
-        // Bắt sự kiện khi người dùng thay đổi lựa chọn ở combobox danh mục chính
-        $('#category').change(function() {
-            var categoryId = $(this).val();
+        const currentSubcategoryId = subcategorySelect.value;
+
+        function resetSubcategories() {
+            subcategorySelect.replaceChildren(new Option('---------', ''));
+            subcategorySelect.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        async function loadSubcategories() {
+            const categoryId = categorySelect.value;
+
             if (!categoryId) {
-                // Nếu không có danh mục chính nào được chọn
-                // Xóa hết các option trong combobox danh mục phụ và thêm option mặc định
-                var subcategorySelect = $('#subcategory');
-                subcategorySelect.empty();
-                subcategorySelect.append('<option value="">---------</option>');
+                resetSubcategories();
                 return;
             }
 
-            // Gọi API để lấy danh sách danh mục phụ tương ứng với danh mục chính
-            $.ajax({
-                url: '{% url "quanly:get_subcategories" %}',
-                data: {
-                    'category_id': categoryId
-                },
-                success: function(data) {
-                    // Xử lý khi API trả về thành công
-                    // Cập nhật lại các option trong combobox danh mục phụ
-                    var subcategorySelect = $('#subcategory');
-                    subcategorySelect.empty();
-                    subcategorySelect.append('<option value="">---------</option>');
-                    $.each(data, function(key, value) {
-                        // Kiểm tra nếu là subcategory hiện tại thì selected
-                        var selected = (value.id == currentSubcategoryId) ? 'selected' : '';
-                        subcategorySelect.append('<option value="' + value.id + '" ' + selected + '>' + value.name + '</option>');
-                    });
-                },
-                error: function(xhr, status, error) {
-                    // Xử lý khi API bị lỗi
-                    console.error("Lỗi khi tải danh sách danh mục phụ:", error);
-                    alert("Có lỗi khi tải danh sách danh mục phụ. Vui lòng thử lại.");
-                }
-            });
-        });
+            try {
+                const url = new URL('{% url "quanly:get_subcategories" %}', window.location.origin);
+                url.searchParams.set('category_id', categoryId);
 
-        // Tự động kích hoạt sự kiện change nếu danh mục chính đã được chọn sẵn
-        // (Thường dùng trong trường hợp chỉnh sửa sản phẩm)
-        if ($('#category').val()) {
-            $('#category').trigger('change');
+                const response = await fetch(url, {
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                subcategorySelect.replaceChildren(new Option('---------', ''));
+
+                data.forEach(function (item) {
+                    const option = new Option(item.name, item.id);
+                    option.selected = String(item.id) === String(currentSubcategoryId);
+                    subcategorySelect.add(option);
+                });
+
+                subcategorySelect.dispatchEvent(new Event('change', { bubbles: true }));
+            } catch (error) {
+                console.error('Lỗi khi tải danh sách danh mục phụ:', error);
+                alert('Có lỗi khi tải danh sách danh mục phụ. Vui lòng thử lại.');
+            }
         }
-    });
+
+        categorySelect.addEventListener('change', loadSubcategories);
+
+        if (categorySelect.value) {
+            loadSubcategories();
+        }
+    })();
 </script>
 
 
 <script>
-    function formatNumber(value) {
-        return new Intl.NumberFormat('en-US').format(value.replace(/\D/g, ''));
-    }
-
-    document.getElementById('id_price').addEventListener('input', function (e) {
-        e.target.value = formatNumber(e.target.value);
-    });
-
-    document.getElementById('id_price_sale').addEventListener('input', function (e) {
-        e.target.value = formatNumber(e.target.value);
-    });
-
-    // Định dạng giá trị khi modal hiển thị
-    document.addEventListener('shown.bs.modal', function (e) {
-        const modal = e.target;
-        const priceField = modal.querySelector('#id_price');
-        const priceSaleField = modal.querySelector('#id_price_sale');
-
-        if (priceField && priceField.value) {
-            priceField.value = formatNumber(priceField.value);
+    (function () {
+        function formatNumber(value) {
+            return new Intl.NumberFormat('en-US').format(value.replace(/\D/g, ''));
         }
-        if (priceSaleField && priceSaleField.value) {
-            priceSaleField.value = formatNumber(priceSaleField.value);
+
+        const priceInput = document.getElementById('id_price');
+        const priceSaleInput = document.getElementById('id_price_sale');
+
+        if (priceInput) {
+            priceInput.addEventListener('input', function (e) {
+                e.target.value = formatNumber(e.target.value);
+            });
         }
-    });
+
+        if (priceSaleInput) {
+            priceSaleInput.addEventListener('input', function (e) {
+                e.target.value = formatNumber(e.target.value);
+            });
+        }
+
+        // Định dạng giá trị khi modal hiển thị
+        document.addEventListener('shown.bs.modal', function (e) {
+            const modal = e.target;
+            const priceField = modal.querySelector('#id_price');
+            const priceSaleField = modal.querySelector('#id_price_sale');
+
+            if (priceField && priceField.value) {
+                priceField.value = formatNumber(priceField.value);
+            }
+            if (priceSaleField && priceSaleField.value) {
+                priceSaleField.value = formatNumber(priceSaleField.value);
+            }
+        }, { once: true });
+    })();
 </script>

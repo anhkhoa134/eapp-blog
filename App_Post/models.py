@@ -317,6 +317,9 @@ def create_PostContent(sender, instance, created, **kwargs):
 
 # Hàm xử lý tín hiệu để xóa các file được upload trong CKEditor5Field khi một PostContent bị xóa.
 @receiver(post_delete, sender=PostContent)
+def postcontent_post_delete(sender, instance, **kwargs):
+    uploaded_images = instance._extract_uploaded_images(instance.content)
+    instance._delete_uploaded_images(uploaded_images)
 
 
 class Comment(models.Model):

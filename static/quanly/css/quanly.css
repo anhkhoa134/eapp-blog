@@ -1267,6 +1267,66 @@ a.card-title:hover, button.card-title:hover {
   box-shadow: var(--card-shadow) !important;
 }
 
+.product-filter-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+}
+
+.product-filter-field {
+  min-width: 0;
+}
+
+.product-filter-field--search {
+  flex: 1 1 240px;
+  max-width: 340px;
+  min-width: 220px;
+}
+
+.product-filter-field--category,
+.product-filter-field--subcategory {
+  flex: 1.35 1 270px;
+  max-width: 360px;
+  min-width: 240px;
+}
+
+.product-filter-field--stock {
+  flex: 0 1 150px;
+  max-width: 170px;
+  min-width: 140px;
+}
+
+.product-filter-field--sort {
+  flex: 0 1 210px;
+  max-width: 230px;
+  min-width: 190px;
+}
+
+.product-filter-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 10px;
+  justify-content: flex-start;
+}
+
+@media (max-width: 767.98px) {
+  .product-filter-field--search,
+  .product-filter-field--category,
+  .product-filter-field--subcategory,
+  .product-filter-field--stock,
+  .product-filter-field--sort,
+  .product-filter-actions {
+    flex-basis: 100%;
+    max-width: none;
+    min-width: 0;
+  }
+
+  .product-filter-actions .btn {
+    flex: 1 1 0;
+  }
+}
+
 /* Pagination Overrides */
 .pagination {
   gap: 6px;

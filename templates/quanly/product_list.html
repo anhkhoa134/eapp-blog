@@ -5,20 +5,20 @@
     <!-- Filter Form -->
     <div class="col-12 filter-card mb-4">
         <form hx-get="{% url 'quanly:product_list' %}" hx-target="#product-list-container" hx-swap="outerHTML">
-            <div class="d-flex flex-wrap gap-2 align-items-center">
-                <div class="flex-fill" style="min-width: 160px; max-width: 220px;">
+            <div class="product-filter-row">
+                <div class="product-filter-field product-filter-field--search">
                     {{ form.name }}
                 </div>
-                <div class="flex-fill" style="min-width: 160px; max-width: 220px;">
+                <div class="product-filter-field product-filter-field--category">
                     {{ form.category }}
                 </div>
-                <div class="flex-fill" style="min-width: 160px; max-width: 220px;">
+                <div class="product-filter-field product-filter-field--subcategory">
                     {{ form.subcategory }}
                 </div>
-                <div class="flex-fill" style="min-width: 160px; max-width: 220px;">
+                <div class="product-filter-field product-filter-field--stock">
                     {{ form.is_stock }}
                 </div>
-                <div class="flex-fill" style="min-width: 160px; max-width: 220px;">
+                <div class="product-filter-field product-filter-field--sort">
                     <select name="sort_by" class="form-select">
                         <option value="-id" {% if request.GET.sort_by == '-id' %}selected{% endif %}>Sản phẩm mới nhất</option>
                         <option value="id" {% if request.GET.sort_by == 'id' %}selected{% endif %}>Sản phẩm cũ nhất</option>
@@ -28,7 +28,7 @@
                         <option value="price_desc" {% if request.GET.sort_by == 'price_desc' %}selected{% endif %}>Giá giảm dần</option>
                     </select>
                 </div>
-                <div class="d-flex justify-content-start gap-2">
+                <div class="product-filter-actions">
                     <input type="submit" value="Lọc" class="btn btn-primary btn-sm px-3">
                     <a class="btn btn-secondary btn-sm px-3" href="{% url 'quanly:product_view' %}">Hủy</a>
                 </div>
@@ -71,7 +71,7 @@
                             hx-swap="outerHTML"
                             onsubmit="showSpinner()">
 
-                        <a data-bs-target="#addModal" type="button" class="card-title" data-bs-toggle="modal"
+                        <a type="button" class="card-title"
                             hx-get="{% url 'quanly:add_product' %}" hx-target="#dialog">
                             <i class="bi bi-plus-circle"></i> Thêm sản phẩm
                         </a>

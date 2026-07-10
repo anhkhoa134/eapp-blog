@@ -89,59 +89,64 @@
 <script>
     // Đoạn script này dùng để tải danh sách chủ đề phụ (subsubjects) dựa trên chủ đề chính (subject) được chọn
     // Tạo combobox phụ thuộc - khi chọn chủ đề chính thì danh sách chủ đề phụ sẽ thay đổi theo
-    $(document).ready(function() {
-        // Lưu giá trị subsubject hiện tại nếu đang trong trường hợp edit
-        var currentSubsubjectId = $('#subsubject').val();
+    (function () {
+        const subjectSelect = document.getElementById('subject');
+        const subsubjectSelect = document.getElementById('subsubject');
 
-        // Thiết lập token CSRF cho tất cả các request AJAX để bảo mật
-        $.ajaxSetup({
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}'
-            }
-        });
+        if (!subjectSelect || !subsubjectSelect) {
+            return;
+        }
 
-        // Bắt sự kiện khi người dùng thay đổi lựa chọn ở combobox chủ đề chính
-        $('#subject').change(function() {
-            var subjectId = $(this).val();
+        const currentSubsubjectId = subsubjectSelect.value;
+
+        function resetSubsubjects() {
+            subsubjectSelect.replaceChildren(new Option('---------', ''));
+            subsubjectSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        async function loadSubsubjects() {
+            const subjectId = subjectSelect.value;
+
             if (!subjectId) {
-                // Nếu không có chủ đề chính nào được chọn
-                // Xóa hết các option trong combobox chủ đề phụ và thêm option mặc định
-                var subsubjectSelect = $('#subsubject');
-                subsubjectSelect.empty();
-                subsubjectSelect.append('<option value="">---------</option>');
+                resetSubsubjects();
                 return;
             }
 
-            // Gọi API để lấy danh sách chủ đề phụ tương ứng với chủ đề chính
-            $.ajax({
-                url: '{% url "quanly:get_subsubjects" %}',
-                data: {
-                    'subject_id': subjectId
-                },
-                success: function(data) {
-                    // Xử lý khi API trả về thành công
-                    // Cập nhật lại các option trong combobox chủ đề phụ
-                    var subsubjectSelect = $('#subsubject');
-                    subsubjectSelect.empty();
-                    subsubjectSelect.append('<option value="">---------</option>');
-                    $.each(data, function(key, value) {
-                        // Kiểm tra nếu là subsubject hiện tại thì selected
-                        var selected = (value.id == currentSubsubjectId) ? 'selected' : '';
-                        subsubjectSelect.append('<option value="' + value.id + '" ' + selected + '>' + value.title + '</option>');
-                    });
-                },
-                error: function(xhr, status, error) {
-                    // Xử lý khi API bị lỗi
-                    console.error("Lỗi khi tải danh sách chủ đề phụ:", error);
-                    alert("Có lỗi khi tải danh sách chủ đề phụ. Vui lòng thử lại.");
-                }
-            });
-        });
+            try {
+                const url = new URL('{% url "quanly:get_subsubjects" %}', window.location.origin);
+                url.searchParams.set('subject_id', subjectId);
 
-        // Tự động kích hoạt sự kiện change nếu chủ đề chính đã được chọn sẵn
-        // (Thường dùng trong trường hợp chỉnh sửa bài viết)
-        if ($('#subject').val()) {
-            $('#subject').trigger('change');
+                const response = await fetch(url, {
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                subsubjectSelect.replaceChildren(new Option('---------', ''));
+
+                data.forEach(function (item) {
+                    const option = new Option(item.title, item.id);
+                    option.selected = String(item.id) === String(currentSubsubjectId);
+                    subsubjectSelect.add(option);
+                });
+
+                subsubjectSelect.dispatchEvent(new Event('change', { bubbles: true }));
+            } catch (error) {
+                console.error('Lỗi khi tải danh sách chủ đề phụ:', error);
+                alert('Có lỗi khi tải danh sách chủ đề phụ. Vui lòng thử lại.');
+            }
         }
-    });
+
+        subjectSelect.addEventListener('change', loadSubsubjects);
+
+        if (subjectSelect.value) {
+            loadSubsubjects();
+        }
+    })();
 </script>
