@@ -7,7 +7,7 @@ File này thay thế các tài liệu security/debug/production issue cũ và đ
 ## Hiện Trạng Codebase
 
 Project là Django ecommerce app dùng cấu hình chính tại `Project/settings.py`.
-Sau refactor domain app, tài liệu kiến trúc/migration hiện nằm ở `docs/APP-REFACTOR.md`.
+Sau refactor domain app, tài liệu kiến trúc/quy ước backend hiện nằm ở `docs/BACKEND-SKILL.md`.
 
 Các file vận hành quan trọng:
 

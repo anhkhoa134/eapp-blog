@@ -2,7 +2,7 @@
 
     <!-- Filter Form -->
     <div class="col-12 filter-card mb-4">
-        <form hx-get="{% url 'quanly:order_list' %}" hx-target="#order-list-container"> 
+        <form hx-get="{% url 'quanly:order_list' %}" hx-target="#order-list-container" hx-swap="outerHTML">
             <div class="row g-2 align-items-center">
                 <div class="col-6 col-md-3">
                     {{form.min_price}}

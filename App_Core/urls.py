@@ -1,5 +1,5 @@
 from django.urls import path
-from django.views.generic import TemplateView
+from django.views.generic import RedirectView, TemplateView
 
 from . import views
 
@@ -14,4 +14,10 @@ urlpatterns = [
     path('gioi-thieu/', TemplateView.as_view(template_name='about.html'), name='about'),
     path('thanh-cong/', TemplateView.as_view(template_name='success.html'), name='success'),
     path('tai-len/', views.custom_upload_function, name='custom_upload_file'),
+
+    # Legacy redirect: URL cũ (không dấu gạch) -> URL canonical mới
+    path('lienhe/', RedirectView.as_view(pattern_name='core:contact', permanent=True, query_string=True)),
+    path('gioithieu/', RedirectView.as_view(pattern_name='core:about', permanent=True, query_string=True)),
+    path('CTV/', RedirectView.as_view(pattern_name='core:CTV', permanent=True, query_string=True)),
+    path('success/', RedirectView.as_view(pattern_name='core:success', permanent=True, query_string=True)),
 ]

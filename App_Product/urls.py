@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.generic import RedirectView
 
 from . import views
 
@@ -31,4 +32,17 @@ urlpatterns = [
     path('so-sanh/them/<int:product_id>/', views.add_to_compare, name='add_to_compare'),
     path('so-sanh/xoa/<int:product_id>/', views.remove_from_compare, name='remove_from_compare'),
     path('danh-gia/them/<int:product_id>/', views.add_review, name='add_review'),
+
+    # Legacy redirect: URL cũ (không dấu gạch) -> URL canonical mới
+    path('sanpham/', RedirectView.as_view(pattern_name='product:product_all', permanent=True, query_string=True)),
+    path('danhmuc/<slug:slug_category>/', RedirectView.as_view(pattern_name='product:product_all', permanent=True, query_string=True)),
+    path('danhmuc/<slug:slug_category>/<slug:slug_subcategory>/', RedirectView.as_view(pattern_name='product:product_all', permanent=True, query_string=True)),
+    path('sanpham/<slug:slug_category>/<slug:slug_product>/', RedirectView.as_view(pattern_name='product:product_detail', permanent=True, query_string=True)),
+    path('sanpham/<slug:slug_category>/<slug:slug_product>/<slug:variant_slug>/', RedirectView.as_view(pattern_name='product:product_detail', permanent=True, query_string=True)),
+    path('cart_view/', RedirectView.as_view(pattern_name='product:cart_view', permanent=True, query_string=True)),
+    path('checkout/', RedirectView.as_view(pattern_name='product:checkout', permanent=True, query_string=True)),
+    path('order/success/<int:order_id>/', RedirectView.as_view(pattern_name='product:order_success', permanent=True, query_string=True)),
+    path('orders/<int:order_id>/', RedirectView.as_view(pattern_name='product:order_detail', permanent=True, query_string=True)),
+    path('wishlist/', RedirectView.as_view(pattern_name='product:wishlist_view', permanent=True, query_string=True)),
+    path('compare/', RedirectView.as_view(pattern_name='product:compare_view', permanent=True, query_string=True)),
 ]

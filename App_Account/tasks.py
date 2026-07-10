@@ -1,4 +1,5 @@
 from celery import shared_task
+from django.contrib.auth import get_user_model
 from django.utils.timezone import now
 from templated_email import send_templated_mail
 
@@ -33,15 +34,21 @@ def send_birthday_emails():
             sent_emails.append(f"{profile.fullname} <{profile.email}>")
 
     if sent_emails:
-        send_templated_mail(
-            template_name='admin_report_email',
-            from_email=None,
-            recipient_list=['leanhkhoa03@gmail.com'],
-            context={
-                'sent_count': len(sent_emails),
-                'sent_emails': sent_emails,
-                'date': now().strftime('%d-%m-%Y'),
-            },
+        # Gửi báo cáo tiến trình cho tài khoản quản lý
+        quanly_email = (
+            get_user_model().objects.filter(username='quanly')
+            .values_list('email', flat=True).first()
         )
+        if quanly_email:
+            send_templated_mail(
+                template_name='admin_report_email',
+                from_email=None,
+                recipient_list=[quanly_email],
+                context={
+                    'sent_count': len(sent_emails),
+                    'sent_emails': sent_emails,
+                    'date': now().strftime('%d-%m-%Y'),
+                },
+            )
 
     return f"Đã gửi {len(sent_emails)} email sinh nhật."

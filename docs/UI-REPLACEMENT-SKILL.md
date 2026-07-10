@@ -17,7 +17,7 @@ Dùng skill này khi cần thay giao diện một project Django bằng bộ UI 
 - seed dữ liệu mới để UI chạy được ngay
 - sau khi giao diện mới chạy ổn, cập nhật content, SEO/meta, sitemap, robots và thông tin thương hiệu trước khi bàn giao
 
-Không dùng skill này cho task chỉ sửa màu, đổi copy nhỏ, hoặc chỉnh một component đơn lẻ.
+Không dùng skill này cho task chỉ sửa màu, đổi copy nhỏ, hoặc chỉnh một component đơn lẻ — các task đó dùng [FRONTEND-SKILL.md](FRONTEND-SKILL.md). Quy ước backend (app ownership, URL namespace, HTMX trang quản lý) xem [BACKEND-SKILL.md](BACKEND-SKILL.md).
 
 Nếu muốn dùng như Codex skill chuẩn cho nhiều repo, đặt nội dung file này vào:
 
@@ -391,16 +391,18 @@ Sau khi `base.html` và `home.html` ổn, chia các URL còn lại thành nhóm 
 Các trang khách truy cập thấy đầu tiên:
 
 - `/` -> `templates/home.html`
-- `/sanpham/` -> `templates/product_all.html`
-- `/danhmuc/<slug:slug_category>/` -> `templates/product_all.html`
-- `/danhmuc/<slug:slug_category>/<slug:slug_subcategory>/` -> `templates/product_all.html`
-- `/sanpham/<slug:slug_category>/<slug:slug_product>` -> `templates/product_detail.html`
-- `/baiviet/` -> `templates/post_all.html`
-- `/chude/<slug:slug_subject>/` -> `templates/post_all.html`
-- `/chude/<slug:slug_subject>/<slug:slug_subsubject>/` -> `templates/post_all.html`
-- `/baiviet/<slug:slug_subject>/<slug:slug_post>` -> `templates/post_detail.html`
-- `/lienhe/` -> `templates/contact.html`
-- `/gioithieu` -> `templates/about.html`
+- `/san-pham/` -> `templates/product_all.html`
+- `/danh-muc/<slug:slug_category>/` -> `templates/product_all.html`
+- `/danh-muc/<slug:slug_category>/<slug:slug_subcategory>/` -> `templates/product_all.html`
+- `/san-pham/<slug:slug_category>/<slug:slug_product>/` -> `templates/product_detail.html`
+- `/bai-viet/` -> `templates/post_all.html`
+- `/chu-de/<slug:slug_subject>/` -> `templates/post_all.html`
+- `/chu-de/<slug:slug_subject>/<slug:slug_subsubject>/` -> `templates/post_all.html`
+- `/bai-viet/<slug:slug_subject>/<slug:slug_post>/` -> `templates/post_detail.html`
+- `/lien-he/` -> `templates/contact.html`
+- `/gioi-thieu/` -> `templates/about.html`
+
+URL cũ dạng không dấu gạch (`/sanpham/`, `/lienhe/`, `/dangnhap/`, `/cart_view/`, `/wishlist/`…) vẫn được hỗ trợ bằng **redirect 301** về URL canonical mới — khai báo trong phần `# Legacy redirect` cuối `urls.py` của từng app (`App_Core`, `App_Account`, `App_Product`, `App_Post`; riêng `/quanly/` nằm ở `App_Quanly`). Không xóa các redirect này khi sửa route; route mới không dùng lại dạng không dấu gạch.
 
 Partial đi kèm:
 
@@ -427,7 +429,7 @@ Lưu ý riêng cho danh sách và chi tiết sản phẩm:
 
 Lưu ý riêng cho biến thể sản phẩm:
 
-- `product_detail.html` phải giữ danh sách `variants`, `active_variant` và URL có `variant_slug` nếu view đang hỗ trợ `/sanpham/<category>/<product>/<variant_slug>`.
+- `product_detail.html` phải giữ danh sách `variants`, `active_variant` và URL có `variant_slug` nếu view đang hỗ trợ `/san-pham/<category>/<product>//<variant_slug>`.
 - Khi không có `variant_slug`, detail page hiện chọn biến thể có effective price thấp nhất; không thay bằng variant đầu tiên tùy ý nếu không sửa view/test tương ứng.
 - Variant selector phải hiển thị các thuộc tính qua `variant.attributes -> VariantAttribute -> Attribute`, ví dụ `Màu: Nâu`, `Kiểu: Khóa kéo`, hoặc summary tương đương.
 - Form thêm giỏ ở detail phải gửi đúng `variant_id`; không gửi mỗi `product_id` cho trang có nhiều biến thể.
@@ -462,17 +464,17 @@ Lưu ý:
 
 Các trang tài khoản nên dùng chung layout form/panel:
 
-- `/dangnhap/` -> `templates/login.html`
-- `/dangky/` -> `templates/register.html`
-- `/doimatkhau/` -> `templates/registration/change_password.html`
-- `/password_reset/request/` -> `templates/registration/reset_form.html`
-- `/password_reset/done/` -> `templates/registration/reset_done.html`
-- `/password_reset/<uidb64>/<token>/confirm/` -> `templates/registration/reset_confirm.html`
-- `/password_reset/complete/` -> `templates/registration/reset_complete.html`
-- `/thongtintaikhoan/` -> `templates/edit_profile.html`
-- `/diachigiaohang/` -> `templates/edit_info.html`
-- `/donhangdamua/` -> `templates/order_cus.html`
-- account sidebar -> `templates/partials/nav_left.html`
+- `/dang-nhap/` -> `templates/login.html`
+- `/dang-ky/` -> `templates/register.html`
+- `/doi-mat-khau/` -> `templates/registration/change_password.html`
+- `/dat-lai-mat-khau/yeu-cau/` -> `templates/registration/reset_form.html`
+- `/dat-lai-mat-khau/da-gui/` -> `templates/registration/reset_done.html`
+- `/dat-lai-mat-khau/<uidb64>/<token>/xac-nhan/` -> `templates/registration/reset_confirm.html`
+- `/dat-lai-mat-khau/hoan-tat/` -> `templates/registration/reset_complete.html`
+- `/thong-tin-tai-khoan/` -> `templates/edit_profile.html`
+- `/dia-chi-giao-hang/` -> `templates/edit_info.html`
+- `/don-hang-da-mua/` -> `templates/order_cus.html`
+- account sidebar -> `templates/partials/account_sidebar.html`
 
 Lưu ý:
 
@@ -486,11 +488,11 @@ Lưu ý:
 
 Nhóm này thường còn UI thương mại điện tử cũ, nhưng vẫn cần giữ đúng flow nghiệp vụ:
 
-- `/cart_view/` -> `templates/cart/cart_view.html`
+- `/gio-hang/` -> `templates/cart/cart_view.html`
 - HTMX cart partials -> `templates/cart/cart_items.html`, `templates/cart/cart_menu.html`, `templates/cart/cart_update.html`
-- `/checkout/` -> `templates/cart/checkout.html`
-- `/order/success/<int:order_id>/` -> `templates/cart/order_success.html`
-- `/orders/<int:order_id>/` -> `templates/cart/order_detail.html`
+- `/thanh-toan/` -> `templates/cart/checkout.html`
+- `/don-hang/thanh-cong/<int:order_id>/` -> `templates/cart/order_success.html`
+- `/don-hang/<int:order_id>/` -> `templates/cart/order_detail.html`
 - invoice nếu có -> `templates/invoice.html`
 
 Lưu ý:
@@ -516,8 +518,8 @@ Khi cập nhật UI sản phẩm, không biến các action nhỏ thành full-pa
 
 Các trang ít truy cập nhưng vẫn cần bỏ giao diện/branding cũ:
 
-- `/success` -> `templates/success.html`
-- `/CTV` -> `templates/CTV.html`
+- `/thanh-cong/` -> `templates/success.html`
+- `/ctv/` -> `templates/CTV.html`
 - `templates/view_cart.html` nếu còn route hoặc include cũ
 - `templates/partials/categories` nếu còn được dùng trên homepage/list page
 
@@ -543,6 +545,7 @@ Không thay trong nhóm này:
 Lưu ý:
 
 - Kiểm tra các URL `/quanly/...` vẫn render/redirect như trước sau khi thay logo/title.
+- Quy ước HTMX của trang quản lý (partial `#<entity>-list-container` + `hx-swap="outerHTML"`, init JS qua `htmx.onLoad` thay vì `htmx:afterSwap`) xem mục 4 của [BACKEND-SKILL.md](BACKEND-SKILL.md); không phá các quy ước này khi đụng tới template quanly.
 - Nếu sau này muốn redesign admin UI đầy đủ, tách thành task riêng vì blast radius lớn.
 
 #### Nhóm G: Missing/legacy route audit
@@ -556,8 +559,8 @@ rg --files templates | sort
 
 Ví dụ cần xử lý nếu view còn render nhưng template không tồn tại:
 
-- `/wishlist/` -> `wishlist.html`
-- `/compare/` -> `compare.html`
+- `/yeu-thich/` -> `wishlist.html`
+- `/so-sanh/` -> `compare.html`
 
 Với route không còn phù hợp domain mới, chọn một trong ba hướng:
 
@@ -585,17 +588,17 @@ Cập nhật ngày 2026-07-07. Quy ước trong danh sách này:
 
 #### Public core chưa cập nhật/hoàn thiện
 
-- `/sanpham/`, `/danhmuc/<slug:slug_category>/`, `/danhmuc/<slug:slug_category>/<slug:slug_subcategory>/` -> `templates/product_all.html`
+- `/san-pham/`, `/danh-muc/<slug:slug_category>/`, `/danh-muc/<slug:slug_category>/<slug:slug_subcategory>/` -> `templates/product_all.html`
   - Đã có một số class mới như `filter-card`, nhưng layout vẫn là filter/sidebar Bootstrap cũ; cần đồng bộ list page, empty state, mobile filter và pagination.
-- `/sanpham/<slug:slug_category>/<slug:slug_product>` -> `templates/product_detail.html`
+- `/san-pham/<slug:slug_category>/<slug:slug_product>/` -> `templates/product_detail.html`
   - Vẫn dùng `fluid-container mx-4`, inline CSS, carousel/table/form Bootstrap cũ; cần cập nhật gallery, variant selector, review form và related products theo design system.
-- `/baiviet/`, `/chude/<slug:slug_subject>/`, `/chude/<slug:slug_subject>/<slug:slug_subsubject>/` -> `templates/post_all.html`
+- `/bai-viet/`, `/chu-de/<slug:slug_subject>/`, `/chu-de/<slug:slug_subject>/<slug:slug_subsubject>/` -> `templates/post_all.html`
   - Vẫn dùng filter/sidebar Bootstrap cũ và `filter-container bg-light`; cần đồng bộ với list page mới.
-- `/baiviet/<slug:slug_subject>/<slug:slug_post>` -> `templates/post_detail.html`
+- `/bai-viet/<slug:slug_subject>/<slug:slug_post>/` -> `templates/post_detail.html`
   - Vẫn dùng blog layout cũ, sidebar inline/sticky và related posts cũ; cần cập nhật article layout, comment/reply nếu có.
-- `/lienhe/` -> `templates/contact.html`
+- `/lien-he/` -> `templates/contact.html`
   - Nội dung đã theo PTcom nhưng layout form/map/info vẫn cũ; cần đồng bộ visual, spacing, mobile và CTA.
-- `/gioithieu` -> `templates/about.html`
+- `/gioi-thieu/` -> `templates/about.html`
   - Nội dung đã theo PTcom nhưng còn layout cũ, inline padding, card Bootstrap và section cũ; cần làm lại theo design system.
 
 Partial public đi kèm cần cập nhật cùng nhóm trên:
@@ -613,35 +616,35 @@ Partial public đi kèm cần cập nhật cùng nhóm trên:
 
 #### Auth/account chưa cập nhật
 
-- `/dangnhap/` -> `templates/login.html`
-- `/dangky/` -> `templates/register.html`
-- `/doimatkhau/` -> `templates/registration/change_password.html`
-- `/password_reset/request/` -> `templates/registration/reset_form.html`
-- `/password_reset/done/` -> `templates/registration/reset_done.html`
-- `/password_reset/<uidb64>/<token>/confirm/` -> `templates/registration/reset_confirm.html`
-- `/password_reset/complete/` -> `templates/registration/reset_complete.html`
-- `/thongtintaikhoan/` -> `templates/edit_profile.html`
-- `/diachigiaohang/` -> `templates/edit_info.html`
-- `/donhangdamua/` -> `templates/order_cus.html`
-- account sidebar -> `templates/partials/nav_left.html`
+- `/dang-nhap/` -> `templates/login.html`
+- `/dang-ky/` -> `templates/register.html`
+- `/doi-mat-khau/` -> `templates/registration/change_password.html`
+- `/dat-lai-mat-khau/yeu-cau/` -> `templates/registration/reset_form.html`
+- `/dat-lai-mat-khau/da-gui/` -> `templates/registration/reset_done.html`
+- `/dat-lai-mat-khau/<uidb64>/<token>/xac-nhan/` -> `templates/registration/reset_confirm.html`
+- `/dat-lai-mat-khau/hoan-tat/` -> `templates/registration/reset_complete.html`
+- `/thong-tin-tai-khoan/` -> `templates/edit_profile.html`
+- `/dia-chi-giao-hang/` -> `templates/edit_info.html`
+- `/don-hang-da-mua/` -> `templates/order_cus.html`
+- account sidebar -> `templates/partials/account_sidebar.html`
 
 Ghi chú: `reset_done.html`, `reset_confirm.html`, `reset_complete.html` còn class/copy legacy như `organic-breadcrumb`, `Home`, `Shop`, `category.html`, `Fashon Category`.
 
 #### Cart/order/checkout chưa cập nhật
 
-- `/cart_view/` -> `templates/cart/cart_view.html`
+- `/gio-hang/` -> `templates/cart/cart_view.html`
 - HTMX cart partials -> `templates/cart/cart_items.html`, `templates/cart/cart_menu.html`, `templates/cart/cart_update.html`
-- `/checkout/` -> `templates/cart/checkout.html`
-- `/order/success/<int:order_id>/` -> `templates/cart/order_success.html`
-- `/orders/<int:order_id>/` -> `templates/cart/order_detail.html`
+- `/thanh-toan/` -> `templates/cart/checkout.html`
+- `/don-hang/thanh-cong/<int:order_id>/` -> `templates/cart/order_success.html`
+- `/don-hang/<int:order_id>/` -> `templates/cart/order_detail.html`
 - invoice -> `templates/invoice.html`
 
 Ghi chú: `invoice.html` còn logo eApp và brand "Nhà Yến Ngân Hà"; `order_detail.html` còn thông tin chuyển khoản demo `Ngân hàng XYZ`, `123456789`, `Công ty ABC`.
 
 #### Static utility/legacy chưa cập nhật
 
-- `/success` -> `templates/success.html`
-- `/CTV` -> `templates/CTV.html`
+- `/thanh-cong/` -> `templates/success.html`
+- `/ctv/` -> `templates/CTV.html`
 - `templates/view_cart.html` nếu route/include cũ còn dùng
 
 Ghi chú: `CTV.html` còn nội dung tuyển cộng tác viên bán Yến Sào và số điện thoại cũ; `view_cart.html` còn class legacy như `hero`, `untree_co-section`, `site-blocks-table`.
@@ -680,8 +683,8 @@ Không redesign admin trong task public UI, nhưng còn các điểm brand cũ c
 
 Các route này đang render template không có trong thư mục `templates`, nên cần tạo template theo design system, redirect sang trang phù hợp, hoặc gỡ route nếu không dùng:
 
-- `/wishlist/` -> `wishlist.html`
-- `/compare/` -> `compare.html`
+- `/yeu-thich/` -> `wishlist.html`
+- `/so-sanh/` -> `compare.html`
 
 ### 9. Hoàn thiện content và SEO sau khi giao diện mới ổn
 
@@ -714,7 +717,7 @@ Lệnh rà nhanh:
 ```bash
 rg -n "demo|example|Lorem|090|info@|old-domain|brand cũ|BÁO GIÁ SỬA CHỮA" templates App_Core App_Product App_Post Project docs -S
 rg -n "meta|og:|twitter|ld\\+json|robots|sitemap|canonical" templates App_Core App_Product App_Post Project -S
-python3 manage.py shell -c "from django.test import Client; c=Client(); urls=['/','/lienhe/','/gioithieu/','/sanpham/','/baiviet/','/robots.txt','/sitemap.xml']; print([(u,c.get(u).status_code,c.get(u).get('Content-Type')) for u in urls])"
+python3 manage.py shell -c "from django.test import Client; c=Client(); urls=['/','/lien-he/','/gioi-thieu/','/san-pham/','/bai-viet/','/robots.txt','/sitemap.xml']; print([(u,c.get(u).status_code,c.get(u).get('Content-Type')) for u in urls])"
 ```
 
 Sau khi sửa SEO, render thêm ít nhất một trang detail sản phẩm và một trang detail bài viết nếu database có dữ liệu:
@@ -740,19 +743,19 @@ node --check static/website/js/<brand_slug>.js
 Render nhanh bằng Django test client:
 
 ```bash
-python3 manage.py shell -c "from django.test import Client; c=Client(HTTP_USER_AGENT='Mozilla/5.0'); urls=['/','/sanpham/','/baiviet/','/lienhe/']; print([(u,c.get(u).status_code) for u in urls])"
+python3 manage.py shell -c "from django.test import Client; c=Client(HTTP_USER_AGENT='Mozilla/5.0'); urls=['/','/san-pham/','/bai-viet/','/lien-he/']; print([(u,c.get(u).status_code) for u in urls])"
 ```
 
 Khi nhóm có trang cần đăng nhập, login test user trước:
 
 ```bash
-python3 manage.py shell -c "from django.test import Client; c=Client(HTTP_USER_AGENT='Mozilla/5.0'); print(c.login(username='quanly', password='quanly123')); urls=['/thongtintaikhoan/','/diachigiaohang/','/donhangdamua/']; print([(u,c.get(u).status_code) for u in urls])"
+python3 manage.py shell -c "from django.test import Client; c=Client(HTTP_USER_AGENT='Mozilla/5.0'); print(c.login(username='quanly', password='quanly123')); urls=['/thong-tin-tai-khoan/','/dia-chi-giao-hang/','/don-hang-da-mua/']; print([(u,c.get(u).status_code) for u in urls])"
 ```
 
 Khi nhóm có form bình luận/đánh giá, test cả anonymous và authenticated:
 
 ```bash
-python3 manage.py shell -c "from django.test import Client; urls=['/sanpham/<category>/<product>','/baiviet/<subject>/<post>']; c=Client(HTTP_USER_AGENT='Mozilla/5.0'); print('anon', [(u,c.get(u).status_code) for u in urls]); c.login(username='quanly', password='quanly123'); print('auth', [(u,c.get(u).status_code) for u in urls])"
+python3 manage.py shell -c "from django.test import Client; urls=['/san-pham/<category>/<product>/','/bai-viet/<subject>/<post>/']; c=Client(HTTP_USER_AGENT='Mozilla/5.0'); print('anon', [(u,c.get(u).status_code) for u in urls]); c.login(username='quanly', password='quanly123'); print('auth', [(u,c.get(u).status_code) for u in urls])"
 ```
 
 Nếu có server local:

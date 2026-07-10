@@ -140,7 +140,7 @@
   function initSearchSelects(scope) {
     const root = scope || document;
     root.querySelectorAll('select.form-control, select.form-select').forEach(function(selectEl) {
-      if (selectEl.dataset.searchSelectReady === 'true' || selectEl.multiple) {
+      if (selectEl.dataset.searchSelectReady === 'true' || selectEl.closest('.admin-search-select') || selectEl.multiple) {
         return;
       }
 
@@ -307,9 +307,15 @@
     initSearchSelects(document);
   });
 
-  document.body.addEventListener('htmx:afterSwap', function(event) {
-    initSearchSelects(event.target);
-  });
+  // Init via htmx:load (after the settle phase) instead of htmx:afterSwap:
+  // during settling htmx resets class/style on id-matched elements to the
+  // server-sent values, which would strip the .admin-native-select class
+  // added here and reveal the native select next to the custom widget.
+  if (window.htmx) {
+    htmx.onLoad(function(content) {
+      initSearchSelects(content);
+    });
+  }
 
   // Auto-resize active echarts dynamically on sidebar expand/collapse or window resize
   const mainContainer = select('#main');

@@ -13,6 +13,7 @@ from django.utils import timezone
 from templated_email import send_templated_mail
 
 from App_Account.models import Checkout_info
+from App_Core.middleware import generate_response
 from App_Product.cart_access import (
     add_product_to_wishlist,
     commerce_behavior,
@@ -40,18 +41,6 @@ from App_Product.models import (
 
 def _wishlist_product_ids(request):
     return wishlist_product_ids(request)
-
-def generate_response(message, type='bg-success'):
-    # print(message, type)
-    return HttpResponse(
-        status=204,
-        headers={
-            'HX-Trigger': json.dumps({
-                "listChange": None,
-                "showMessage": {"message": message, "type": type}
-            })
-        }
-    )
 
 def _variant_effective_price():
     return Case(

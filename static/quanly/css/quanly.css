@@ -849,7 +849,8 @@ select.form-select-sm {
   background-size: 14px 14px;
 }
 
-.admin-native-select {
+.admin-native-select,
+.admin-search-select > select {
   display: none !important;
 }
 

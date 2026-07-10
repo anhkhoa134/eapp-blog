@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.generic import RedirectView
 
 from . import views
 
@@ -22,4 +23,17 @@ urlpatterns = [
     path('htmx/check-old-password/', views.check_old_password, name='check_old_password'),
     path('htmx/check-password1/', views.check_password1, name='check_password1'),
     path('htmx/check-password2/', views.check_password2, name='check_password2'),
+
+    # Legacy redirect: URL cũ (không dấu gạch) -> URL canonical mới
+    path('dangky/', RedirectView.as_view(pattern_name='account:register', permanent=True, query_string=True)),
+    path('dangnhap/', RedirectView.as_view(pattern_name='account:login', permanent=True, query_string=True)),
+    path('dangxuat/', RedirectView.as_view(pattern_name='account:logout', permanent=True, query_string=True)),
+    path('doimatkhau/', RedirectView.as_view(pattern_name='account:change_password', permanent=True, query_string=True)),
+    path('thongtintaikhoan/', RedirectView.as_view(pattern_name='account:edit_profile', permanent=True, query_string=True)),
+    path('diachigiaohang/', RedirectView.as_view(pattern_name='account:edit_info', permanent=True, query_string=True)),
+    path('donhangdamua/', RedirectView.as_view(pattern_name='account:order_cus', permanent=True, query_string=True)),
+    path('password_reset/request/', RedirectView.as_view(pattern_name='account:password_reset_request', permanent=True, query_string=True)),
+    path('password_reset/done/', RedirectView.as_view(pattern_name='account:password_reset_done', permanent=True, query_string=True)),
+    path('password_reset/<uidb64>/<token>/confirm/', RedirectView.as_view(pattern_name='account:password_reset_confirm', permanent=True, query_string=True)),
+    path('password_reset/complete/', RedirectView.as_view(pattern_name='account:password_reset_complete', permanent=True, query_string=True)),
 ]

@@ -4,7 +4,7 @@
 
     <!-- Filter Form -->
     <div class="col-12 filter-card mb-4">
-        <form hx-get="{% url 'quanly:product_list' %}" hx-target="#product-list-container"> 
+        <form hx-get="{% url 'quanly:product_list' %}" hx-target="#product-list-container" hx-swap="outerHTML">
             <div class="d-flex flex-wrap gap-2 align-items-center">
                 <div class="flex-fill" style="min-width: 160px; max-width: 220px;">
                     {{ form.name }}

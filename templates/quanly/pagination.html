@@ -3,8 +3,9 @@
         {% if page_obj.has_previous %}
         <li class="page-item">
             <a class="page-link" style="cursor: pointer;"
-                hx-get="{{ URL_name }}?page={{ page_obj.previous_page_number }}&{{ filtered_query_params }}" 
-                hx-target="{{target_container_id}}" 
+                hx-get="{{ URL_name }}?page={{ page_obj.previous_page_number }}&{{ filtered_query_params }}"
+                hx-target="{{target_container_id}}"
+                hx-swap="outerHTML"
                 aria-label="Previous">
                 <span aria-hidden="true">&laquo;</span>
             </a>
@@ -24,8 +25,9 @@
             {% else %}
             <li class="page-item {% if page_obj.number == i %}active{% endif %}">
                 <a class="page-link" style="cursor: pointer;"
-                    hx-get="{{ URL_name }}?page={{ i }}&{{ filtered_query_params }}" 
-                    hx-target="{{target_container_id}}">{{ i }}</a>
+                    hx-get="{{ URL_name }}?page={{ i }}&{{ filtered_query_params }}"
+                    hx-target="{{target_container_id}}"
+                    hx-swap="outerHTML">{{ i }}</a>
             </li>
             {% endif %}
         {% endfor %}
@@ -33,8 +35,9 @@
         {% if page_obj.has_next %}
         <li class="page-item">
             <a class="page-link" style="cursor: pointer;"
-                hx-get="{{ URL_name }}?page={{ page_obj.next_page_number }}&{{ filtered_query_params }}" 
-                hx-target="{{target_container_id}}" 
+                hx-get="{{ URL_name }}?page={{ page_obj.next_page_number }}&{{ filtered_query_params }}"
+                hx-target="{{target_container_id}}"
+                hx-swap="outerHTML"
                 aria-label="Next">
                 <span aria-hidden="true">&raquo;</span>
             </a>

@@ -35,7 +35,7 @@ from templated_email import send_templated_mail
 
 from App_Account.models import Checkout_info, Profile
 from App_Core.constants import LIMIT_PRODUCT_OR_POST, MAX_UPLOAD_SIZE, excluded_usernames
-from App_Core.middleware import get_directory_size
+from App_Core.middleware import generate_response, get_directory_size
 from App_Core.model_utils import compress_image
 from App_Core.models import Contact, PageView
 from App_Post.filters import PostFilter
@@ -82,19 +82,7 @@ logger = logging.getLogger(__name__)
 from .decorators import quanly_required
 
 
-def generate_response(message, type='bg-success'):
-    return HttpResponse(
-        status=204,
-        headers={
-            'HX-Trigger': json.dumps({
-                'listChange': None,
-                'showMessage': {'message': message, 'type': type}
-            })
-        }
-    )
-
-
-############################################## App quanly ##############################################    
+############################################## App quanly ##############################################
 def round_price(number):
     if number < 1000:
         return round(number, -2)

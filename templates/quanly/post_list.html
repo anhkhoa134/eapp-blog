@@ -4,7 +4,7 @@
 
     <!-- Filter Form -->
     <div class="col-12 filter-card mb-4">
-        <form hx-get="{% url 'quanly:post_list' %}" hx-target="#post-list-container">
+        <form hx-get="{% url 'quanly:post_list' %}" hx-target="#post-list-container" hx-swap="outerHTML">
             <div class="row g-2 align-items-center">
                 <div class="col-12 col-md-4">
                     {{ form.keyword }}
