@@ -29,7 +29,7 @@ from App_Core.model_utils import (
 class Subject(models.Model):
     title = models.CharField(max_length=255, unique=True)
     # slug = AutoSlugField(populate_from='title', unique=True)
-    slug = models.SlugField(unique=True, blank=True, null=True)
+    slug = models.SlugField(max_length=255, unique=True, blank=True, null=True)
     description = models.TextField(default='', blank=True, null=True)
     # image = models.ImageField(upload_to='subjects/', blank=True, null=True)
     image = models.ImageField(upload_to=user_directory_path_subject, blank=True, null=True)
@@ -89,7 +89,7 @@ def subject_pre_delete(sender, instance, **kwargs):
 class SubSubject(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='subsubjects')
     title = models.CharField(max_length=255, blank=True, null=True)
-    slug = models.SlugField(blank=True, null=True)
+    slug = models.SlugField(max_length=255, blank=True, null=True)
     description = models.TextField(default='', blank=True, null=True)
     image = models.ImageField(upload_to=user_directory_path_subsubject, blank=True, null=True)
 
@@ -156,7 +156,7 @@ class Post(models.Model):
 
     title = models.CharField(max_length=255, unique=True)
     # slug = AutoSlugField(populate_from='title', unique=True)
-    slug = models.SlugField(unique=True, blank=True, null=True)
+    slug = models.SlugField(max_length=255, unique=True, blank=True, null=True)
     description = models.TextField(default='', blank=True, null=True)
     author = models.CharField(max_length=50, default='', blank=True, null=True)
     is_sale = models.BooleanField(default=False)

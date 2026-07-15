@@ -89,7 +89,7 @@ def payment_pre_delete(sender, instance, **kwargs):
 class Category(models.Model):
     name = models.CharField(max_length=255, unique=True)
     # slug = AutoSlugField(populate_from='name', unique=True)
-    slug = models.SlugField(unique=True, blank=True, null=True)
+    slug = models.SlugField(max_length=255, unique=True, blank=True, null=True)
     description = models.TextField(default='', blank=True, null=True)
     # image = models.ImageField(upload_to='categories/', blank=True, null=True)
     image = models.ImageField(upload_to=user_directory_path_category, blank=True, null=True)
@@ -151,7 +151,7 @@ def category_pre_delete(sender, instance, **kwargs):
 class SubCategory(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategories')
     name = models.CharField(max_length=255, blank=True, null=True)
-    slug = models.SlugField(blank=True, null=True)
+    slug = models.SlugField(max_length=255, blank=True, null=True)
     description = models.TextField(default='', blank=True, null=True)
     # image = models.ImageField(upload_to='categories/', blank=True, null=True)
     image = models.ImageField(upload_to=user_directory_path_subcategory, blank=True, null=True)
@@ -215,7 +215,7 @@ class Product(models.Model):
     subcategory = models.ForeignKey(SubCategory, blank=True, null=True, related_name='products', on_delete=models.SET_NULL)
     name = models.CharField(max_length=255, unique=True)
     # slug = AutoSlugField(populate_from='name', unique=True)
-    slug = models.SlugField(unique=True, blank=True, null=True)
+    slug = models.SlugField(max_length=255, unique=True, blank=True, null=True)
     description = models.TextField(default='', blank=True, null=True)
     price = models.IntegerField(blank=True, null=True, default=0) #models.DecimalField(max_digits=99999999999999, decimal_places=2, default='1.99')
     price_sale = models.IntegerField(blank=True, null=True, default=0)
@@ -385,7 +385,7 @@ class ProductVariant(models.Model):
     price = models.IntegerField(default=0)
     price_sale = models.IntegerField(blank=True, null=True)
     stock = models.PositiveIntegerField(blank=True, null=True, default=0)
-    slug = models.SlugField(blank=True, null=True)
+    slug = models.SlugField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return f"{self.name}"
