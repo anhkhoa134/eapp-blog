@@ -104,7 +104,7 @@ def post_all(request, slug_subject=None, slug_subsubject=None):
         'subsubject': current_subsubject,
         'total_posts': total_posts,  # Tổng số bài viết
         'filtered_posts_count': filtered_posts_count,  # Số bài viết sau khi lọc
-        'subjects': Subject.objects.all(),
+        'subjects': Subject.objects.all().order_by('id'),  # khớp thứ tự navbar/trang chủ (context processor)
         'selected_subjects': subject_filters,
         'keyword': keyword_filter,
         

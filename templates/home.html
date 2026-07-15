@@ -9,147 +9,134 @@
 
 {% block content %}
 
-    <!-- Hero Start -->
-    <section class="hero-section">
-        <div class="container">
-            <div id="header-carousel" class="carousel slide hero-carousel" data-bs-ride="carousel">
-                <div class="carousel-indicators">
-                    <button type="button" data-bs-target="#header-carousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                    <button type="button" data-bs-target="#header-carousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                    <button type="button" data-bs-target="#header-carousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
-                </div>
-                <div class="carousel-inner">
-                    <div class="carousel-item active">
-                        <img src="{% static 'website/img/hero-1.jpg' %}" alt="Khuyến mãi 10%">
-                        <div class="carousel-caption">
-                            <span class="hero-eyebrow">Ưu đãi hôm nay</span>
-                            <h2 class="hero-title">Khuyến mãi đến 10% cho các sản phẩm công nghệ chính hãng</h2>
-                            <a href="{% url 'product:product_all' %}" class="btn btn-light py-2 px-4 fw-semibold">Mua sắm ngay <i class="fa fa-arrow-right ml-2"></i></a>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <img src="{% static 'website/img/hero-2.webp' %}" alt="Công nghệ chính hãng">
-                        <div class="carousel-caption">
-                            <span class="hero-eyebrow">Chính hãng 100%</span>
-                            <h2 class="hero-title">Công nghệ hoàn hảo, cuộc sống thông minh</h2>
-                            <a href="{% url 'product:product_all' %}" class="btn btn-light py-2 px-4 fw-semibold">Khám phá ngay <i class="fa fa-arrow-right ml-2"></i></a>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <img src="{% static 'website/img/hero-3.webp' %}" alt="Giao hàng toàn quốc">
-                        <div class="carousel-caption">
-                            <span class="hero-eyebrow">Giao hàng toàn quốc</span>
-                            <h2 class="hero-title">Miễn phí vận chuyển, đổi trả trong 7 ngày</h2>
-                            <a href="{% url 'product:product_all' %}" class="btn btn-light py-2 px-4 fw-semibold">Xem sản phẩm <i class="fa fa-arrow-right ml-2"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#header-carousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Trước</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#header-carousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Sau</span>
-                </button>
-            </div>
-        </div>
-    </section>
-    <!-- Hero End -->
-
-    <!-- USP strip Start -->
+    <!-- Hero blog Start -->
     <section class="container mt-4">
-        <div class="usp-strip row g-0">
-            <div class="col-6 col-lg-3">
-                <div class="usp-item">
-                    <span class="usp-icon"><i class="fa fa-shield-alt"></i></span>
-                    <div>
-                        <p class="usp-title">Sản phẩm chính hãng</p>
-                        <p class="usp-sub">Cam kết chất lượng 100%</p>
+        {% if hero_posts %}
+        <div class="row g-3 g-lg-4">
+            {% with hero_main=hero_posts.0 %}
+            <div class="col-lg-8">
+                <article class="feature-card feature-card--lg">
+                    <a {% include 'partials/href_post.html' with post=hero_main %} class="feature-card__media">
+                        <img src="{{ hero_main.get_image }}" alt="{{ hero_main.title }}">
+                    </a>
+                    <div class="feature-card__overlay">
+                        {% if hero_main.subject %}
+                            <a href="{% url 'post:subject' hero_main.subject.slug %}" class="feature-card__tag">{{ hero_main.subject.title }}</a>
+                        {% endif %}
+                        <a {% include 'partials/href_post.html' with post=hero_main %} class="text-decoration-none">
+                            <h1 class="feature-card__title">{{ hero_main.title }}</h1>
+                        </a>
+                        <p class="feature-card__desc d-none d-md-block">{{ hero_main.description|truncatechars:150 }}</p>
+                        <div class="feature-card__meta">
+                            <span><i class="bi bi-person me-1"></i>{{ hero_main.author|default:'eApp Blog' }}</span>
+                            <span><i class="bi bi-calendar3 me-1"></i>{{ hero_main.display_at|date:'d-m-Y' }}</span>
+                        </div>
                     </div>
-                </div>
+                </article>
             </div>
-            <div class="col-6 col-lg-3">
-                <div class="usp-item">
-                    <span class="usp-icon"><i class="fa fa-shipping-fast"></i></span>
-                    <div>
-                        <p class="usp-title">Miễn phí vận chuyển</p>
-                        <p class="usp-sub">Giao nhanh toàn quốc</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-lg-3">
-                <div class="usp-item">
-                    <span class="usp-icon"><i class="fas fa-exchange-alt"></i></span>
-                    <div>
-                        <p class="usp-title">Đổi trả 7 ngày</p>
-                        <p class="usp-sub">Thủ tục đơn giản</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-lg-3">
-                <div class="usp-item">
-                    <span class="usp-icon"><i class="fa fa-headset"></i></span>
-                    <div>
-                        <p class="usp-title">Hỗ trợ 24/7</p>
-                        <p class="usp-sub">Tư vấn tận tình</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- USP strip End -->
-
-    <!-- Categories Start -->
-    {% include 'partials/categories' %}
-    <!-- Categories End -->
-
-    <!-- Promo banners Start -->
-    <section class="container mt-2">
-        <div class="row g-4">
-            <div class="col-md-6">
-                <div class="promo-banner">
-                    <img src="{% static 'website/img/offer-1.png' %}" alt="Camera khuyến mãi">
-                    <div class="promo-content">
-                        <span class="promo-tag">Giảm giá 10%</span>
-                        <h3 class="promo-title">Camera sắc nét, lưu giữ khoảnh khắc vàng</h3>
-                        <a href="{% url 'product:product_all' %}" class="btn btn-light btn-sm fw-semibold px-3">Xem Thêm</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="promo-banner promo-alt">
-                    <img src="{% static 'website/img/offer-2.png' %}" alt="Công nghệ khuyến mãi">
-                    <div class="promo-content">
-                        <span class="promo-tag">Giảm giá 10%</span>
-                        <h3 class="promo-title">Công nghệ hoàn hảo, cuộc sống thông minh</h3>
-                        <a href="{% url 'product:product_all' %}" class="btn btn-light btn-sm fw-semibold px-3">Xem Thêm</a>
-                    </div>
+            {% endwith %}
+            <div class="col-lg-4">
+                <div class="d-flex flex-column gap-3 gap-lg-4 h-100">
+                    {% for post in hero_posts|slice:"1:3" %}
+                    <article class="feature-card feature-card--sm flex-fill">
+                        <a {% include 'partials/href_post.html' %} class="feature-card__media">
+                            <img src="{{ post.get_thumbnail }}" alt="{{ post.title }}" loading="lazy">
+                        </a>
+                        <div class="feature-card__overlay">
+                            {% if post.subject %}
+                                <a {% include 'partials/href_subject.html' %} class="feature-card__tag">{{ post.subject.title }}</a>
+                            {% endif %}
+                            <a {% include 'partials/href_post.html' %} class="text-decoration-none">
+                                <h2 class="feature-card__title feature-card__title--sm">{{ post.title }}</h2>
+                            </a>
+                            <div class="feature-card__meta">
+                                <span><i class="bi bi-calendar3 me-1"></i>{{ post.display_at|date:'d-m-Y' }}</span>
+                            </div>
+                        </div>
+                    </article>
+                    {% endfor %}
                 </div>
             </div>
         </div>
+        {% endif %}
     </section>
-    <!-- Promo banners End -->
+    <!-- Hero blog End -->
 
-    <!-- Featured products Start -->
+    <!-- Topic strip Start -->
+    <section class="container mt-4">
+        <div class="row g-3">
+            {% for subject in subjects %}
+            <div class="col-md-6 col-lg-4">
+                <a href="{% url 'post:subject' subject.slug %}" class="topic-card">
+                    <span class="topic-card__icon">
+                        {% if subject.slug == 'tin-tuc-cong-nghe' %}
+                            <i class="bi bi-cpu"></i>
+                        {% elif subject.slug == 'meo-mua-sam' %}
+                            <i class="bi bi-lightbulb"></i>
+                        {% elif subject.slug == 'huong-dan-su-dung' %}
+                            <i class="bi bi-journal-check"></i>
+                        {% else %}
+                            <i class="bi bi-grid"></i>
+                        {% endif %}
+                    </span>
+                    <span class="topic-card__body">
+                        <span class="topic-card__title">{{ subject.title }}</span>
+                        <span class="topic-card__count">{{ subject.posts.count }} bài viết</span>
+                    </span>
+                    <i class="fa fa-arrow-right topic-card__arrow"></i>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    <!-- Topic strip End -->
+
+    <!-- Latest posts Start -->
     <section class="container mt-5">
         <div class="section-head">
-            <h2 class="section-title">Sản Phẩm Nổi Bật</h2>
-            <a class="view-all" href="{% url 'product:product_all' %}">Xem tất cả <i class="fa fa-arrow-right ml-1"></i></a>
+            <h2 class="section-title">Bài Viết Mới Nhất</h2>
+            <a class="view-all" href="{% url 'post:post_all' %}">Xem tất cả <i class="fa fa-arrow-right ml-1"></i></a>
         </div>
-        <div class="row">
-            {% include 'partials/products.html' %}
+        <div class="row g-4">
+            {% for post in latest_posts %}
+            <div class="col-sm-6 col-lg-4">
+                <article class="post-card">
+                    <a {% include 'partials/href_post.html' %} class="post-card__media ratio ratio-16x9">
+                        <img src="{{ post.get_thumbnail }}" alt="{{ post.title }}" loading="lazy">
+                    </a>
+                    <div class="post-card__body">
+                        <div class="post-card__meta">
+                            {% if post.subject %}
+                                <a {% include 'partials/href_subject.html' %} class="pill-link">{{ post.subject.title }}</a>
+                            {% endif %}
+                            <span><i class="bi bi-calendar3 me-1"></i>{{ post.display_at|date:'d-m-Y' }}</span>
+                        </div>
+                        <a {% include 'partials/href_post.html' %} class="text-decoration-none">
+                            <h3 class="post-card__title">{{ post.title }}</h3>
+                        </a>
+                        <p class="post-card__desc">{{ post.description|truncatechars:120 }}</p>
+                    </div>
+                </article>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="content-card text-center py-5 px-3">
+                    <i class="bi bi-journal-x display-6 text-muted d-block mb-3"></i>
+                    <p class="mb-0">Chưa có bài viết nào.</p>
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </section>
-    <!-- Featured products End -->
+    <!-- Latest posts End -->
 
     <!-- Newsletter Start -->
-    <section class="container mt-4">
+    <section class="container mt-5">
         <div class="newsletter-band">
             <div class="row align-items-center justify-content-center">
                 <div class="col-lg-5 text-center text-lg-start mb-3 mb-lg-0">
-                    <h2 class="mb-1">Đăng ký nhận tin</h2>
-                    <p class="mb-0">Nhận thông tin khuyến mãi, sản phẩm mới và tin tức công nghệ từ PTcom.</p>
+                    <h2 class="mb-1">Đăng ký nhận bản tin</h2>
+                    <p class="mb-0">Nhận tin tức công nghệ, thủ thuật hay và bài viết mới nhất từ eApp Blog.</p>
                 </div>
                 <div class="col-lg-5">
                     <form onsubmit="showSpinner()" action="{% url 'core:contact' %}" method="POST">
@@ -165,51 +152,36 @@
     </section>
     <!-- Newsletter End -->
 
-    <!-- Products by category Start -->
-    {% for category in categories %}
+    <!-- Posts by subject Start -->
+    {% for subject in subjects %}
+    {% if subject.posts.all %}
     <section class="container mt-5">
         <div class="section-head">
-            <h2 class="section-title">{{ category.name }}</h2>
-            <a class="view-all" href="{% url 'product:product_all' category.slug %}">Xem tất cả <i class="fa fa-arrow-right ml-1"></i></a>
+            <h2 class="section-title">{{ subject.title }}</h2>
+            <a class="view-all" href="{% url 'post:subject' subject.slug %}">Xem tất cả <i class="fa fa-arrow-right ml-1"></i></a>
         </div>
-        <div class="row">
-            {% include 'partials/products.html' with products=category.products.all|slice:":8" %}
-        </div>
-    </section>
-    {% endfor %}
-    <!-- Products by category End -->
-
-    <!-- Vendor Start -->
-    <section class="container mt-5">
-        <div class="vendor-strip">
-            <div class="vendor-track">
-                <div class="vendor-item p-4">
-                    <img src="{% static 'website/img/vendor-1.jpg' %}" alt="Thương hiệu 1" loading="lazy">
-                </div>
-                <div class="vendor-item p-4">
-                    <img src="{% static 'website/img/vendor-2.jpg' %}" alt="Thương hiệu 2" loading="lazy">
-                </div>
-                <div class="vendor-item p-4">
-                    <img src="{% static 'website/img/vendor-3.jpg' %}" alt="Thương hiệu 3" loading="lazy">
-                </div>
-                <div class="vendor-item p-4">
-                    <img src="{% static 'website/img/vendor-4.jpg' %}" alt="Thương hiệu 4" loading="lazy">
-                </div>
-                <div class="vendor-item p-4">
-                    <img src="{% static 'website/img/vendor-5.jpg' %}" alt="Thương hiệu 5" loading="lazy">
-                </div>
-                <div class="vendor-item p-4">
-                    <img src="{% static 'website/img/vendor-6.jpg' %}" alt="Thương hiệu 6" loading="lazy">
-                </div>
-                <div class="vendor-item p-4">
-                    <img src="{% static 'website/img/vendor-7.jpg' %}" alt="Thương hiệu 7" loading="lazy">
-                </div>
-                <div class="vendor-item p-4">
-                    <img src="{% static 'website/img/vendor-8.jpg' %}" alt="Thương hiệu 8" loading="lazy">
-                </div>
+        <div class="row g-4">
+            {% for post in subject.posts.all|slice:":4" %}
+            <div class="col-6 col-lg-3">
+                <article class="post-card post-card--compact">
+                    <a {% include 'partials/href_post.html' %} class="post-card__media ratio ratio-16x9">
+                        <img src="{{ post.get_thumbnail }}" alt="{{ post.title }}" loading="lazy">
+                    </a>
+                    <div class="post-card__body">
+                        <div class="post-card__meta">
+                            <span><i class="bi bi-calendar3 me-1"></i>{{ post.display_at|date:'d-m-Y' }}</span>
+                        </div>
+                        <a {% include 'partials/href_post.html' %} class="text-decoration-none">
+                            <h3 class="post-card__title">{{ post.title }}</h3>
+                        </a>
+                    </div>
+                </article>
             </div>
+            {% endfor %}
         </div>
     </section>
-    <!-- Vendor End -->
+    {% endif %}
+    {% endfor %}
+    <!-- Posts by subject End -->
 
 {% endblock content %}

@@ -7,5 +7,5 @@
     <li>{{ email }}</li>
     {% endfor %}
 </ul>
-<p>- Hệ thống PTcom -</p>
+<p>- Hệ thống eApp Blog -</p>
 {% endblock %}

@@ -35,7 +35,8 @@ def cart(request):
             cart = get_cart_for_request(request)
 
         categories = Category.objects.prefetch_related('subcategories')
-        subjects = Subject.objects.all()
+        # order_by('id') để thứ tự chủ đề trên navbar khớp với trang chủ
+        subjects = Subject.objects.all().order_by('id')
 
     except Exception:
         logger.exception("Context processor error")

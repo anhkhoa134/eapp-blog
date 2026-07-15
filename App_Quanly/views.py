@@ -2048,7 +2048,7 @@ def email_list(request):
 @quanly_required
 def send_marketing_email(request):
     if request.method == "POST":
-        subject = request.POST.get("subject", "Khuyến mãi từ PTcom")
+        subject = request.POST.get("subject", "Bản tin từ eApp Blog")
         message = request.POST.get("message", "")
         recipient_raw = request.POST.get("recipients", "")
         recipient_list = [email.strip() for email in recipient_raw.split(",") if email.strip()]
@@ -2063,7 +2063,7 @@ def send_marketing_email(request):
                 from_email=None,
                 recipient_list=[email],
                 context={
-                    'site_name': 'PTcom',
+                    'site_name': 'eApp Blog',
                     'subject': subject,
                     # 'name': '',
                     # 'phone': '',

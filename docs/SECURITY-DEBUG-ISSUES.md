@@ -65,7 +65,13 @@ Các ngoại lệ đang được cho phép:
 
 `PageViewMiddleware` ghi log request đáng ngờ qua logger `App_Core` và đếm các public path trong model `PageView`. Middleware này không đếm `/admin/`, `/static/`, `/media/`, `/quanly/`, `/htmx/`.
 
-`UploadLimitMiddleware` kiểm tra POST upload của user đã đăng nhập và từ chối request vượt `MAX_UPLOAD_REQUEST_SIZE` hoặc tổng dung lượng project trong `App_Core.constants`.
+`UploadLimitMiddleware` kiểm tra POST upload của user đã đăng nhập và từ chối request vượt `MAX_UPLOAD_REQUEST_SIZE` hoặc tổng dung lượng upload trong `App_Core.constants`.
+
+Lưu ý production đã từng gặp:
+
+- CKEditor upload ở `/tai-len/` bị chặn vì middleware từng tính quota bằng toàn bộ `settings.BASE_DIR`; VPS có source/static/log lớn sẽ vượt `MAX_UPLOAD_SIZE` dù `media/` chưa lớn. Quota phải tính theo `settings.MEDIA_ROOT`.
+- CKEditor `SimpleUploadAdapter` cần response JSON. Nếu chặn upload, endpoint `/tai-len/` phải trả dạng `{"error": {"message": "..."}}` với HTTP 400, không trả `204` HTMX.
+- Trang `/quan-ly/thong-tin-tai-khoan/` chỉ nên hiển thị dung lượng upload/media. Không quét toàn bộ `BASE_DIR` trong request vì production có thể timeout.
 
 Security settings hiện tại:
 
@@ -117,7 +123,9 @@ STORAGES = {
 }
 ```
 
-Khi `DEBUG=False`, manifest storage xử lý rất chặt. Template tham chiếu static file không tồn tại có thể gây lỗi 500. Sau khi sửa static hoặc template có `{% static %}`, chạy:
+Khi `DEBUG=False`, manifest storage xử lý rất chặt. Template tham chiếu static file không tồn tại hoặc `staticfiles/manifest.json` chưa được tạo/cập nhật có thể gây lỗi 500. Ví dụ đã từng gặp: `/quan-ly/thong-tin-tai-khoan/` sập vì layout gọi `{% static 'website/img/hadona/favicon.ico' %}` trong khi production chưa có manifest mới.
+
+Sau khi sửa static hoặc template có `{% static %}`, chạy:
 
 ```bash
 python manage.py collectstatic --noinput
@@ -129,6 +137,13 @@ Khi production bị 404 static hoặc 500 do template/static:
 ```bash
 python scripts/3_security_tools.py server
 python scripts/3_security_tools.py debug --verbose
+```
+
+Nếu lỗi chỉ xuất hiện khi `DEBUG=False`, tái tạo local bằng:
+
+```bash
+ENVIRONMENT=prod python manage.py collectstatic --noinput
+ENVIRONMENT=prod python manage.py shell -c "from django.test import Client; from django.contrib.auth.models import User; u=User.objects.get(username='quanly'); c=Client(); c.force_login(u); r=c.get('/quan-ly/thong-tin-tai-khoan/'); print(r.status_code)"
 ```
 
 ## Lệnh Debug
@@ -330,10 +345,12 @@ Checklist vận hành:
 | Home page 500 | `python scripts/3_security_tools.py server` | Sửa lỗi context/template/static trong output hoặc log |
 | CSS/JS không load | `python manage.py collectstatic --noinput` | Khôi phục static file thiếu hoặc sửa template static path |
 | Probe đáng ngờ | `python scripts/3_security_tools.py all` | Chặn IP abuse và cập nhật middleware rule thật hẹp |
-| Upload bị từ chối | Kiểm tra `App_Core.constants` | Điều chỉnh upload/request/project cap có chủ đích |
+| CKEditor không upload ảnh trên VPS nhưng paste ảnh được | Network tab request `/tai-len/`, log Django, kiểm tra quota trong `UploadLimitMiddleware` | Quota phải tính `MEDIA_ROOT`; lỗi CKEditor phải trả JSON `{"error": {"message": "..."}}` |
+| Upload bị từ chối | Kiểm tra `App_Core.constants` và dung lượng `MEDIA_ROOT` | Điều chỉnh upload/request/media cap có chủ đích |
 | Database lỗi | `python manage.py check` và `python manage.py migrate` | Chạy migration hoặc restore DB backup |
 | Chưa có admin | `python manage.py createsuperuser` | Tạo production superuser |
-| Static 500 khi `DEBUG=False` | `python scripts/3_security_tools.py server` | Sửa file thiếu trong WhiteNoise manifest |
+| Static 500 khi `DEBUG=False` | `python scripts/3_security_tools.py server` hoặc `python manage.py collectstatic --noinput` | Sửa file thiếu trong WhiteNoise manifest, chạy lại `collectstatic`, restart app |
+| `/quan-ly/thong-tin-tai-khoan/` chậm hoặc không mở production | Test bằng `ENVIRONMENT=prod` và user `quanly` | Không quét `BASE_DIR`; chỉ dùng `MEDIA_ROOT` cho dung lượng upload |
 
 ## Lịch Sử Gộp File
 

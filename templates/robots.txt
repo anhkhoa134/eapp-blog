@@ -2,6 +2,9 @@ User-agent: *
 Disallow: /admin/
 Disallow: /quan-ly/
 Disallow: /quanly/
+Disallow: /san-pham/
+Disallow: /danh-muc/
+Disallow: /yeu-thich/
 Disallow: /gio-hang/
 Disallow: /thanh-toan/
 Disallow: /don-hang/

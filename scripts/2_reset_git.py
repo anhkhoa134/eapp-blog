@@ -2,19 +2,23 @@
 Các lệnh sử dụng nhanh:
 
 1. Chỉ xoá .git cũ, tạo repo Git mới, commit lại code hiện tại, không push:
-   python3 scripts/2_reset_git.py --skip-push
+   python scripts/2_reset_git.py --skip-push
 
 2. Reset Git và push ghi đè lịch sử remote GitHub cũ:
-   python3 scripts/2_reset_git.py --remote-url https://github.com/anhkhoa134/eApp.git --remote-name origin --branch main
+   python scripts/2_reset_git.py --remote-url https://github.com/anhkhoa134/eApp.git --remote-name origin --branch main
 
 3. Reset Git, không hỏi tương tác, không push nếu thiếu --remote-url:
-   python3 scripts/2_reset_git.py --skip-push --non-interactive
+   python scripts/2_reset_git.py --skip-push --non-interactive
 
 4. Nếu thật sự cần fetch remote trước khi push:
-   python3 scripts/2_reset_git.py --remote-url https://github.com/anhkhoa134/eApp.git --fetch-before-push
+   python scripts/2_reset_git.py --remote-url https://github.com/anhkhoa134/eApp.git --fetch-before-push
 
 5. Chỉ dọn .git hiện tại, không xoá lịch sử/không init lại:
-   python3 scripts/2_reset_git.py --cleanup-only
+   python scripts/2_reset_git.py --cleanup-only
+
+6. Chỉ đổi remote URL, giữ nguyên repo và lịch sử commit hiện tại:
+   python scripts/2_reset_git.py --set-remote-only --remote-url https://github.com/anhkhoa134/eApp.git
+   (có thể kèm --remote-name nếu remote không phải origin; bỏ trống --remote-url sẽ hỏi interactive)
 
 Ghi chú:
 - Mặc định script KHÔNG fetch remote để tránh kéo lịch sử Git cũ về .git.
@@ -181,6 +185,65 @@ def cleanup_current_git(project_root: Path) -> int:
     _run_git_cleanup(project_root)
     _print_sizes(project_root)
     _warn_if_git_still_large(project_root)
+    return 0
+
+
+def set_remote_only(
+    project_root: Path,
+    remote_url: Optional[str],
+    remote_name: Optional[str],
+    interactive: bool = True,
+) -> int:
+    """
+    Chỉ đổi/thêm remote URL, không xoá .git, không init lại, không commit/push.
+    """
+    git_dir = project_root / ".git"
+    if not git_dir.exists():
+        print("[set-remote] Không tìm thấy .git, hãy chạy git init hoặc reset trước.")
+        return 1
+
+    existing_remotes = _get_existing_remotes(project_root)
+    if existing_remotes:
+        print("[set-remote] Remote đang có:")
+        for name, url in existing_remotes.items():
+            print(f"    - {name} -> {url}")
+    else:
+        print("[set-remote] Chưa có remote nào.")
+
+    if not remote_url and interactive:
+        remote_url = input("[set-remote] Nhập remote URL mới (Enter để huỷ): ").strip()
+    if not remote_url:
+        print("[set-remote] Không có remote URL, không thay đổi gì.")
+        return 1
+
+    if not remote_name and interactive and existing_remotes:
+        default_name = next(iter(existing_remotes.keys()))
+        remote_name = (
+            input(f"[set-remote] Nhập remote name (mặc định: {default_name}): ").strip()
+            or default_name
+        )
+    if not remote_name:
+        remote_name = "origin"
+
+    try:
+        if remote_name in existing_remotes:
+            subprocess.run(
+                ["git", "remote", "set-url", remote_name, remote_url],
+                cwd=project_root,
+                check=True,
+            )
+            print(f"    -> Đã đổi URL remote '{remote_name}': {existing_remotes[remote_name]} -> {remote_url}")
+        else:
+            subprocess.run(
+                ["git", "remote", "add", remote_name, remote_url],
+                cwd=project_root,
+                check=True,
+            )
+            print(f"    -> Đã thêm remote mới '{remote_name}' -> {remote_url}")
+        subprocess.run(["git", "remote", "-v"], cwd=project_root, check=False)
+    except subprocess.CalledProcessError as exc:
+        print(f"    -> Lỗi khi thiết lập remote: {exc}")
+        return 1
     return 0
 
 
@@ -437,6 +500,11 @@ if __name__ == "__main__":
         help="Chỉ dọn .git hiện tại, không xoá .git, không init lại, không commit/push.",
     )
     parser.add_argument(
+        "--set-remote-only",
+        action="store_true",
+        help="Chỉ đổi/thêm remote URL, giữ nguyên repo và lịch sử commit. Dùng kèm --remote-url và --remote-name.",
+    )
+    parser.add_argument(
         "--fetch-before-push",
         action="store_true",
         help="Fetch remote trước khi push. Mặc định tắt để không kéo lịch sử cũ về .git.",
@@ -451,6 +519,16 @@ if __name__ == "__main__":
     project_root = Path(__file__).resolve().parent.parent
     if args.cleanup_only:
         raise SystemExit(cleanup_current_git(project_root))
+
+    if args.set_remote_only:
+        raise SystemExit(
+            set_remote_only(
+                project_root=project_root,
+                remote_url=args.remote_url,
+                remote_name=args.remote_name,
+                interactive=not args.non_interactive,
+            )
+        )
 
     raise SystemExit(
         reset_git_repository(

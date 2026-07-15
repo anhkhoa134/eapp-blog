@@ -7,11 +7,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="author" content="ldphong">
-    <meta name="copyright" content="PTCOM">
+    <meta name="author" content="eApp Blog">
+    <meta name="copyright" content="eApp Blog">
     <meta property="og:locale" content="vi_VN">
-    <title>{% block title %}{% endblock title %} | ptcom.vn - PTCOM chuyên mua bán sản phẩm công nghệ</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563eb'/%3E%3Ctext x='32' y='40' font-size='24' font-family='Arial,sans-serif' font-weight='700' fill='white' text-anchor='middle'%3EPT%3C/text%3E%3C/svg%3E">
+    <title>{% block title %}{% endblock title %} | eapp.vn - eApp Blog tin tức & thủ thuật công nghệ</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563eb'/%3E%3Ctext x='32' y='40' font-size='24' font-family='Arial,sans-serif' font-weight='700' fill='white' text-anchor='middle'%3EeA%3C/text%3E%3C/svg%3E">
     {% block meta %}{% endblock meta %}
     <link rel="canonical" href="{{ request.build_absolute_uri }}">
 
@@ -34,22 +34,14 @@
 
 <body>
 
-    <!-- Announcement bar Start -->
-    <div class="announce-bar">
+    <!-- Announcement bar Start (chỉ hiện trên desktop) -->
+    <div class="announce-bar d-none d-lg-block">
         <div class="container d-flex flex-wrap align-items-center justify-content-center justify-content-lg-between">
             <div class="d-none d-lg-flex align-items-center">
-                <a href="mailto:ptcom88a@gmail.com"><i class="fa fa-envelope mr-2"></i>ptcom88a@gmail.com</a>
-                <span class="announce-sep">|</span>
-                <a href="tel:0938717380"><i class="fa fa-phone-alt mr-2"></i>0938.717.380</a>
+                <a href="mailto:admin@eapp.vn"><i class="fa fa-envelope mr-2"></i>admin@eapp.vn</a>
             </div>
             <div class="d-flex align-items-center">
-                <i class="fa fa-truck mr-2"></i>Miễn phí vận chuyển cho đơn hàng toàn quốc
-            </div>
-            <div class="d-none d-lg-flex align-items-center">
-                <a class="px-2" href="" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                <a class="px-2" href="" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                <a class="px-2" href="" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                <a class="px-2" href="" aria-label="Youtube"><i class="fab fa-youtube"></i></a>
+                <i class="fa fa-bolt mr-2"></i>Cập nhật tin tức & thủ thuật công nghệ mỗi ngày
             </div>
         </div>
     </div>
@@ -58,21 +50,41 @@
     <!-- Main header (sticky) Start -->
     <div class="header-main">
         <div class="container">
-            <div class="d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center gap-2 gap-lg-3">
                 <!-- Hamburger (mobile) -->
                 <button class="btn border d-lg-none px-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Mở menu">
                     <i class="fa fa-bars"></i>
                 </button>
 
-                <!-- Logo -->
-                <a href="{% url 'core:home' %}" class="site-logo">
-                    <span class="logo-mark">PT</span>
-                    <span class="logo-text d-none d-sm-inline"><span>PT</span>com</span>
+                <!-- Logo (chỉ hiện trên desktop) -->
+                <a href="{% url 'core:home' %}" class="site-logo d-none d-lg-inline-flex">
+                    <span class="logo-mark">eA</span>
+                    <span class="logo-text"><span>eApp</span> Blog</span>
                 </a>
 
+                <!-- Search (mobile, chung hàng với menu + avatar) -->
+                <form class="header-search input-group d-lg-none flex-grow-1" method="get" action="{% url 'post:post_all' %}" role="search">
+                    <select class="form-select" name="subject" aria-label="Lọc theo chủ đề">
+                        <option value="">Chủ đề</option>
+                        {% for sub in subjects %}
+                        <option value="{{ sub.id }}" {% if sub.id in selected_subjects %}selected{% endif %}>{{ sub.title }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" class="form-control" name="keyword" placeholder="Tìm kiếm..." aria-label="Tìm kiếm bài viết" value="{{ keyword|default:'' }}">
+                    <button class="btn btn-primary" type="submit" aria-label="Tìm kiếm">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </form>
+
                 <!-- Search (desktop) -->
-                <form class="header-search input-group flex-grow-1 d-none d-lg-flex mx-lg-4" method="get" action="{% url 'product:product_all' %}" role="search">
-                    <input type="text" class="form-control" name="product_name" placeholder="Bạn muốn tìm sản phẩm gì hôm nay?" aria-label="Tìm kiếm sản phẩm" value="{{ search_query|default:'' }}">
+                <form class="header-search input-group flex-grow-1 d-none d-lg-flex mx-lg-auto" method="get" action="{% url 'post:post_all' %}" role="search">
+                    <select class="form-select" name="subject" aria-label="Lọc theo chủ đề">
+                        <option value="">Tất cả chủ đề</option>
+                        {% for sub in subjects %}
+                        <option value="{{ sub.id }}" {% if sub.id in selected_subjects %}selected{% endif %}>{{ sub.title }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" class="form-control" name="keyword" placeholder="Bạn muốn đọc tin gì hôm nay?" aria-label="Tìm kiếm bài viết" value="{{ keyword|default:'' }}">
                     <button class="btn btn-primary" type="submit" aria-label="Tìm kiếm">
                         <i class="fa fa-search"></i>
                     </button>
@@ -88,8 +100,10 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
                             <li><a class="dropdown-item" href="{% url 'account:edit_profile' %}"><i class="fa fa-user-circle mr-2"></i>Thông tin tài khoản</a></li>
+                            {% comment %} Menu đơn hàng/yêu thích tạm ẩn — site hiện chỉ dùng Post, sẽ tính sau
                             <li><a class="dropdown-item" href="{% url 'account:order_cus' %}"><i class="fa fa-box mr-2"></i>Đơn hàng đã mua</a></li>
                             <li><a class="dropdown-item" href="{% url 'product:wishlist_view' %}"><i class="fa fa-heart mr-2"></i>Sản phẩm yêu thích</a></li>
+                            {% endcomment %}
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item text-danger" href="{% url 'account:logout' %}"><i class="fa fa-sign-out-alt mr-2"></i>Đăng xuất</a></li>
                         </ul>
@@ -101,20 +115,15 @@
                     </a>
                     {% endif %}
 
+                    {% comment %} Giỏ hàng tạm ẩn — site hiện chỉ dùng Post, sẽ tính sau
                     <a href="{% url 'product:cart_view' %}" class="header-action" aria-label="Giỏ hàng">
                         {% include 'cart/cart_menu.html' %}
                         <span class="action-label d-none d-md-inline">Giỏ hàng</span>
                     </a>
+                    {% endcomment %}
                 </div>
             </div>
 
-            <!-- Search (mobile) -->
-            <form class="header-search input-group d-lg-none mt-2" method="get" action="{% url 'product:product_all' %}" role="search">
-                <input type="text" class="form-control" name="product_name" placeholder="Tìm kiếm sản phẩm..." aria-label="Tìm kiếm sản phẩm" value="{{ search_query|default:'' }}">
-                <button class="btn btn-primary" type="submit" aria-label="Tìm kiếm">
-                    <i class="fa fa-search"></i>
-                </button>
-            </form>
         </div>
     </div>
     <!-- Main header End -->
@@ -127,34 +136,6 @@
                     <a class="nav-link {% if request.path|strip_slashes == '' %}active{% endif %}" href="{% url 'core:home' %}">Trang Chủ</a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle {% if request.path|strip_slashes == 'san-pham' %}active{% endif %}" href="{% url 'product:product_all' %}" id="navbarDropdownProduct" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Sản Phẩm
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownProduct">
-                        <li><a class="dropdown-item" href="{% url 'product:product_all' %}">Tất cả sản phẩm</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        {% for category in categories %}
-                            <li><a class="dropdown-item" href="{% url 'product:product_all' category.slug %}">{{ category.name }}</a></li>
-                        {% endfor %}
-                    </ul>
-                </li>
-                {% for category in categories %}
-                <li class="nav-item dropdown">
-                    <a class="nav-link {% if category.subcategories.all %}dropdown-toggle{% endif %}" href="{% url 'product:product_all' category.slug %}" {% if category.subcategories.all %}role="button" data-bs-toggle="dropdown" aria-expanded="false"{% endif %}>
-                        {{ category.name }}
-                    </a>
-                    {% if category.subcategories.all %}
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{% url 'product:product_all' category.slug %}">Tất cả {{ category.name }}</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        {% for subcategory in category.subcategories.all %}
-                            <li><a class="dropdown-item" href="{% url 'product:product_all' category.slug subcategory.slug %}">{{ subcategory.name }}</a></li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
-                </li>
-                {% endfor %}
-                <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle {% if request.path|strip_slashes == 'bai-viet' %}active{% endif %}" href="{% url 'post:post_all' %}" id="navbarDropdownPost" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Bài Viết
                     </a>
@@ -166,9 +147,36 @@
                         {% endfor %}
                     </ul>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if request.path|strip_slashes == 'lien-he' %}active{% endif %}" href="{% url 'core:contact' %}">Liên Hệ</a>
+                {% for subject in subjects %}
+                <li class="nav-item {% if subject.subsubjects.all %}dropdown{% endif %}">
+                    <a class="nav-link {% if subject.subsubjects.all %}dropdown-toggle{% endif %} {% if request.resolver_match.kwargs.slug_subject == subject.slug %}active{% endif %}" href="{% url 'post:subject' subject.slug %}" {% if subject.subsubjects.all %}role="button" data-bs-toggle="dropdown" aria-expanded="false"{% endif %}>
+                        {{ subject.title }}
+                    </a>
+                    {% if subject.subsubjects.all %}
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'post:subject' subject.slug %}">Tất cả {{ subject.title }}</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        {% for subsubject in subject.subsubjects.all %}
+                            <li><a class="dropdown-item" href="{% url 'post:post_all' subject.slug subsubject.slug %}">{{ subsubject.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
                 </li>
+                {% endfor %}
+                {% comment %} Menu Sản Phẩm tạm ẩn — site hiện chỉ dùng Post, sẽ tính sau
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {% if request.path|strip_slashes == 'san-pham' %}active{% endif %}" href="{% url 'product:product_all' %}" id="navbarDropdownProduct" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Sản Phẩm
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownProduct">
+                        <li><a class="dropdown-item" href="{% url 'product:product_all' %}">Tất cả sản phẩm</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        {% for category in categories %}
+                            <li><a class="dropdown-item" href="{% url 'product:product_all' category.slug %}">{{ category.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </li>
+                {% endcomment %}
             </ul>
         </div>
     </div>
@@ -178,8 +186,8 @@
     <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
         <div class="offcanvas-header border-bottom">
             <a href="{% url 'core:home' %}" class="site-logo">
-                <span class="logo-mark">PT</span>
-                <span class="logo-text"><span>PT</span>com</span>
+                <span class="logo-mark">eA</span>
+                <span class="logo-text"><span>eApp</span> Blog</span>
             </a>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Đóng"></button>
         </div>
@@ -189,6 +197,15 @@
                     <a class="nav-link {% if request.path|strip_slashes == '' %}active{% endif %}" href="{% url 'core:home' %}"><i class="fa fa-home mr-2"></i>Trang Chủ</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link {% if request.path|strip_slashes == 'bai-viet' %}active{% endif %}" href="{% url 'post:post_all' %}"><i class="fa fa-newspaper mr-2"></i>Tất Cả Bài Viết</a>
+                </li>
+                {% for subject in subjects %}
+                <li class="nav-item">
+                    <a class="nav-link ps-4 {% if request.resolver_match.kwargs.slug_subject == subject.slug %}active{% endif %}" href="{% url 'post:subject' subject.slug %}"><i class="fa fa-angle-right mr-2"></i>{{ subject.title }}</a>
+                </li>
+                {% endfor %}
+                {% comment %} Menu Sản Phẩm tạm ẩn — site hiện chỉ dùng Post, sẽ tính sau
+                <li class="nav-item">
                     <a class="nav-link {% if request.path|strip_slashes == 'san-pham' %}active{% endif %}" href="{% url 'product:product_all' %}"><i class="fa fa-store mr-2"></i>Tất Cả Sản Phẩm</a>
                 </li>
                 {% for category in categories %}
@@ -196,20 +213,17 @@
                     <a class="nav-link ps-4" href="{% url 'product:product_all' category.slug %}"><i class="fa fa-angle-right mr-2"></i>{{ category.name }}</a>
                 </li>
                 {% endfor %}
-                <li class="nav-item">
-                    <a class="nav-link {% if request.path|strip_slashes == 'bai-viet' %}active{% endif %}" href="{% url 'post:post_all' %}"><i class="fa fa-newspaper mr-2"></i>Tất Cả Bài Viết</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if request.path|strip_slashes == 'lien-he' %}active{% endif %}" href="{% url 'core:contact' %}"><i class="fa fa-headset mr-2"></i>Liên Hệ</a>
-                </li>
+                {% endcomment %}
 
                 {% if request.user.is_authenticated %}
                 <li class="nav-item">
                     <a class="nav-link {% if request.path|strip_slashes == 'thong-tin-tai-khoan' %}active{% endif %}" href="{% url 'account:edit_profile' %}"><i class="fa fa-user mr-2"></i>Tài Khoản</a>
                 </li>
+                {% comment %} Menu đơn hàng tạm ẩn — site hiện chỉ dùng Post, sẽ tính sau
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'account:order_cus' %}"><i class="fa fa-box mr-2"></i>Đơn Hàng Đã Mua</a>
                 </li>
+                {% endcomment %}
                 <li class="nav-item">
                     <a class="nav-link text-danger" href="{% url 'account:logout' %}"><i class="fa fa-sign-out-alt mr-2"></i>Đăng Xuất</a>
                 </li>
@@ -236,44 +250,34 @@
             <div class="row gy-4">
                 <div class="col-lg-4 col-md-6">
                     <a href="{% url 'core:home' %}" class="site-logo mb-3">
-                        <span class="logo-mark">PT</span>
-                        <span class="logo-text text-white"><span>PT</span>com</span>
+                        <span class="logo-mark">eA</span>
+                        <span class="logo-text text-white"><span>eApp</span> Blog</span>
                     </a>
-                    <p class="mt-3">Khám phá thế giới số trong tầm tay bạn. PTcom chuyên mua bán các sản phẩm công nghệ chính hãng với giá tốt nhất.</p>
-                    <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-2"></i>88 Bùi Công Trừng, Đông Thạnh, Hóc Môn, TP.HCM</p>
-                    <p class="mb-2"><i class="fa fa-envelope text-primary mr-2"></i><a href="mailto:ptcom88a@gmail.com">ptcom88a@gmail.com</a></p>
-                    <p class="mb-3"><i class="fa fa-phone-alt text-primary mr-2"></i><a href="tel:0938717380">0938.717.380</a></p>
-                    <div>
-                        <a class="footer-social" href="" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a class="footer-social" href="" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a class="footer-social" href="" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a class="footer-social" href="" aria-label="Youtube"><i class="fab fa-youtube"></i></a>
-                    </div>
+                    <p class="mt-3">Blog tin tức công nghệ hiện đại — cập nhật tin tức, mẹo mua sắm và hướng dẫn sử dụng thiết bị mỗi ngày từ đội ngũ eApp.</p>
+                    <p class="mb-3"><i class="fa fa-envelope text-primary mr-2"></i><a href="mailto:admin@eapp.vn">admin@eapp.vn</a></p>
                 </div>
                 <div class="col-lg-2 col-md-6 col-6">
-                    <h5 class="footer-heading">Về PTcom</h5>
+                    <h5 class="footer-heading">Về eApp Blog</h5>
                     <a class="footer-link" href="{% url 'core:home' %}">Trang Chủ</a>
                     <a class="footer-link" href="{% url 'core:about' %}">Giới Thiệu</a>
-                    <a class="footer-link" href="{% url 'product:product_all' %}">Sản Phẩm</a>
                     <a class="footer-link" href="{% url 'post:post_all' %}">Bài Viết</a>
                     <a class="footer-link" href="{% url 'core:contact' %}">Liên Hệ</a>
                 </div>
                 <div class="col-lg-3 col-md-6 col-6">
-                    <h5 class="footer-heading">Hỗ Trợ Khách Hàng</h5>
+                    <h5 class="footer-heading">Chủ Đề Nổi Bật</h5>
+                    {% for subject in subjects %}
+                        <a class="footer-link" href="{% url 'post:subject' subject.slug %}">{{ subject.title }}</a>
+                    {% endfor %}
                     {% if request.user.is_authenticated %}
                         <a class="footer-link" href="{% url 'account:edit_profile' %}">Thông Tin Tài Khoản</a>
-                        <a class="footer-link" href="{% url 'account:order_cus' %}">Đơn Hàng Đã Mua</a>
                     {% else %}
                         <a class="footer-link" href="{% url 'account:login' %}">Đăng Nhập</a>
                         <a class="footer-link" href="{% url 'account:register' %}">Đăng Ký</a>
                     {% endif %}
-                    <a class="footer-link" href="{% url 'product:cart_view' %}">Giỏ Hàng</a>
-                    <a class="footer-link" href="{% url 'core:contact' %}">Chính Sách Đổi Trả</a>
-                    <a class="footer-link" href="{% url 'core:contact' %}">Chính Sách Vận Chuyển</a>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h5 class="footer-heading">Đăng Ký Nhận Tin</h5>
-                    <p>Nhận thông tin khuyến mãi, sản phẩm mới và tin tức công nghệ từ PTcom.</p>
+                    <p>Nhận bản tin công nghệ, thủ thuật hay và bài viết mới nhất từ eApp Blog.</p>
                     <form onsubmit="showSpinner()" action="{% url 'core:contact' %}" method="POST" class="footer-form">
                         {% csrf_token %}
                         <div class="input-group">
@@ -281,48 +285,22 @@
                             <button class="btn btn-primary" type="submit" aria-label="Đăng ký nhận tin"><i class="fa fa-paper-plane"></i></button>
                         </div>
                     </form>
-                    <div class="mt-4">
-                        <h5 class="footer-heading">Thanh Toán</h5>
-                        <img class="img-fluid" src="{% static 'website/img/payments.png' %}" alt="Phương thức thanh toán">
-                    </div>
                 </div>
             </div>
         </div>
         <div class="footer-bottom">
             <div class="container d-flex flex-wrap align-items-center justify-content-between gap-2">
                 <div>
-                    <a class="text-white font-weight-semi-bold" href="{% url 'core:home' %}">PTcom</a>. All Rights Reserved.
+                    <a class="text-white font-weight-semi-bold" href="{% url 'core:home' %}">eApp Blog</a>. All Rights Reserved.
                 </div>
                 <div class="copyright">
                     Copyright © <script type="text/javascript">var creditsyear = new Date();document.write(creditsyear.getFullYear());</script>
-                    <strong><span class="text-white">PTcom</span></strong>.
+                    <strong><span class="text-white">eApp Blog</span></strong>.
                 </div>
             </div>
         </div>
     </footer>
     <!-- Footer End -->
-
-
-    <!-- Nút liên hệ nổi: Zalo -->
-    <a class="contact-text" href="https://zalo.me/0938717380" target="_blank">
-        <img src="{% static 'canhan/img/icon/zalo_icon.webp' %}" alt="Zalo" style="width: 20px; height: 20px;" class="mb-1">
-        <strong style="font-size: 16px; font-weight: 700; color: #e10e0e">Tư vấn nhanh</strong>
-    </a>
-
-    <!-- Nút liên hệ nổi: Gọi điện -->
-    <a href="tel:0938717380" class="contact-call d-flex align-items-center justify-content-center">
-        <i class="bi bi-telephone-fill" style="font-size: 24px;"></i>
-    </a>
-
-    <!-- Nút đặt hẹn (mở modal HTMX) -->
-    <a href="#"
-        class="support-menu-box support-menu-contact"
-        hx-get="{% url 'core:contact_modal' %}"
-        hx-target="#dialog"
-        hx-swap="innerHTML">
-        <img src="{% static 'canhan/img/icon/contact-icon.avif' %}" alt="Contact" height="32" width="32" loading="lazy" />
-        <div class="support-menu-label">Liên hệ</div>
-    </a>
 
 
     <!-- Spinner cho loading page + upload file -->

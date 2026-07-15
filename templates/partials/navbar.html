@@ -1,18 +1,18 @@
 {% load static %}
 {% load custom_tags %}
 
-<nav class="custom-navbar navbar navbar-expand-md navbar-dark bg-dark" aria-label="PTcom navigation">
+<nav class="custom-navbar navbar navbar-expand-md navbar-dark bg-dark" aria-label="eApp Blog navigation">
     <div class="container">
         <a href="{% url 'core:home' %}" class="site-logo navbar-brand">
             <span class="logo-mark">PT</span>
             <span class="logo-text text-white"><span>PT</span>com</span>
         </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsPtcom" aria-controls="navbarsPtcom" aria-expanded="false" aria-label="Mở menu">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsEapp" aria-controls="navbarsEapp" aria-expanded="false" aria-label="Mở menu">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse" id="navbarsPtcom">
+        <div class="collapse navbar-collapse" id="navbarsEapp">
             <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
                 <li><a class="nav-link" href="{% url 'core:home' %}">Trang chủ</a></li>
                 <li><a class="nav-link" href="{% url 'product:product_all' %}">Sản phẩm</a></li>

@@ -17,16 +17,10 @@ from App_Core.forms import ContactForm
 from App_Core.middleware import generate_response
 from App_Core.models import Contact
 from App_Post.models import Post, Subject
-from App_Product.models import Category, Product, SubCategory
+from App_Product.models import Category
 from App_Core.storage import CustomStorage
 
 logger = logging.getLogger(__name__)
-
-
-def _wishlist_product_ids(request):
-    if request.user.is_authenticated:
-        return set(request.user.wishlist.values_list('product_id', flat=True))
-    return set()
 
 
 def handler404(request, exception, template_name='404.html'):
@@ -70,42 +64,36 @@ def home(request):
     try:
         # prefetch subcategories vì nav trong base.html duyệt category.subcategories
         categories = Category.objects.prefetch_related('subcategories')
-        subcategories = SubCategory.objects.all()
-        products = Product.objects.all().order_by('-id')[0:8]
-        products_featured = Product.objects.filter(featured=True).order_by('-id')
-        products_newest = Product.objects.filter(is_stock=True).order_by('-created_at')[:10]
+        subjects = Subject.objects.prefetch_related('posts').order_by('id')
 
-        subjects = Subject.objects.all().order_by('id')
-        posts = Post.objects.all().order_by('-id')#[0:3]
-        posts_featured = Post.objects.filter(featured=True).order_by('-id')
+        posts = Post.objects.select_related('subject', 'subsubject').order_by('-display_at')
+        posts_featured = Post.objects.filter(featured=True).select_related('subject').order_by('-display_at')
 
-        # form = ContactForm() # chuyển sang dùng trong context_processor 
+        # Hero trang chủ blog: ưu tiên bài featured, thiếu thì bù bài mới nhất
+        hero_posts = list(posts_featured[:3])
+        if len(hero_posts) < 3:
+            hero_ids = [post.id for post in hero_posts]
+            hero_posts += list(posts.exclude(id__in=hero_ids)[:3 - len(hero_posts)])
+        hero_ids = [post.id for post in hero_posts]
+        latest_posts = posts.exclude(id__in=hero_ids)[:6]
+
         return render(request, 'home.html', {'categories':categories,
-                                                    'subcategories':subcategories,
-                                                    'products':products,
-                                                    'products_featured':products_featured,
-                                                    'products_newest':products_newest,
-                                                    
                                                     'subjects':subjects,
                                                     'posts':posts,
                                                     'posts_featured':posts_featured,
-                                                    'wishlist_product_ids': _wishlist_product_ids(request),
-                                                    
-                                                    # 'form':form,
+                                                    'hero_posts':hero_posts,
+                                                    'latest_posts':latest_posts,
                                                     })
     except Exception:
         logger.exception("Home view error")
         # Trong trường hợp lỗi, render trang home với dữ liệu rỗng
         return render(request, 'home.html', {
             'categories': [],
-            'subcategories': [],
-            'products': [],
-            'products_featured': [],
-            'products_newest': [],
             'subjects': [],
             'posts': [],
             'posts_featured': [],
-            'wishlist_product_ids': set(),
+            'hero_posts': [],
+            'latest_posts': [],
         })
 
 def contact(request):
@@ -128,7 +116,7 @@ def contact(request):
             
             # Gửi email
             # send_mail(
-            #     subject = "Thông báo mới từ PTcom",
+            #     subject = "Thông báo mới từ eApp Blog",
             #     message = f"Đây là tin nhắn tự động. \nName: {name} \nPhone: {phone} \nEmail: {email} \nNội dung: {message}",
             #     from_email = None,
             #     recipient_list = ["wenlamsao@gmail.com"],
@@ -141,7 +129,7 @@ def contact(request):
                 from_email=None,
                 recipient_list=[quanly_email],
                 context={
-                    'site_name': 'PTcom',
+                    'site_name': 'eApp Blog',
                     'name': name,
                     'phone':phone,
                     'email': email,
@@ -180,7 +168,7 @@ def contact_modal(request):
                 from_email=None,
                 recipient_list=[quanly_email],
                 context={
-                    'site_name': 'PTcom',
+                    'site_name': 'eApp Blog',
                     'name': name,
                     'phone':phone,
                     'email': email,

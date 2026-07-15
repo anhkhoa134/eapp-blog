@@ -91,7 +91,7 @@
 															<th class="column" width="154" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal;">
 																<table width="100%" border="0" cellspacing="0" cellpadding="0">
 																	<tr>
-																		<td class="logo"><a href="https://ptcom.vn/" target="_blank"><img src="https://ptcom.vn/static/website/img/hero-1.jpg" width="154" height="40" border="0" alt="" /></a></td>
+																		<td class="logo"><a href="https://eapp.vn/" target="_blank"><img src="https://eapp.vn/static/website/img/hero-1.jpg" width="154" height="40" border="0" alt="" /></a></td>
 																	</tr>
 																</table>
 															</th>
@@ -103,7 +103,7 @@
 																			<table class="center" border="0" cellspacing="0" cellpadding="0" style="text-align:center;">
 																				<tr>
 																					<td class="img" width="22" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://img.icons8.com/color/50/slack-new.png" alt="slack-new" width="14" height="14" border="0"/></td>
-																					<td class="text-top" style="color:#999999; font-family:Arial, sans-serif; font-size:13px; line-height:17px; text-align:left; min-width:auto !important;"><a href="https://ptcom.vn/san-pham/" target="_blank" class="link-grey" style="color:#999999; text-decoration:none;"><span class="link-grey" style="color:#999999; text-decoration:none;">Sản phẩm công nghệ</span></a></td>
+																					<td class="text-top" style="color:#999999; font-family:Arial, sans-serif; font-size:13px; line-height:17px; text-align:left; min-width:auto !important;"><a href="https://eapp.vn/bai-viet/" target="_blank" class="link-grey" style="color:#999999; text-decoration:none;"><span class="link-grey" style="color:#999999; text-decoration:none;">Bài viết công nghệ</span></a></td>
 																				</tr>
 																			</table>
 																		</td>
@@ -185,7 +185,7 @@
 															<th class="column" width="170" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal;">
 																<table width="100%" border="0" cellspacing="0" cellpadding="0">
 																	<tr>
-																		<td class="img m-center" style="font-size:0pt; line-height:0pt; text-align:left;"><a href="https://ptcom.vn/" target="_blank"><img src="https://ptcom.vn/static/website/img/hero-1.jpg" width="154" height="40" border="0" alt="" /></a></td>
+																		<td class="img m-center" style="font-size:0pt; line-height:0pt; text-align:left;"><a href="https://eapp.vn/" target="_blank"><img src="https://eapp.vn/static/website/img/hero-1.jpg" width="154" height="40" border="0" alt="" /></a></td>
 																	</tr>
 																</table>
 															</th>
@@ -196,11 +196,9 @@
 																		<td align="right">
 																			<table class="center" border="0" cellspacing="0" cellpadding="0" style="text-align:center;">
 																				<tr>
-																					<td class="img" width="55" style="font-size:0pt; line-height:0pt; text-align:left;"><a href="tel:0938717380" target="_blank"><img src="https://img.icons8.com/color/50/phone.png" alt="phone" width="33" height="33" border="0" /></a></td>
-																					<td class="img" width="55" style="font-size:0pt; line-height:0pt; text-align:left;"><a href="https://zalo.me/0938717380" target="_blank"><img src="https://img.icons8.com/color/50/zalo.png" alt="zalo" width="33" height="33" border="0" /></a></td>
 																					<!-- <td class="img" width="55" style="font-size:0pt; line-height:0pt; text-align:left;"><a href="#" target="_blank"><img src="https://img.icons8.com/ios-glyphs/40/2e65ff/facebook.png" alt="facebook" width="33" height="33" border="0" /></a></td> -->
 																					<td class="img" width="55" style="font-size:0pt; line-height:0pt; text-align:left;"><a href="https://m.me/61561421856081" target="_blank"><img src="https://img.icons8.com/ios-glyphs/40/A82CFF/facebook-messenger.png" alt="facebook-messenger" width="33" height="33" border="0" /></a></td>
-																					<td class="img" width="34" style="font-size:0pt; line-height:0pt; text-align:left;"><a href="mailto:ptcom88a@gmail.com" target="_blank"><img src="https://img.icons8.com/color/50/gmail--v1.png" alt="gmail--v1" width="33" height="33" border="0" /></a></td>
+																					<td class="img" width="34" style="font-size:0pt; line-height:0pt; text-align:left;"><a href="mailto:admin@eapp.vn" target="_blank"><img src="https://img.icons8.com/color/50/gmail--v1.png" alt="gmail--v1" width="33" height="33" border="0" /></a></td>
 																				</tr>
 																			</table>
 																		</td>
@@ -219,7 +217,7 @@
 																<table width="100%" border="0" cellspacing="0" cellpadding="0">
 																	<tr>
 																		<td class="text-footer m-center" style="color:#666666; font-family:'Roboto', Arial, sans-serif; font-size:12px; line-height:26px; text-align:left; min-width:auto !important;">
-																			PTcom - Sản phẩm công nghệ chính hãng <br />88 Bùi Công Trừng, Đông Thạnh, Hóc Môn, TP.HCM, Việt Nam
+																			eApp Blog - Tin tức và thủ thuật công nghệ <br />admin@eapp.vn
 																		</td>
 																	</tr>
 																</table>
@@ -228,7 +226,7 @@
 															<th class="column-bottom" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; vertical-align:bottom;">
 																<table width="100%" border="0" cellspacing="0" cellpadding="0">
 																	<tr>
-																		<td class="text-footer right m-center" style="color:#666666; font-family:'Roboto', Arial, sans-serif; font-size:12px; line-height:26px; min-width:auto !important; text-align:right;"><a href="https://ptcom.vn/dang-nhap/" target="_blank" class="link-grey-u" style="color:#999999; text-decoration:underline;"><span class="link-grey-u" style="color:#999999; text-decoration:underline;">Đăng Nhập</span></a></td>
+																		<td class="text-footer right m-center" style="color:#666666; font-family:'Roboto', Arial, sans-serif; font-size:12px; line-height:26px; min-width:auto !important; text-align:right;"><a href="https://eapp.vn/dang-nhap/" target="_blank" class="link-grey-u" style="color:#999999; text-decoration:underline;"><span class="link-grey-u" style="color:#999999; text-decoration:underline;">Đăng Nhập</span></a></td>
 																	</tr>
 																</table>
 															</th>

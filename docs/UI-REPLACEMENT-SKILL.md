@@ -115,6 +115,26 @@ url('images/hero.jpg')
 url('../img/<brand_slug>/hero.jpg')
 ```
 
+#### Font chữ và tiếng Việt
+
+Khi chọn hoặc migrate font cho UI tiếng Việt, phải kiểm tra font có subset/ký tự tiếng Việt đầy đủ cho các weight thực tế đang dùng, nhất là heading đậm `600`/`700`. Không dùng một font chỉ có subset latin/latin-ext nếu nội dung có dấu tiếng Việt vì các ký tự như `ư`, `ơ`, `ă`, `đ`, dấu nặng/hỏi/ngã có thể bị render lệch hoặc rơi về fallback từng ký tự.
+
+Ưu tiên self-host font trong `static/vendor/gfonts/` hoặc `static/website/fonts/`, dùng `font-display: swap`, và khai báo fallback rõ ràng:
+
+```css
+:root {
+  --brand-font-sans: "Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, "Helvetica Neue", sans-serif;
+}
+
+body {
+  font-family: var(--brand-font-sans);
+}
+```
+
+Với Hadona, website public đang dùng `static/vendor/gfonts/hadona-fonts.css`, trỏ tới bộ local `Plus Jakarta Sans` có subset Vietnamese và fallback `Inter` rồi system fonts. Nếu đổi font sau này, phải test bằng câu tiếng Việt có đủ dấu, ví dụ: `Chiêm ngưỡng kỳ quan thiên nhiên từ một góc nhìn khác biệt`.
+
+Không dùng `Georgia`, `Times New Roman` hoặc font serif hệ thống cho tiêu đề/card chứa dữ liệu tiếng Việt động nếu chưa test kỹ trên trình duyệt đích. Lỗi đã gặp ở Hadona: tiêu đề bài viết như `Set menu buổi tối sát biển` và `Check-in Jeep hồng & khung tím` bị vỡ dấu khi card dùng `Georgia`; các selector card title nên dùng `var(--hadona-font-sans)` hoặc font self-hosted có Vietnamese subset.
+
 Trong template, gọi bằng `{% static %}`:
 
 ```django
@@ -816,6 +836,7 @@ Không yêu cầu user copy file thủ công nếu file đã nằm trong repo.
 - [ ] Đã backup template cũ
 - [ ] Đã copy asset vào `static`
 - [ ] Đã tách CSS/JS khỏi HTML tĩnh
+- [ ] Font chữ hỗ trợ đầy đủ tiếng Việt ở các weight đang dùng và có fallback rõ ràng
 - [ ] `base.html` giữ đủ Django blocks/context hooks
 - [ ] Navbar lấy category từ DB, không hard-code detail URL
 - [ ] Mobile navbar dùng offcanvas trái sang phải, có backdrop và click ngoài để đóng

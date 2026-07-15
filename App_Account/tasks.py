@@ -23,7 +23,7 @@ def send_birthday_emails():
                 from_email=None,
                 recipient_list=[profile.email],
                 context={
-                    'site_name': 'PTcom',
+                    'site_name': 'eApp Blog',
                     'subject': 'Chúc mừng sinh nhật!',
                     'email': profile.email,
                     'name': profile.fullname or '',

@@ -217,7 +217,7 @@ def password_reset_request(request):
                         context={
                             'email': user.email,
                             'domain': request.META['HTTP_HOST'],
-                            'site_name': 'PTcom',
+                            'site_name': 'eApp Blog',
                             'uid': uidb64,
                             'user': user,
                             'token': token,

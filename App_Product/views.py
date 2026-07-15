@@ -528,7 +528,7 @@ def checkout(request):
                     context={
                         'order_id': order.id,
                         'url_chitiet_donhang': url_chitiet_donhang,
-                        'site_name': 'PTcom',
+                        'site_name': 'eApp Blog',
                         'user': user,
                         'email': email,
                         'fullname':fullname,
@@ -544,7 +544,7 @@ def checkout(request):
             url_quanly_donhang = request.build_absolute_uri(reverse('quanly:order_view'))
             message = f'Đơn hàng mới {price}đ'
             # send_mail(
-            #     subject = "Thông báo mới từ PTcom",
+            #     subject = "Thông báo mới từ eApp Blog",
             #     message = f"Đây là tin nhắn tự động. \n\nUsername: {user} \nPhone: {phone} \nNội dung: {message} \n\nTruy cập {url_quanly_donhang} để xem chi tiết.",
             #     from_email = None,
             #     recipient_list = [quanly_email],
@@ -557,7 +557,7 @@ def checkout(request):
                 recipient_list=[quanly_email],
                 context={
                     'url_quanly_donhang': url_quanly_donhang,
-                    'site_name': 'PTcom',
+                    'site_name': 'eApp Blog',
                     'user': user,
                     'email': email,
                     'fullname':fullname,

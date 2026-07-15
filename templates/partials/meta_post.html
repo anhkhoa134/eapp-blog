@@ -1,16 +1,16 @@
 {% load static %}
 <!-- SEO Meta Tags -->
-<meta name="description" content="{{ post.title }}{% if post.description %}: {{ post.description|striptags|truncatechars:150 }}{% else %} - Tin tức từ PTcom.{% endif %}">
-<meta name="keywords" content="{% if post.subject %}{{ post.subject.title }}, {% endif %}{% if post.subsubject %}{{ post.subsubject.title }}, {% endif %}{{ post.title }}, PTcom, tin tức công nghệ">
-<meta name="author" content="PTcom">
+<meta name="description" content="{{ post.title }}{% if post.description %}: {{ post.description|striptags|truncatechars:150 }}{% else %} - Tin tức từ eApp Blog.{% endif %}">
+<meta name="keywords" content="{% if post.subject %}{{ post.subject.title }}, {% endif %}{% if post.subsubject %}{{ post.subsubject.title }}, {% endif %}{{ post.title }}, eApp Blog, tin tức công nghệ">
+<meta name="author" content="eApp Blog">
 <meta name="robots" content="index, follow">
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="article">
-<meta property="og:title" content="{{ post.title }} | PTcom">
+<meta property="og:title" content="{{ post.title }} | eApp Blog">
 <meta property="og:description" content="{{ post.description|striptags|truncatechars:160 }}">
 <meta property="og:url" content="{{ request.build_absolute_uri }}">
-<meta property="og:site_name" content="PTcom">
+<meta property="og:site_name" content="eApp Blog">
 <meta property="og:locale" content="vi_VN">
 {% if post.thumbnail %}
 <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ post.get_thumbnail }}">
@@ -18,7 +18,7 @@
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="{{ post.title }} | PTcom">
+<meta name="twitter:title" content="{{ post.title }} | eApp Blog">
 <meta name="twitter:description" content="{{ post.description|striptags|truncatechars:160 }}">
 {% if post.thumbnail %}
 <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ post.get_thumbnail }}">
@@ -34,11 +34,11 @@
   "image": "{% if post.thumbnail %}{{ request.scheme }}://{{ request.get_host }}{{ post.get_thumbnail }}{% endif %}",
   "author": {
     "@type": "Organization",
-    "name": "PTcom"
+    "name": "eApp Blog"
   },
   "publisher": {
     "@type": "Organization",
-    "name": "PTcom"
+    "name": "eApp Blog"
   },
   "datePublished": "{{ post.created_at|date:'c' }}",
   "dateModified": "{{ post.updated_at|date:'c' }}",

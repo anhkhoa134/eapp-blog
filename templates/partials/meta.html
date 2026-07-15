@@ -1,46 +1,45 @@
 {% load static %}
 <!-- SEO Meta Tags -->
-<meta name="description" content="PTcom chuyên mua bán điện thoại, laptop, camera giám sát, phụ kiện và thiết bị thông minh chính hãng tại Hóc Môn, TP.HCM.">
-<meta name="keywords" content="PTcom, sản phẩm công nghệ, điện thoại, laptop, camera giám sát, phụ kiện công nghệ, thiết bị thông minh, cửa hàng công nghệ Hóc Môn">
-<meta name="author" content="PTcom">
+<meta name="description" content="eApp Blog - blog tin tức công nghệ hiện đại: tin tức, đánh giá sản phẩm, mẹo mua sắm và hướng dẫn sử dụng thiết bị công nghệ, cập nhật mỗi ngày.">
+<meta name="keywords" content="eApp Blog, tin tức công nghệ, đánh giá sản phẩm, mẹo mua sắm, hướng dẫn sử dụng, thủ thuật công nghệ, blog công nghệ">
+<meta name="author" content="eApp Blog">
 <meta name="robots" content="index, follow">
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website">
-<meta property="og:title" content="PTcom - Sản phẩm công nghệ chính hãng">
-<meta property="og:description" content="Mua điện thoại, laptop, camera giám sát, phụ kiện và thiết bị thông minh tại PTcom.">
+<meta property="og:title" content="eApp Blog - Tin tức & thủ thuật công nghệ">
+<meta property="og:description" content="Tin tức công nghệ, đánh giá sản phẩm, mẹo mua sắm và hướng dẫn sử dụng thiết bị, cập nhật mỗi ngày tại eApp Blog.">
 <meta property="og:url" content="{{ request.build_absolute_uri }}">
-<meta property="og:site_name" content="PTcom">
+<meta property="og:site_name" content="eApp Blog">
 <meta property="og:locale" content="vi_VN">
 <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'website/img/hero-1.jpg' %}">
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="PTcom - Sản phẩm công nghệ chính hãng">
-<meta name="twitter:description" content="Mua điện thoại, laptop, camera giám sát, phụ kiện và thiết bị thông minh tại PTcom.">
+<meta name="twitter:title" content="eApp Blog - Tin tức & thủ thuật công nghệ">
+<meta name="twitter:description" content="Tin tức công nghệ, đánh giá sản phẩm, mẹo mua sắm và hướng dẫn sử dụng thiết bị, cập nhật mỗi ngày tại eApp Blog.">
 <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'website/img/hero-1.jpg' %}">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "ElectronicsStore",
-  "name": "PTcom",
+  "@type": "WebSite",
+  "name": "eApp Blog",
   "url": "{{ request.scheme }}://{{ request.get_host }}",
-  "description": "PTcom chuyên mua bán điện thoại, laptop, camera giám sát, phụ kiện và thiết bị thông minh chính hãng.",
+  "description": "eApp Blog - blog tin tức công nghệ hiện đại: tin tức, đánh giá sản phẩm, mẹo mua sắm và hướng dẫn sử dụng thiết bị.",
   "image": "{{ request.scheme }}://{{ request.get_host }}{% static 'website/img/hero-1.jpg' %}",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "88 Bùi Công Trừng, Đông Thạnh, Hóc Môn",
-    "addressLocality": "TP.HCM",
-    "addressCountry": "VN"
-  },
-  "contactPoint": {
-    "@type": "ContactPoint",
-    "telephone": "+84-938-717-380",
-    "contactType": "Customer Service",
-    "areaServed": "VN",
-    "availableLanguage": ["Vietnamese"]
+  "publisher": {
+    "@type": "Organization",
+    "name": "eApp Blog",
+    "url": "{{ request.scheme }}://{{ request.get_host }}",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "email": "admin@eapp.vn",
+      "contactType": "Customer Service",
+      "areaServed": "VN",
+      "availableLanguage": ["Vietnamese"]
+    }
   }
 }
 </script>
