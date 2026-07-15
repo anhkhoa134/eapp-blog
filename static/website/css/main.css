@@ -295,28 +295,11 @@ button.bg-secondary:hover, button.bg-secondary:focus { background-color: #dbe4f0
 	white-space: nowrap;
 }
 
-.site-logo .logo-mark {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
+.site-logo img {
 	width: 42px;
 	height: 42px;
+	object-fit: contain;
 	border-radius: 10px;
-	background: linear-gradient(135deg, var(--pt-primary), #60a5fa);
-	color: #fff;
-	font-weight: 700;
-	font-size: 1.1rem;
-	letter-spacing: 0.5px;
-}
-
-.site-logo .logo-text {
-	font-size: 1.45rem;
-	font-weight: 700;
-	color: var(--pt-dark);
-}
-
-.site-logo .logo-text span {
-	color: var(--pt-primary);
 }
 
 /* Search */
@@ -375,11 +358,10 @@ button.bg-secondary:hover, button.bg-secondary:focus { background-color: #dbe4f0
 		padding: 8px 0;
 	}
 
-	.site-logo .logo-mark {
+	.site-logo img {
 		width: 34px;
 		height: 34px;
 		border-radius: 8px;
-		font-size: 0.95rem;
 	}
 
 	.header-search .form-control {

@@ -11,7 +11,7 @@
     <meta name="copyright" content="eApp Blog">
     <meta property="og:locale" content="vi_VN">
     <title>{% block title %}{% endblock title %} | eapp.vn - eApp Blog tin tức & thủ thuật công nghệ</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563eb'/%3E%3Ctext x='32' y='40' font-size='24' font-family='Arial,sans-serif' font-weight='700' fill='white' text-anchor='middle'%3EeA%3C/text%3E%3C/svg%3E">
+    <link rel="icon" href="{% static 'canhan/img/logo-eapp/favicon-eapp.ico' %}" type="image/x-icon">
     {% block meta %}{% endblock meta %}
     {# Canonical bỏ query string để trang phân trang/lọc (?page=, ?keyword=) không sinh URL trùng lặp #}
     <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
@@ -59,8 +59,7 @@
 
                 <!-- Logo (chỉ hiện trên desktop) -->
                 <a href="{% url 'core:home' %}" class="site-logo d-none d-lg-inline-flex">
-                    <span class="logo-mark">eA</span>
-                    <span class="logo-text"><span>eApp</span> Blog</span>
+                    <img src="{% static 'canhan/img/logo-eapp/eapp.webp' %}" alt="eApp Blog" width="42" height="42" loading="lazy">
                 </a>
 
                 <!-- Search (mobile, chung hàng với menu + avatar) -->
@@ -187,8 +186,7 @@
     <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
         <div class="offcanvas-header border-bottom">
             <a href="{% url 'core:home' %}" class="site-logo">
-                <span class="logo-mark">eA</span>
-                <span class="logo-text"><span>eApp</span> Blog</span>
+                <img src="{% static 'canhan/img/logo-eapp/eapp.webp' %}" alt="eApp Blog" width="42" height="42" loading="lazy">
             </a>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Đóng"></button>
         </div>
@@ -251,8 +249,7 @@
             <div class="row gy-4">
                 <div class="col-lg-4 col-md-6">
                     <a href="{% url 'core:home' %}" class="site-logo mb-3">
-                        <span class="logo-mark">eA</span>
-                        <span class="logo-text text-white"><span>eApp</span> Blog</span>
+                        <img src="{% static 'canhan/img/logo-eapp/eapp.webp' %}" alt="eApp Blog" width="42" height="42" loading="lazy">
                     </a>
                     <p class="mt-3">Blog tin tức công nghệ hiện đại — cập nhật tin tức, mẹo mua sắm và hướng dẫn sử dụng thiết bị mỗi ngày từ đội ngũ eApp.</p>
                     <p class="mb-3"><i class="fa fa-envelope text-primary mr-2"></i><a href="mailto:admin@eapp.vn">admin@eapp.vn</a></p>
