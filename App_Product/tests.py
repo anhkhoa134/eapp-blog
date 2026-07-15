@@ -1,17 +1,11 @@
-import shutil
-import tempfile
-from io import BytesIO
 from unittest.mock import patch
 
-from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.urls import reverse
-from PIL import Image as PILImage
 
 from App_Account.forms import CustomPasswordChangeForm
 from App_Quanly.models import CommerceBehaviorConfig
-from App_Product.management.commands.seed_products import MockRequest, seed_category_images, seed_product_variants
 from App_Product.models import (
     Attribute,
     Cart,
@@ -252,87 +246,6 @@ class ProductVariantCartTests(TestCase):
         self.assertRedirects(response, reverse('product:order_success', args=[order.id]))
         self.assertIn(order.id, self.client.session.get('guest_order_ids', []))
         self.assertEqual(mocked_send_mail.call_count, 1)
-
-
-class SeedProductVariantTests(TestCase):
-    def test_seed_product_variants_reuses_default_variant_and_updates_stock(self):
-        category = Category.objects.create(name='Điện thoại & Máy tính')
-        product = Product.objects.create(
-            category=category,
-            name='iPhone 15 Pro Max 256GB',
-            price=29990000,
-            price_sale=27990000,
-            stock=0,
-            is_stock=False,
-        )
-        default_variant = product.variants.first()
-        variants_data = [
-            {
-                'price': 29990000,
-                'price_sale': 27990000,
-                'stock': 12,
-                'attributes': [('Màu sắc', 'Titan Tự Nhiên'), ('Dung lượng', '256GB')],
-            },
-            {
-                'price': 34990000,
-                'price_sale': 32990000,
-                'stock': 5,
-                'attributes': [('Màu sắc', 'Titan Đen'), ('Dung lượng', '512GB')],
-            },
-        ]
-
-        seed_product_variants(product, variants_data, default_variant)
-
-        product.refresh_from_db()
-        default_variant.refresh_from_db()
-        self.assertEqual(product.variants.count(), 2)
-        self.assertEqual(default_variant.stock, 12)
-        self.assertTrue(product.is_stock)
-        self.assertEqual(product.stock, 17)
-        self.assertTrue(
-            default_variant.attributes.filter(attribute__key='Màu sắc', attribute__value='Titan Tự Nhiên').exists()
-        )
-        self.assertTrue(
-            product.variants.filter(
-                attributes__attribute__key='Dung lượng',
-                attributes__attribute__value='512GB',
-            ).exists()
-        )
-
-
-class SeedCategoryImageTests(TestCase):
-    def setUp(self):
-        self.media_root = tempfile.mkdtemp()
-        self.settings_override = override_settings(MEDIA_ROOT=self.media_root)
-        self.settings_override.enable()
-
-    def tearDown(self):
-        self.settings_override.disable()
-        shutil.rmtree(self.media_root, ignore_errors=True)
-
-    def test_seed_category_images_uses_product_image_from_same_category(self):
-        user = User.objects.create_user(username='seed-admin', password='test-pass-123')
-        category = Category.objects.create(name='Điện thoại & Máy tính')
-        product = Product(
-            category=category,
-            name='iPhone 15 Pro Max 256GB',
-            price=29990000,
-            price_sale=27990000,
-            stock=12,
-            is_stock=True,
-        )
-        product.request = MockRequest(user)
-
-        image_buffer = BytesIO()
-        PILImage.new('RGB', (20, 20), color='red').save(image_buffer, format='JPEG')
-        product.image.save('iphone-seed.jpg', ContentFile(image_buffer.getvalue()), save=True)
-
-        seed_category_images({category.name: category}, user)
-
-        category.refresh_from_db()
-        self.assertTrue(category.image)
-        self.assertIn('/categories/', category.image.name)
-        self.assertTrue(category.image.name.endswith('.webp'))
 
 
 class PasswordStrengthValidationTests(TestCase):

@@ -13,7 +13,8 @@
     <title>{% block title %}{% endblock title %} | eapp.vn - eApp Blog tin tức & thủ thuật công nghệ</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563eb'/%3E%3Ctext x='32' y='40' font-size='24' font-family='Arial,sans-serif' font-weight='700' fill='white' text-anchor='middle'%3EeA%3C/text%3E%3C/svg%3E">
     {% block meta %}{% endblock meta %}
-    <link rel="canonical" href="{{ request.build_absolute_uri }}">
+    {# Canonical bỏ query string để trang phân trang/lọc (?page=, ?keyword=) không sinh URL trùng lặp #}
+    <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
 
     <!-- Web Fonts (self-host, thay Google Fonts CDN) -->
     <link href="{% static 'vendor/gfonts/poppins.css' %}" rel="stylesheet">

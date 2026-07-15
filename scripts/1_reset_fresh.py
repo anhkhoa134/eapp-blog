@@ -28,7 +28,7 @@ db.sqlite3.*, db.sqlite3-*, staticfiles collected, media/ và logs/ (mặc đị
 Sau migrate, nếu không dùng --skip-seed:
   1. Hỏi xác nhận trước khi tạo/cập nhật account seed superadmin.
   2. Hỏi xác nhận trước khi tạo/cập nhật account seed quanly.
-  3. Chạy seed_products, seed_posts, seed_quanly, seed_paymentmethods.
+  3. Chạy seed_posts.
 
 Account seed có password mặc định 123456 khi bạn xác nhận tạo/cập nhật.
 Cuối script in SECRET_KEY mới để copy vào .env.
@@ -138,7 +138,7 @@ def run_seed_data(base_dir: Path, manage_py: Path, dry_run: bool) -> None:
         print("(dry-run) would ask: create/update seed account superadmin?")
         print("(dry-run) would ask: create/update seed account quanly?")
         print(f"(dry-run) would run: {sys.executable} manage.py shell -c <create confirmed seed accounts>")
-        for command in ("seed_products", "seed_posts", "seed_quanly", "seed_paymentmethods"):
+        for command in ("seed_posts",):
             print(f"(dry-run) would run: {sys.executable} manage.py {command}")
         print()
         return
@@ -154,20 +154,23 @@ def run_seed_data(base_dir: Path, manage_py: Path, dry_run: bool) -> None:
     )
 
     if create_superadmin or create_quanly:
-        accounts: list[tuple[str, str, bool]] = []
+        # (username, email, is_staff, is_superuser). Trang /quan-ly/ chỉ kiểm tra
+        # username qua decorator quanly_required nên account quanly không được
+        # cấp quyền vào Django admin.
+        accounts: list[tuple[str, str, bool, bool]] = []
         if create_superadmin:
-            accounts.append(("superadmin", "superadmin@example.com", True))
+            accounts.append(("superadmin", "superadmin@example.com", True, True))
         if create_quanly:
-            accounts.append(("quanly", "quanly@example.com", True))
+            accounts.append(("quanly", "quanly@example.com", False, False))
 
         account_lines = [
             "from django.contrib.auth import get_user_model",
             "User=get_user_model()",
             f"accounts={accounts!r}",
-            "for username,email,is_superuser in accounts:",
+            "for username,email,is_staff,is_superuser in accounts:",
             "    user,created=User.objects.get_or_create(username=username, defaults={'email': email})",
             "    user.email=email",
-            "    user.is_staff=True",
+            "    user.is_staff=is_staff",
             "    user.is_superuser=is_superuser",
             "    user.set_password('123456')",
             "    user.save()",
@@ -180,13 +183,9 @@ def run_seed_data(base_dir: Path, manage_py: Path, dry_run: bool) -> None:
         )
     else:
         print("Skipped creating seed accounts.")
-        print("WARNING: Nếu chưa có user nào, seed_paymentmethods sẽ dùng user seed do seed_quanly tạo.")
 
     seed_commands = (
-        ("seed_products",),
         ("seed_posts",),
-        ("seed_quanly",),
-        ("seed_paymentmethods",),
     )
     try:
         for command_args in seed_commands:

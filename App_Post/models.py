@@ -136,7 +136,14 @@ class SubSubject(models.Model):
             return mark_safe('<img src="%s" width="35" height="35" style="border-radius: 8px;" />' % (self.image.url))
         else:
             return mark_safe('<img src="%s" width="35" height="35" style="border-radius: 8px;" />' % subsubject_icon_url)
-    
+
+    def get_absolute_url(self):
+        # URL canonical của subsubject là /chu-de/<subject>/<subsubject>/ (khớp link trên navbar)
+        return reverse('post:post_all', kwargs={
+            'slug_subject': self.subject.slug,
+            'slug_subsubject': self.slug,
+        })
+
 @receiver(pre_delete, sender=SubSubject)
 def subsubject_pre_delete(sender, instance, **kwargs):
     if instance.image:

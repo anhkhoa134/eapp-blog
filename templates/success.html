@@ -2,6 +2,10 @@
 {% load static %}
 {% block title %}Gửi thành công{% endblock title %}
 
+{% block meta %}
+{% include 'partials/meta.html' with meta_title="Gửi thành công | eApp Blog" meta_robots="noindex, follow" %}
+{% endblock meta %}
+
 {% block content %}
 <main class="container page-shell">
     <nav aria-label="breadcrumb">

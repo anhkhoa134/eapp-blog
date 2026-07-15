@@ -1,28 +1,30 @@
 {% load static %}
+{# get_thumbnail đã tự fallback về ảnh placeholder nên og:image/twitter:image luôn có giá trị #}
 <!-- SEO Meta Tags -->
-<meta name="description" content="{{ post.title }}{% if post.description %}: {{ post.description|striptags|truncatechars:150 }}{% else %} - Tin tức từ eApp Blog.{% endif %}">
+<meta name="description" content="{% if post.description %}{{ post.description|striptags|truncatechars:160 }}{% else %}{{ post.title }} - Tin tức từ eApp Blog.{% endif %}">
 <meta name="keywords" content="{% if post.subject %}{{ post.subject.title }}, {% endif %}{% if post.subsubject %}{{ post.subsubject.title }}, {% endif %}{{ post.title }}, eApp Blog, tin tức công nghệ">
-<meta name="author" content="eApp Blog">
+<meta name="author" content="{{ post.author|default:'eApp Blog' }}">
 <meta name="robots" content="index, follow">
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="article">
 <meta property="og:title" content="{{ post.title }} | eApp Blog">
 <meta property="og:description" content="{{ post.description|striptags|truncatechars:160 }}">
-<meta property="og:url" content="{{ request.build_absolute_uri }}">
+<meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
 <meta property="og:site_name" content="eApp Blog">
 <meta property="og:locale" content="vi_VN">
-{% if post.thumbnail %}
 <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ post.get_thumbnail }}">
+<meta property="article:published_time" content="{{ post.created_at|date:'c' }}">
+<meta property="article:modified_time" content="{{ post.updated_at|date:'c' }}">
+{% if post.subject %}
+<meta property="article:section" content="{{ post.subject.title }}">
 {% endif %}
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ post.title }} | eApp Blog">
 <meta name="twitter:description" content="{{ post.description|striptags|truncatechars:160 }}">
-{% if post.thumbnail %}
 <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ post.get_thumbnail }}">
-{% endif %}
 
 <!-- Article Structured Data -->
 <script type="application/ld+json">
@@ -31,20 +33,22 @@
   "@type": "Article",
   "headline": "{{ post.title|escapejs }}",
   "description": "{{ post.description|striptags|truncatechars:160|escapejs }}",
-  "image": "{% if post.thumbnail %}{{ request.scheme }}://{{ request.get_host }}{{ post.get_thumbnail }}{% endif %}",
+  "image": "{{ request.scheme }}://{{ request.get_host }}{{ post.get_thumbnail }}",
   "author": {
-    "@type": "Organization",
-    "name": "eApp Blog"
+    "@type": "{% if post.author %}Person{% else %}Organization{% endif %}",
+    "name": "{{ post.author|default:'eApp Blog'|escapejs }}"
   },
   "publisher": {
     "@type": "Organization",
-    "name": "eApp Blog"
+    "name": "eApp Blog",
+    "url": "{{ request.scheme }}://{{ request.get_host }}"
   },
+  "articleSection": "{% if post.subject %}{{ post.subject.title|escapejs }}{% endif %}",
   "datePublished": "{{ post.created_at|date:'c' }}",
   "dateModified": "{{ post.updated_at|date:'c' }}",
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "{{ request.build_absolute_uri }}"
+    "@id": "{{ request.scheme }}://{{ request.get_host }}{{ request.path }}"
   }
 }
 </script>

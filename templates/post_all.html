@@ -1,10 +1,16 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load custom_tags %}
-{% block title %}{% if subject %}{{ subject.title }}{% elif subsubject %}{{ subsubject.title }}{% else %}Bài Viết{% endif %}{% endblock title %}
+{% block title %}{% if subsubject %}{{ subsubject.title }}{% elif subject %}{{ subject.title }}{% else %}Bài Viết{% endif %}{% endblock title %}
 
 {% block meta %}
-{% include 'partials/meta.html' %}
+{% if subsubject %}
+{% include 'partials/meta.html' with meta_title=subsubject.title meta_description=subsubject.description meta_image=subsubject.get_image %}
+{% elif subject %}
+{% include 'partials/meta.html' with meta_title=subject.title meta_description=subject.description meta_image=subject.get_image %}
+{% else %}
+{% include 'partials/meta.html' with meta_title="Bài viết công nghệ mới nhất | eApp Blog" meta_description="Tổng hợp bài viết mới nhất của eApp Blog: tin tức công nghệ, đánh giá sản phẩm, mẹo mua sắm và hướng dẫn sử dụng thiết bị." %}
+{% endif %}
 {% endblock meta %}
 
 {% block content %}

@@ -3,7 +3,8 @@
 <meta name="description" content="{{ product.name }}{% if product.description %}: {{ product.description|striptags|truncatechars:150 }}{% else %} tại eApp Blog.{% endif %}">
 <meta name="keywords" content="{% if product.category %}{{ product.category.name }}, {% endif %}{% if product.subcategory %}{{ product.subcategory.name }}, {% endif %}{{ product.name }}, eApp Blog, sản phẩm công nghệ">
 <meta name="author" content="eApp Blog">
-<meta name="robots" content="index, follow">
+{# Mảng sản phẩm tạm ẩn — site hiện chỉ dùng Post, sẽ tính sau #}
+<meta name="robots" content="noindex, follow">
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="product">

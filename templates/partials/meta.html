@@ -1,24 +1,32 @@
 {% load static %}
+{# Partial meta dùng chung: trang nào cần nội dung riêng thì truyền meta_title / meta_description / meta_keywords / meta_robots / meta_image qua include with #}
+{% static 'website/img/hero-1.jpg' as og_image_default %}
+{% firstof meta_title "eApp Blog - Tin tức & thủ thuật công nghệ" as seo_title %}
+{% firstof meta_description "eApp Blog - blog tin tức công nghệ hiện đại: tin tức, đánh giá sản phẩm, mẹo mua sắm và hướng dẫn sử dụng thiết bị công nghệ, cập nhật mỗi ngày." as seo_description %}
+{% firstof meta_keywords "eApp Blog, tin tức công nghệ, đánh giá sản phẩm, mẹo mua sắm, hướng dẫn sử dụng, thủ thuật công nghệ, blog công nghệ" as seo_keywords %}
+{% firstof meta_robots "index, follow" as seo_robots %}
+{% firstof meta_image og_image_default as seo_image %}
+
 <!-- SEO Meta Tags -->
-<meta name="description" content="eApp Blog - blog tin tức công nghệ hiện đại: tin tức, đánh giá sản phẩm, mẹo mua sắm và hướng dẫn sử dụng thiết bị công nghệ, cập nhật mỗi ngày.">
-<meta name="keywords" content="eApp Blog, tin tức công nghệ, đánh giá sản phẩm, mẹo mua sắm, hướng dẫn sử dụng, thủ thuật công nghệ, blog công nghệ">
+<meta name="description" content="{{ seo_description }}">
+<meta name="keywords" content="{{ seo_keywords }}">
 <meta name="author" content="eApp Blog">
-<meta name="robots" content="index, follow">
+<meta name="robots" content="{{ seo_robots }}">
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website">
-<meta property="og:title" content="eApp Blog - Tin tức & thủ thuật công nghệ">
-<meta property="og:description" content="Tin tức công nghệ, đánh giá sản phẩm, mẹo mua sắm và hướng dẫn sử dụng thiết bị, cập nhật mỗi ngày tại eApp Blog.">
-<meta property="og:url" content="{{ request.build_absolute_uri }}">
+<meta property="og:title" content="{{ seo_title }}">
+<meta property="og:description" content="{{ seo_description }}">
+<meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
 <meta property="og:site_name" content="eApp Blog">
 <meta property="og:locale" content="vi_VN">
-<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'website/img/hero-1.jpg' %}">
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ seo_image }}">
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="eApp Blog - Tin tức & thủ thuật công nghệ">
-<meta name="twitter:description" content="Tin tức công nghệ, đánh giá sản phẩm, mẹo mua sắm và hướng dẫn sử dụng thiết bị, cập nhật mỗi ngày tại eApp Blog.">
-<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'website/img/hero-1.jpg' %}">
+<meta name="twitter:title" content="{{ seo_title }}">
+<meta name="twitter:description" content="{{ seo_description }}">
+<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ seo_image }}">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
@@ -28,7 +36,7 @@
   "name": "eApp Blog",
   "url": "{{ request.scheme }}://{{ request.get_host }}",
   "description": "eApp Blog - blog tin tức công nghệ hiện đại: tin tức, đánh giá sản phẩm, mẹo mua sắm và hướng dẫn sử dụng thiết bị.",
-  "image": "{{ request.scheme }}://{{ request.get_host }}{% static 'website/img/hero-1.jpg' %}",
+  "image": "{{ request.scheme }}://{{ request.get_host }}{{ og_image_default }}",
   "publisher": {
     "@type": "Organization",
     "name": "eApp Blog",

@@ -3,7 +3,8 @@
 {% block title %}{% if category %}{{ category.name }}{% elif subcategory %}{{ subcategory.name }}{% else %}Tất Cả Sản phẩm{% endif %}{% endblock title %}
 
 {% block meta %}
-{% include 'partials/meta.html' %}
+{# Mảng sản phẩm tạm ẩn — site hiện chỉ dùng Post, sẽ tính sau #}
+{% include 'partials/meta.html' with meta_robots="noindex, follow" %}
 {% endblock meta %}
 
 {% block content %}

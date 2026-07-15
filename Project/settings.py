@@ -135,12 +135,24 @@ WSGI_APPLICATION = 'Project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if env('POSTGRES_DB', default=''):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': env('POSTGRES_DB'),
+            'USER': env('POSTGRES_USER'),
+            'PASSWORD': env('POSTGRES_PASSWORD'),
+            'HOST': env('POSTGRES_HOST'),
+            'PORT': env('POSTGRES_PORT'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
@@ -436,9 +448,11 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True # Áp dụng HSTS cho tất cả các tên
 SECURE_HSTS_PRELOAD = False # Preload yêu cầu max-age >= 31536000 (1 năm); bật lại khi tăng SECURE_HSTS_SECONDS
 
 
-# Logging configuration để debug lỗi production
+# Logging configuration để theo dõi lỗi gần đây trên production
 LOGS_DIR = os.path.join(BASE_DIR, 'logs')
 os.makedirs(LOGS_DIR, exist_ok=True) # RotatingFileHandler không tự tạo thư mục
+LOG_FILE_MAX_BYTES = 5 * 1024 * 1024  # 5MB
+LOG_FILE_BACKUP_COUNT = 1
 
 LOGGING = {
     'version': 1,
@@ -462,16 +476,16 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': os.path.join(LOGS_DIR, 'debug.log'),
-            'maxBytes': 5 * 1024 * 1024,  # 5MB
-            'backupCount': 1,
+            'maxBytes': LOG_FILE_MAX_BYTES,
+            'backupCount': LOG_FILE_BACKUP_COUNT,
             'formatter': 'detailed',
         },
-        'error_file': {
+        'recent_error_file': {
             'level': 'ERROR',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(LOGS_DIR, 'error.log'),
-            'maxBytes': 5 * 1024 * 1024,  # 5MB
-            'backupCount': 1,
+            'filename': os.path.join(LOGS_DIR, 'recent_errors.log'),
+            'maxBytes': LOG_FILE_MAX_BYTES,
+            'backupCount': LOG_FILE_BACKUP_COUNT,
             'formatter': 'verbose',
         },
         'console': {
@@ -482,17 +496,17 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['error_file', 'console'],
+            'handlers': ['recent_error_file', 'console'],
             'level': 'INFO',
             'propagate': True,
         },
         'App_Core': {
-            'handlers': ['debug_file', 'error_file', 'console'],
+            'handlers': ['debug_file', 'recent_error_file', 'console'],
             'level': 'DEBUG',
             'propagate': True,
         },
         'django.request': {
-            'handlers': ['error_file'],
+            'handlers': ['recent_error_file'],
             'level': 'ERROR',
             'propagate': False,
         },

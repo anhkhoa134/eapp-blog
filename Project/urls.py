@@ -4,13 +4,14 @@ from . import settings
 from django.conf.urls.static import static
 from django.views.generic.base import TemplateView
 from django.contrib.sitemaps.views import sitemap
-from App_Core.sitemap import StaticViewSitemap, PostSitemap, SubjectSitemap
+from App_Core.sitemap import StaticViewSitemap, PostSitemap, SubjectSitemap, SubSubjectSitemap
 
 # Sitemap Product/Category tạm bỏ — site hiện chỉ dùng Post, sẽ tính sau
 sitemaps = {
     'static': StaticViewSitemap,
     'posts': PostSitemap,
     'subjects': SubjectSitemap,
+    'subsubjects': SubSubjectSitemap,
 }
 
 urlpatterns = [
