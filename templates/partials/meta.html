@@ -1,6 +1,6 @@
-{% load static %}
 {# Partial meta dùng chung: trang nào cần nội dung riêng thì truyền meta_title / meta_description / meta_keywords / meta_robots / meta_image qua include with #}
-{% static 'website/img/hero-1.jpg' as og_image_default %}
+{% load static %}
+{% static 'website/img/seed_posts/top-laptop-cho-sinh-vien.jpg' as og_image_default %}
 {% firstof meta_title "eApp Blog - Tin tức & thủ thuật công nghệ" as seo_title %}
 {% firstof meta_description "eApp Blog - blog tin tức công nghệ hiện đại: tin tức, đánh giá sản phẩm, mẹo mua sắm và hướng dẫn sử dụng thiết bị công nghệ, cập nhật mỗi ngày." as seo_description %}
 {% firstof meta_keywords "eApp Blog, tin tức công nghệ, đánh giá sản phẩm, mẹo mua sắm, hướng dẫn sử dụng, thủ thuật công nghệ, blog công nghệ" as seo_keywords %}
