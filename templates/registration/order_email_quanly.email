@@ -14,7 +14,7 @@
 	<meta name="format-detection" content="address=no" />
 	<meta name="format-detection" content="telephone=no" />
 	<meta name="x-apple-disable-message-reformatting" />
-   	<link href="https://fonts.googleapis.com/css?family=Poppins:400,700" rel="stylesheet"/>
+   	<link href="https://fonts.googleapis.com/css?family=Be+Vietnam+Pro:400,700&amp;subset=vietnamese,latin" rel="stylesheet"/>
 	<title>Email Template</title>
 
 
@@ -134,7 +134,7 @@
 										<!-- CTA -->
 										<table width="100%" border="0" cellspacing="0" cellpadding="0">
 											<tr>
-												<td class="h2 center" style="padding-bottom: 20px; color:#313131; font-family:'Poppins', Arial, sans-serif; font-size:45px; line-height:55px; font-weight:bold; text-transform:uppercase; text-align:center;">
+												<td class="h2 center" style="padding-bottom: 20px; color:#313131; font-family:'Be Vietnam Pro', Arial, sans-serif; font-size:45px; line-height:55px; font-weight:bold; text-transform:uppercase; text-align:center;">
 													ĐƠN HÀNG MỚI
 												</td>
 											</tr>
