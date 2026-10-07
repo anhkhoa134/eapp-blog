@@ -538,7 +538,7 @@ EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 
 
 # Cấu hình Celery
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='redis://localhost:6379/0')  # no worker runs; no .delay() in code
 CELERY_RESULT_BACKEND = 'django-db'  # Hoặc bạn có thể sử dụng 'redis://localhost:6379/0' nếu bạn muốn lưu kết quả vào Redis
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
