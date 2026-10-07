@@ -73,7 +73,7 @@ INSTALLED_APPS = [
     'App_Post',
     'App_Quanly',
 
-    'templated_email',
+    'Project.third_party_apps.TemplatedEmailConfig',  # AutoField = vendor migration 0001
     'django_ckeditor_5',
     'corsheaders',
     'autoslug',
@@ -83,6 +83,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'Project.health.HealthCheckMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
