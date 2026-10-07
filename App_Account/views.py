@@ -83,6 +83,8 @@ def toanbo_so(password1):
     return True                # ngược lại, nếu ko có False, từ trở về True => toàn bộ là số
 
 def check_old_password(request):
+    if not request.user.is_authenticated:  # anonymous GET used to raise NotImplementedError → 500
+        return HttpResponse("")
     old_password = request.POST.get('old_password')
     if not request.user.check_password(old_password):
         return HttpResponse("<div style='color: red;'>Mật khẩu cũ không chính xác.</div>")
