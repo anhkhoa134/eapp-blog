@@ -95,3 +95,9 @@ node_modules/
 npm-debug.log
 yarn-debug.log
 yarn-error.log
+
+# Junk & secrets (common rules for all sites)
+*.sqlite3-wal
+*.sqlite3-shm
+*@gmail.com
+*service-account*.json
