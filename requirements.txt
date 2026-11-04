@@ -3,11 +3,6 @@ Django==5.2.18
 psycopg2-binary==2.9.9
 django-environ==0.14.0
 django-jazzmin==3.0.5
-celery==5.6.3
-kombu==5.6.2
-redis==5.0.8
-django-celery-beat==2.9.0
-django-celery-results==2.6.0
 django-templated-email==3.0.1
 django-render-block==0.11
 django-ckeditor-5==0.2.20
