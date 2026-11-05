@@ -1,4 +1,5 @@
-from celery import shared_task
+# Not scheduled anywhere: this site runs no Celery worker or beat, so these functions never ran
+# in production. Wire them to cron or a management command if they are needed.
 from django.contrib.auth import get_user_model
 from django.utils.timezone import now
 from templated_email import send_templated_mail
@@ -6,7 +7,6 @@ from templated_email import send_templated_mail
 from .models import Profile
 
 
-@shared_task
 def send_birthday_emails():
     today = now().date()
     profiles = Profile.objects.filter(
