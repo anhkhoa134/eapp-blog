@@ -2,7 +2,7 @@
 Django==5.2.18
 psycopg2-binary==2.9.9
 django-environ==0.14.0
-django-jazzmin==3.0.2
+django-jazzmin==3.0.1
 django-templated-email==3.0.1
 django-render-block==0.11
 django-ckeditor-5==0.2.20
